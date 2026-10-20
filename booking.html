@@ -16,23 +16,28 @@
     <img class="photo" src="assets/photo/banner.webp" alt="">
     <div class="wrap"><a class="logo-panel" href="index.html" aria-label="光瀨都市鉄道 首頁"><img src="assets/img/logo-dark-960.png" alt="光瀨都市鉄道" width="300" height="78"></a></div>
   </div>
-  <nav class="gnav" aria-label="主要選單"><ul><li><a href="timetable.html">時刻表與班次/票價查詢<span class="en">Timetable / Fares</span></a></li><li><a href="booking.html" aria-current="page">線上訂票<span class="soon">準備中</span><span class="en">Online Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li><a href="airport.html">機場聯外交通<span class="soon">準備中</span><span class="en">Airport Access</span></a></li><li class="admin"><a id="adminlink" href="http://127.0.0.1:8888/hikarise/app/" target="_blank" rel="noopener">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav>
+  <nav class="gnav" aria-label="主要選單"><ul><li><a href="timetable.html">時刻表與班次/票價查詢<span class="en">Timetable / Fares</span></a></li><li><a href="booking.html" aria-current="page">線上訂票<span class="en">Online Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li><a href="airport.html">機場聯外交通<span class="soon">準備中</span><span class="en">Airport Access</span></a></li><li class="admin"><a id="adminlink" href="atos.html">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav>
 </header>
 <main>
 <div class="wrap">
   <div class="crumb"><a href="index.html">首頁</a> ＞ 線上訂票</div>
-  <div class="soonbox"><h2>線上訂票</h2><p style="margin:0 0 4px;color:var(--muted);font-size:12px;letter-spacing:.1em">ONLINE BOOKING</p><p>線上訂票系統準備中，敬請期待。</p><p><a class="btn" href="index.html">回到首頁</a></p></div>
+  <div class="pagehead"><h1>線上訂票</h1><p>Online Booking　特急・特快為全車指定席</p></div>
+  <div id="app"></div>
 </div>
 </main>
 <footer>
   <div class="wrap">
     <img src="assets/img/mark-dark.png" alt="">
-    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票（準備中）</a><a href="airport.html">機場聯外交通（準備中）</a></div>
+    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="airport.html">機場聯外交通（準備中）</a></div>
     <div class="copy">© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。</div>
   </div>
 </footer>
 <script src="assets/js/site-config.js"></script>
-<script>try{var a=document.getElementById('adminlink');if(a&&window.HK_CONFIG&&HK_CONFIG.atosUrl)a.href=HK_CONFIG.atosUrl;}catch(e){}</script>
-
+<script src="assets/js/atos-model.js"></script>
+<script src="assets/js/hk-core.js"></script>
+<script src="assets/js/hk-map.js"></script>
+<script src="assets/js/hk-ui.js"></script>
+<script src="assets/js/booking.js"></script>
+<script src="assets/js/site.js"></script>
 </body>
 </html>
