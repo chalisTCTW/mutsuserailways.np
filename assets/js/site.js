@@ -243,7 +243,9 @@
     let manual = false, picked = null;
     const reset = h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { manual = false; tick(); } }, '回到現在');
     const m = renderMap(box, H, L, { interactive: false });
-    const lg = h('div', { class: 'legend' }, h('span', null, h('i', { class: 'l' }), '特急類'), h('span', null, h('i', { class: 'e' }), '急行・快速類'), h('span', null, h('i'), '各站停車'), h('span', null, '位置依時刻表推算，並非實際車輛位置。'));
+    const seenR = new Set(), routeLeg = [];
+    H.svcs.forEach(sv => { const k = sv.routeName; if (seenR.has(k)) return; seenR.add(k); routeLeg.push(h('span', null, h('i', { class: 'rc', style: `background:${sv.color}` }), k)); });
+    const lg = h('div', { class: 'legend' }, ...routeLeg, h('span', null, '列車の色は各路線のイメージカラーです。位置依時刻表推算，並非實際車輛位置。'));
     box.append(lg);
     const list = h('ul');
     side.append(h('h3', null, '運行中的列車'), list);

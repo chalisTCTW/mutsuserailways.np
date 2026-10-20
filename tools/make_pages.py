@@ -63,10 +63,10 @@ def write(name, page, title, body, scripts=True, desc=''):
 
 # ── 首頁 ──
 slides = [
-  dict(img='assets/photo/ad1.webp', tag='新型列車', h='新2100形　登場', p='2026年10月起投入營運，最高速度 160 公里／小時。連絡機場、通勤名島、勝守、平倉的新選擇！', href='index.html#n1', alt='新2100形'),
-  dict(img='assets/photo/ad2.webp', tag='空港LINER', h='空港LINER　增班', p='松澤國際機場～光瀨市區，一車直達，最快只要 11 分鐘！', href='index.html#n2', alt='松澤國際機場'),
-  dict(img='assets/photo/ad3.webp', tag='再會，與感謝', h='10000系　退役倒數', p='服務 26 年的 10000系，將於 2026 年底退役。', href='index.html#n3', alt='10000系'),
-  dict(img=None, tag='時刻表・票價', h='時刻表與票價改訂', p='尖峰時段班次更密集，服務更方便！', href='timetable.html', alt=''),
+  dict(img='assets/photo/ad1.webp', tag='新型列車', h='新2100形　營運開始', p='2026年10月起投入營運，最高時速 160 公里。連結機場，也行駛名島、勝守、平倉方向，通勤與出遊都更從容。', href='index.html#n1', alt='新2100形'),
+  dict(img='assets/photo/ad2.webp', tag='空港LINER', h='空港LINER　增班', p='松澤國際機場與光瀨市區之間，一車直達，最快 11 分鐘。', href='index.html#n2', alt='松澤國際機場'),
+  dict(img='assets/photo/ad3.webp', tag='感謝與道別', h='10000系　即將退役', p='陪伴大家 26 年的 10000系，預定於 2026 年底退役。歡迎把握最後的乘車機會。', href='index.html#n3', alt='10000系'),
+  dict(img=None, tag='時刻表・票價', h='時刻表・票價改訂', p='尖峰時段增加班次，等車時間更短。', href='timetable.html', alt=''),
 ]
 sl = []
 for i, d in enumerate(slides):

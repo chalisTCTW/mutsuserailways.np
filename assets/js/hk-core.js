@@ -40,6 +40,10 @@
   }
 
   /* ───────── 建立索引 ───────── */
+  /** MTR 的路線顏色（整數 RGB）→ #rrggbb；沒有就用預設的灰綠。 */
+  function hexColor(v) { const n = Number(v); if (!isFinite(n) || n < 0) return '#5d7d70'; return '#' + (n & 0xFFFFFF).toString(16).padStart(6, '0'); }
+  /** 在這個底色上要用黑字還是白字（WCAG 相對亮度）。 */
+  function inkOn(hex) { const r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255; const f = x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); const L = 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); return L > 0.42 ? '#12231c' : '#ffffff'; }
   function build(snapshot) {
     const A = root.ATOS;
     if (!A || !A.buildNetwork) throw new Error('model.js 尚未載入');
@@ -67,7 +71,8 @@
       const route = routesByKey[s.route], member = net.members[s.member];
       if (!route || !member || route.status === 'maintenance') return;
       const nm = parseRouteName(route.displayZh);
-      svcs.push({ idx, stops: s.stops, depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: typeClass(nm.type), routeName: route.displayZh });
+      const col = hexColor(member.color != null ? member.color : route.color);
+      svcs.push({ idx, stops: s.stops, depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col) });
     });
     H.svcs = svcs;
 

@@ -46,12 +46,12 @@
     return _p;
   }
   function computeLayout(H) {
-    const ov = {}; const c = H.layoutCache;
-    // 快取只在「車站名稱完全一致」時使用；路網改了（增減車站）就整個作廢、重新排版，避免舊座標卡住新路網
-    const same = c && c.stations && H.stations.every(st => c.stations[st.zh]) && Object.keys(c.stations).every(k => H.stations.some(st => st.zh === k));
-    if (same) for (const k in c.stations) ov[k] = c.stations[k];
-    const fullyCached = !!same;
-    return root.HK.map.layout(H, { override: ov, tries: fullyCached ? 1 : 8, stopAtZero: true });
+    const c = H.layoutCache, names = H.stations.map(st => st.zh).sort();
+    // 預算參數（recipe）只在「車站名單完全一致」時使用；路網改了（增減車站）就整個作廢、重新試算，避免舊資料卡住新路網
+    const same = c && c.version === 2 && c.recipe && Array.isArray(c.stationNames) && c.stationNames.length === names.length && c.stationNames.every((n, i) => n === names[i]);
+    const ov = (c && c.override) || {};
+    if (same) { try { return root.HK.map.layout(H, { override: ov, recipe: c.recipe }); } catch (e) { /* 退回試算 */ } }
+    return root.HK.map.layout(H, { override: ov, tries: 16, stopAtZero: true });
   }
 
   /* ───────── 路線圖 ───────── */
@@ -169,7 +169,7 @@
           if (!pts) return;
           const [x, y] = root.HK.map.pointAt(pts, tr.frac);
           const g = s('g', { class: 'tr ' + tr.sv.tcls, transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})`, tabindex: '0', role: 'button', 'aria-label': `${tr.sv.routeName} ${H.destOf(tr.sv, tr.i)}行き` });
-          g.append(s('rect', { x: -9, y: -6, width: 18, height: 12, rx: 2, class: 'tr-body' }), s('rect', { x: -14, y: -14, width: 28, height: 28, class: 'tr-hit', fill: 'transparent' }));
+          g.append(s('rect', { x: -9, y: -6, width: 18, height: 12, rx: 2, class: 'tr-body', style: tr.sv.color ? `fill:${tr.sv.color}` : null }), s('rect', { x: -14, y: -14, width: 28, height: 28, class: 'tr-hit', fill: 'transparent' }));
           if (onClick) { g.addEventListener('click', () => onClick(tr)); g.addEventListener('keydown', e => { if (e.key === 'Enter') onClick(tr); }); }
           gTr.append(g);
         });
@@ -179,7 +179,7 @@
   }
 
   /** 種別標籤（白綠配色：特急類＝綠底白字、急行／快速類＝綠框、各停＝灰框）。 */
-  function typeTag(sv) { return sv.type ? h('span', { class: 'ttag t-' + sv.tcls }, sv.type) : h('span', { class: 'ttag t-loc' }, '各停'); }
+  function typeTag(sv) { const st = sv.color ? `background:${sv.color};border-color:${sv.color};color:${sv.ink}` : null; return sv.type ? h('span', { class: 'ttag t-' + sv.tcls, style: st }, sv.type) : h('span', { class: 'ttag t-loc', style: st }, '各停'); }
   /** 以最簡短的字呈現種別（時刻表格子用）。 */
   function typeMark(sv) { return sv.tcls === 'ltd' ? '特' : sv.tcls === 'exp' ? '快' : ''; }
 
