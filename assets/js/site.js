@@ -173,7 +173,7 @@
       out.append(h('h2', { class: 'h2' }, `${H.stName(fSel.value)} → ${H.stName(tSel.value)}`, h('small', null, `${hm(t0)} 之後的班次`)));
       if (!res.length) { out.append(h('p', { class: 'lead' }, '在這個時間之後沒有找到可乘坐的班次。可以改個時刻再查查看。')); return; }
       res.forEach((j, n) => out.append(journeyCard(H, j, fare, n === 0)));
-      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ' + Math.round(H.minTransfer / 60 * 10) / 10 + ' 分鐘計算。票價依最短距離的路徑計算，與搭乘的班次無關。'));
+      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ' + Math.round(H.minTransfer / 60 * 10) / 10 + ' 分鐘計算。票價依經過的收費區計算，與搭乘的班次無關；特急・特快另加指定席費用。'));
       try { history.replaceState(null, '', `?tab=route&from=${fSel.value}&to=${tSel.value}&t=${tIn.value}`); } catch (e) { }
     }
     if (q.get('from')) go();
@@ -205,9 +205,10 @@
     const form = h('form', { class: 'finder', onsubmit: e => { e.preventDefault(); go(); } }, h('div', { style: 'display:grid;grid-template-columns:1fr 1fr auto;gap:10px 12px;align-items:end;padding:14px 16px' }, field('出發站', fSel), field('抵達站', tSel), h('button', { class: 'btn', type: 'submit' }, '計算票價')));
     const C = H.cfg;
     const rule = h('div', { class: 'sec' }, h('h2', null, '票價制度'), h('table', { class: 'tbl' }, h('tbody', null,
-      h('tr', null, h('th', { style: 'width:30%' }, '起步票價'), h('td', null, `${yen(C.fareBase)}（含同一分區內）`)),
-      h('tr', null, h('th', null, '加算'), h('td', null, `每跨越一個分區加 ${yen(C.fareStep)}`)),
-      h('tr', null, h('th', null, '路徑的取法'), h('td', null, '環狀線或有多條路徑可以抵達時，依「最短距離」的路徑所經過的分區計算。')))));
+      h('tr', null, h('th', { style: 'width:30%' }, '基本運費'), h('td', null, `${yen(C.fareBase)}（含同一收費區內）`)),
+      h('tr', null, h('th', null, '區間加算'), h('td', null, `每跨越一個收費區加 ${yen(C.fareStep)}（依實際經過的路徑計算跨越次數，而非區號差）`)),
+      h('tr', null, h('th', null, '指定席費用'), h('td', null, `${yen(C.seatFee)}（特急、特快為全車指定席；其他種別不需要）`)),
+      h('tr', null, h('th', null, '路徑的取法'), h('td', null, '有多條路徑時，取跨越收費區最少、其次距離最短的路徑。')))));
     root.append(h('div', { style: 'margin-top:16px' }, form), out, rule);
     function go() {
       out.replaceChildren();
@@ -215,7 +216,12 @@
       const f = H.fare(fSel.value, tSel.value);
       if (!f) { out.append(h('p', { class: 'lead' }, '這兩站之間查不到路徑。')); return; }
       out.append(h('div', { class: 'fare-box' }, h('div', { style: 'padding:14px 16px;display:flex;flex-wrap:wrap;gap:6px 24px;align-items:baseline' }, h('span', { style: 'font-weight:700' }, `${H.stName(fSel.value)} → ${H.stName(tSel.value)}`), h('span', { class: 'big' }, yen(f.yen)), h('span', { style: 'color:var(--muted);font-size:13px' }, `跨越分區 ${f.zones}　經過 ${f.path.length - 1} 區間　約 ${f.km.toFixed(1)} km`)),
-        h('div', { class: 'rule' }, '計算所用的最短路徑：' + f.path.map(id => H.stName(id)).join(' → '))));
+        h('table', { class: 'tbl', style: 'margin:0 16px 10px;width:calc(100% - 32px)' }, h('tbody', null,
+          h('tr', null, h('th', null, '基本運費'), h('td', { style: 'text-align:right' }, yen(f.base))),
+          h('tr', null, h('th', null, `跨越收費區 ${f.crossed} 個 × ${yen(f.step)}`), h('td', { style: 'text-align:right' }, yen(f.zoneFee))),
+          h('tr', null, h('th', null, '乘車券合計'), h('td', { style: 'text-align:right;font-weight:700' }, yen(f.yen))),
+          h('tr', null, h('th', null, '搭乘特急・特快時另加指定席費用'), h('td', { style: 'text-align:right' }, '+' + yen(f.seat || H.cfg.seatFee) + '（合計 ' + yen(f.yen + H.cfg.seatFee) + '）')))),
+        h('div', { class: 'rule' }, '計算所用的路徑：' + f.path.map(id => H.stName(id)).join(' → ') + (H.zonesConfigured ? '' : '　※ 收費區資料尚未設定，目前以未跨越任何區間計算。'))));
     }
     go();
   }
@@ -255,10 +261,22 @@
     slider.addEventListener('input', () => { manual = true; tick(Number(slider.value)); });
 
     function describe(tr) {
-      const st = tr.sv.stops, i = tr.i, next = st[i + 1], dest = H.destOf(tr.sv, i);
-      return h('div', null, h('div', null, typeTag(tr.sv), h('strong', { style: 'margin-left:8px' }, tr.sv.routeName), h('span', { style: 'margin-left:8px' }, `${dest}行`)),
-        h('div', { style: 'margin-top:6px;font-size:13px' }, tr.dwelling ? `${H.stName(tr.from)} 停車中（${hm(tr.dep)} 發車）` : `${H.stName(tr.from)} → ${H.stName(tr.to)} 運行中`),
-        next ? h('div', { style: 'font-size:13px;color:var(--muted)' }, `下一站 ${H.stName(next.station)}　${hm(tr.tr.base + next.arr)} 到站`) : null);
+      const sv = tr.sv, st = sv.stops, i = tr.i, dest = H.destOf(sv, i), cars = H.carsOf(sv), ri = H.reserveInfo(sv), base = tr.tr.base;
+      const carBar = h('span', { class: 'carbar', title: cars + '両編成' }, ...Array.from({ length: cars }, (_, k) => h('i', { style: `background:${sv.color}` }, String(k + 1))));
+      const rows = [];
+      st.forEach((s, k) => {
+        if (s.pax === false) return;
+        const past = k < i || (k === i && !tr.dwelling && false), here = k === i && tr.dwelling, nextS = k === i + 1;
+        const first = k === 0, last = k === st.length - 1;
+        rows.push(h('tr', { class: (k < i ? 'past ' : '') + (here ? 'here ' : '') + (nextS ? 'next' : '') },
+          h('td', { class: 'mk' }, here ? '●' : nextS ? '▶' : ''), h('td', null, H.stName(s.station), s.platformName ? h('small', null, ` ${s.platformName}番線`) : null),
+          h('td', { class: 'tm' }, first ? '' : hm(base + s.arr)), h('td', { class: 'tm' }, last ? '' : hm(base + s.dep))));
+      });
+      return h('div', { class: 'tinfo' },
+        h('div', { class: 'ti-head' }, typeTag(sv), h('strong', null, sv.routeName), h('span', { class: 'ti-dest' }, `${dest}行`)),
+        h('div', { class: 'ti-cars' }, carBar, h('span', null, `${cars} 両編成`), ri ? h('span', { class: 'resv' }, '全車指定席') : null),
+        h('div', { class: 'ti-state' }, tr.dwelling ? `${H.stName(tr.from)} 停車中（${hm(tr.dep)} 發車）` : `${H.stName(tr.from)} → ${H.stName(tr.to)} 運行中`),
+        h('table', { class: 'ti-stops' }, h('thead', null, h('tr', null, h('th'), h('th', null, '停靠站'), h('th', null, '到'), h('th', null, '發'))), h('tbody', null, rows)));
     }
     function tick(forced) {
       const t = forced != null ? forced : H.nowSec();
@@ -283,6 +301,7 @@
       if (page === 'home') await home(H);
       else if (page === 'timetable') timetable(H);
       else if (page === 'live') live(H);
+      else if (page === 'booking') HK.booking(H, app);
     } catch (e) {
       console.error(e);
       const t = h('div', { class: 'wrap' }, h('div', { class: 'soonbox' }, h('h2', null, '資料暫時無法顯示'), h('p', null, '載入時刻表資料時發生問題，請稍後再試。')));

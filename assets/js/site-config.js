@@ -2,6 +2,10 @@
 window.HK_CONFIG = {
   // 「企業管理登入」要開啟的 ATOS 網址。ATOS 在遊戲所在的電腦上執行；預設只有那台電腦（或同一區域網路）打得開。
   atosUrl: 'http://127.0.0.1:8888/hikarise/app/',
+  // ATOS 運作狀態（「企業管理登入」頁）：ATOS（遊戲內）定期把狀態寫到這個倉庫的獨立分支，本站讀它判斷是否上線。
+  atosStatus: { repo: 'chalisTCTW/mutsuserailways.np', branch: 'atos-status', path: 'status.json', onlineWithinSec: 180, pollSec: 60 },
+  // 一直可用的既有連結（例：Tailscale）。偵測不到位址、或關閉了位址回報（heartbeat.ips=off）時，網頁仍會顯示這個按鈕。
+  atosFixedUrls: [{ label: 'Tailscale（外出也能用）', url: 'http://100.98.63.88:8888/hikarise/app/', kind: 'phone' }],
   // 網站顯示用的時區（秒）。台灣＝8*3600、日本＝9*3600。
   tzOffsetSec: 8 * 3600,
   // 票價：起步票價與每跨一個分區的加算（円）

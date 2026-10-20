@@ -10,6 +10,9 @@
     tzOffsetSec: 8 * 3600,         // 網站顯示用的時區（遊戲存檔記的是 UTC 的一天中時刻）
     fareBase: 290,                 // 起步票價（円）
     fareStep: 200,                 // 每跨一個分區加算（円）
+    seatFee: 500,                  // 指定席費用（円）
+    seatsPerCar: 40,               // 2100 形每節座位數（2+2）
+    reserved: [{ re: '特急', cars: 8 }, { re: '特別快速|特快', cars: 6 }],   // 全車指定席的種別與編組節數
     minTransferSec: 120,           // 轉乘最短時間（快照有值時以快照為準）
     zoneOverride: {},              // { "車站中文名": 分區編號 }：遊戲內沒設分區時，可在這裡補
   }, root.HK_CONFIG || {});
@@ -224,22 +227,66 @@
     };
 
     /* ── 票價 ──
-     * 起步 fareBase 円；沿最短路徑每跨一個分區加 fareStep 円。
-     * 一個車站最多屬於三個分區（邊界站）；相鄰兩站的跨區數取兩站分區集合中最接近的一組差值。
-     * 沒有設定分區（0）的車站不提供資訊，直接略過。 */
-    H.fare = function (fromId, toId) {
-      const path = H.shortestPath(fromId, toId);
-      if (!path) return null;
-      let crossed = 0, km = 0, prevZ = null;
-      for (let i = 0; i < path.length; i++) {
-        const z = H.stById[path[i]].zones;
-        if (i > 0) { const a = H.stById[path[i - 1]], b = H.stById[path[i]]; km += Math.hypot(a.x - b.x, a.z - b.z); }
-        if (!z.length) continue;
-        if (prevZ) { let best = Infinity; for (const p of prevZ) for (const q of z) best = Math.min(best, Math.abs(p - q)); crossed += best; }
-        prevZ = z;
+     * 票價＝基本運費 fareBase ＋ fareStep × 路徑跨越的收費區數（＋指定席費用，另計）。
+     * 收費區在 MTR 裡只是編號，編號大小與相鄰與否無關，所以只看「沿路徑車站依序所屬的收費區」：
+     * 前後兩站沒有共同的收費區＝跨過一個區界（一個車站可屬於最多三區，位於區界上）。
+     * 路徑：在實體鄰接圖上取「跨區數最少、其次距離最短」的路徑。沒有設定收費區（0）的車站略過不影響。 */
+    H.zoneSet = id => (H.stById[id] && H.stById[id].zones) || [];
+    /** 兩個相鄰車站之間是否跨區（0／1）：沒有共同收費區才算跨區；任一站沒設定收費區就不算。 */
+    const zoneStep = (a, b) => { const za = H.zoneSet(a), zb = H.zoneSet(b); if (!za.length || !zb.length) return 0; return za.some(z => zb.includes(z)) ? 0 : 1; };
+    H.farePath = function (fromId, toId) {
+      if (fromId === toId) return { path: [fromId], crossed: 0, km: 0, bounds: [] };
+      // Dijkstra：成本＝(跨區數×1e7 ＋ 距離)；跨區用「目前所在收費區集合」追蹤，避免邊界站造成重複計算
+      const key = (id, cur) => id + '#' + cur.join(',');
+      const startCur = H.zoneSet(fromId).slice();
+      const best = new Map([[key(fromId, startCur), { c: 0, cross: 0, prev: null, id: fromId, cur: startCur }]]);
+      const q = [best.get(key(fromId, startCur))]; let goal = null;
+      const done = new Set();
+      while (q.length) {
+        q.sort((x, y) => x.c - y.c);
+        const u = q.shift(), ku = key(u.id, u.cur); if (done.has(ku)) continue; done.add(ku);
+        if (u.id === toId) { goal = u; break; }
+        for (const { to, len } of H.adj.get(u.id) || []) {
+          const zt = H.zoneSet(to); let cur2, add = 0;
+          if (!zt.length) cur2 = u.cur;
+          else if (!u.cur.length) cur2 = zt.slice();
+          else { const inter = u.cur.filter(z => zt.includes(z)); if (inter.length) cur2 = inter; else { cur2 = zt.slice(); add = 1; } }
+          const nd = { c: u.c + add * 1e7 + len, cross: u.cross + add, prev: u, id: to, cur: cur2, step: add };
+          const kn = key(to, cur2), old = best.get(kn);
+          if (!old || nd.c < old.c) { best.set(kn, nd); q.push(nd); }
+        }
       }
-      const yen = fromId === toId ? 0 : CFG.fareBase + CFG.fareStep * crossed;
-      return { yen, zones: crossed, path, km: km / 1000 };
+      if (!goal) return null;
+      const path = [], bounds = []; let n = goal;
+      while (n) { path.unshift(n.id); n = n.prev; }
+      // 跨區的位置：沿路徑重算一次（給明細用）
+      let cur = H.zoneSet(path[0]).slice(), km = 0;
+      for (let i = 1; i < path.length; i++) {
+        const A = H.stById[path[i - 1]], Bq = H.stById[path[i]]; km += Math.hypot(A.x - Bq.x, A.z - Bq.z);
+        const zt = H.zoneSet(path[i]); if (!zt.length) continue;
+        if (!cur.length) { cur = zt.slice(); continue; }
+        const inter = cur.filter(z => zt.includes(z)); if (inter.length) cur = inter; else { bounds.push({ from: path[i - 1], to: path[i], fromZone: cur.slice(), toZone: zt.slice() }); cur = zt.slice(); }
+      }
+      return { path, crossed: goal.cross, km: km / 1000, bounds };
+    };
+    /** 票價明細：{ base, step, crossed, zoneFee, seat, total, path, bounds, km } */
+    H.fare = function (fromId, toId, opt) {
+      const r = H.farePath(fromId, toId); if (!r) return null;
+      const seat = opt && opt.seat ? CFG.seatFee : 0, base = fromId === toId ? 0 : CFG.fareBase, zoneFee = fromId === toId ? 0 : CFG.fareStep * r.crossed;
+      const total = base + zoneFee + seat;
+      return { yen: base + zoneFee, base, step: CFG.fareStep, crossed: r.crossed, zones: r.crossed, zoneFee, seat, total, path: r.path, bounds: r.bounds, km: r.km };
+    };
+    /** 這個班次（服務）是否全車指定席；回傳 { cars, seats, fee } 或 null。 */
+    H.reserveInfo = function (sv) {
+      for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) return { cars: r.cars, seats: r.cars * CFG.seatsPerCar, fee: CFG.seatFee, perCar: CFG.seatsPerCar };
+      return null;
+    };
+    /** 編組節數（顯示用）：指定席種別依規定；其他用車庫內有出庫路徑的側線的編組。 */
+    H.carsOf = function (sv) {
+      const ri = H.reserveInfo(sv); if (ri) return ri.cars;
+      const sd = ((sv.depot && sv.depot.sidings) || []).filter(x => x.cars > 0 && x.path !== false).map(x => x.cars);
+      if (sd.length) { const c = new Map(); sd.forEach(n => c.set(n, (c.get(n) || 0) + 1)); return [...c.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0][0]; }
+      return 8;
     };
     H.zonesConfigured = stations.some(s => s.zones.length);
 

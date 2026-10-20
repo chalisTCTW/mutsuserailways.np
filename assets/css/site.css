@@ -267,3 +267,70 @@ footer .copy { width: 100%; font-size: 12px; opacity: .85; border-top: 1px solid
   .mapbox .rmap { min-width: 760px; max-height: none; }
   .mapbox .legend { position: sticky; left: 0; }
 }
+
+/* ── 線上訂票 ── */
+.bk-form { display: grid; grid-template-columns: 1fr 1fr 150px 120px 90px auto; gap: 10px 12px; align-items: end; padding: 14px 16px; }
+.bk-list { list-style: none; margin: 8px 0 0; padding: 0; border: 1px solid var(--line); }
+.bk-list li + li { border-top: 1px dotted #9fb0a9; }
+.bk-trip { display: grid; grid-template-columns: 140px auto 1fr auto auto auto; gap: 8px 12px; align-items: center; width: 100%; background: #fff; border: 0; padding: 10px 12px; text-align: left; cursor: pointer; font-size: 14px; border-radius: 0; }
+.bk-trip:hover:not(:disabled) { background: var(--g3); }
+.bk-trip:disabled { opacity: .5; cursor: not-allowed; }
+.bk-trip .tm { font-weight: 700; font-variant-numeric: tabular-nums; }
+.bk-trip .cars, .bk-trip .fr { font-size: 12px; color: var(--muted); }
+.bk-trip .fr.few { color: #b3261e; font-weight: 700; }
+.bk-trip .yen { font-weight: 700; color: var(--g0); }
+.bk-cars { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.bk-ct { border: 1px solid var(--g1); background: #fff; color: var(--g0); padding: 4px 10px; cursor: pointer; border-radius: 0; font-size: 13px; }
+.bk-ct small { display: block; font-size: 11px; color: var(--muted); }
+.bk-ct[aria-pressed="true"] { background: var(--g1); color: #fff; } .bk-ct[aria-pressed="true"] small { color: #fff; }
+.bk-grid { display: inline-block; padding: 12px 16px; border: 2px solid var(--g1); border-radius: 18px 18px 6px 6px; background: var(--g4); }
+.bk-head, .bk-row { display: grid; grid-template-columns: 38px 38px 28px 38px 38px; gap: 6px; align-items: center; margin-bottom: 6px; text-align: center; }
+.bk-head b { font-size: 12px; color: var(--muted); } .bk-row .aisle { font-size: 11px; color: var(--muted); }
+.seat { width: 38px; height: 34px; border: 1px solid var(--g1); border-radius: 6px 6px 3px 3px; background: #fff; color: var(--g0); cursor: pointer; font-size: 12px; padding: 0; }
+.seat.sel { background: var(--g1); color: #fff; }
+.seat.taken { background: #d6dbd9; border-color: #b4bbb8; color: #8a9390; cursor: not-allowed; }
+.bk-info { margin-top: 10px; font-size: 14px; }
+.bk-legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+.bk-legend .st { display: inline-block; width: 14px; height: 12px; margin-right: 5px; border: 1px solid var(--g1); vertical-align: -1px; }
+.bk-legend .st.sel { background: var(--g1); } .bk-legend .st.taken { background: #d6dbd9; border-color: #b4bbb8; } .bk-legend .st.free { background: #fff; }
+.tk { max-width: 560px; border: 2px solid var(--g1); background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+.tk > header { display: flex; align-items: center; gap: 10px; background: var(--g1); color: #fff; padding: 8px 14px; font-size: 13px; }
+.tk > header span { margin-left: auto; font-size: 11px; opacity: .9; }
+.tk-main { display: flex; align-items: center; justify-content: space-around; padding: 18px 10px 8px; }
+.tk-st { text-align: center; } .tk-st small { display: block; font-size: 10px; color: var(--muted); letter-spacing: .1em; } .tk-st strong { font-size: 24px; } .tk-st em { display: block; font-style: normal; color: var(--g0); }
+.tk-arrow { font-size: 26px; color: var(--g1); }
+.tk-dl { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin: 8px 16px; font-size: 14px; }
+.tk-dl dt { font-size: 11px; color: var(--muted); } .tk-dl dd { margin: 0; font-weight: 700; }
+.tk-fare { margin: 6px 16px 10px; width: calc(100% - 32px); } .tk-fare .tot th, .tk-fare .tot td { font-weight: 700; background: var(--g3); }
+.tk > footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 16px; border-top: 2px dashed var(--g1); font-size: 12px; color: var(--muted); }
+.tk-bar { display: flex; gap: 2px; align-items: stretch; height: 28px; } .tk-bar i { background: #222; display: block; }
+@media print { header, footer, .util, .crumb, .pagehead, .finder, .bk-list, .bk-cars, .noprint, .bk-legend { display: none !important; } .tk { box-shadow: none; } }
+@media (max-width: 760px) { .bk-form { grid-template-columns: 1fr 1fr; } .bk-trip { grid-template-columns: 1fr auto; } }
+
+/* ── 列車資訊（即時列車動態） ── */
+.tinfo .ti-head { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.tinfo .ti-dest { color: var(--g0); font-weight: 700; }
+.ti-cars { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 4px; font-size: 13px; }
+.carbar { display: inline-flex; gap: 2px; } .carbar i { width: 18px; height: 14px; font-style: normal; font-size: 9px; line-height: 14px; text-align: center; color: #fff; border-radius: 2px; }
+.resv { background: #b3261e; color: #fff; padding: 1px 6px; font-size: 12px; border-radius: 2px; }
+.ti-state { margin: 4px 0 8px; font-size: 13px; color: var(--muted); }
+.ti-stops { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ti-stops th { text-align: left; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); padding: 2px 4px; }
+.ti-stops td { padding: 3px 4px; border-bottom: 1px dotted #c8d2ce; } .ti-stops td.tm { font-variant-numeric: tabular-nums; width: 50px; } .ti-stops td.mk { width: 16px; color: var(--g1); }
+.ti-stops tr.past td { color: #98a39f; } .ti-stops tr.here td, .ti-stops tr.next td { font-weight: 700; background: var(--g4); }
+.ti-stops small { color: var(--muted); font-weight: 400; }
+
+/* ── 企業管理登入（ATOS 狀態） ── */
+.as-head { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); border-left: 8px solid #9aa5a1; background: #fff; margin-top: 16px; }
+.as-head > div { flex: 1; } .as-head strong { display: block; font-size: 24px; } .as-head small { color: var(--muted); font-size: 13px; }
+.as-head .dot { width: 16px; height: 16px; border-radius: 50%; background: #9aa5a1; flex: none; }
+.as-head.on { border-left-color: var(--g1); background: var(--g4); } .as-head.on .dot { background: #1fa45a; box-shadow: 0 0 0 5px rgba(31,164,90,.2); animation: asp 2s infinite; }
+@keyframes asp { 50% { box-shadow: 0 0 0 9px rgba(31,164,90,0); } } @media (prefers-reduced-motion: reduce) { .as-head.on .dot { animation: none; } }
+.as-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+.as-card { border: 1px solid var(--line); background: #fff; padding: 14px 16px; } .as-card h2 { margin: 0 0 4px; font-size: 18px; border: 0; padding: 0; }
+.as-card .desc { margin: 0 0 12px; color: var(--muted); font-size: 13px; } .as-card.dis { opacity: .6; }
+.as-go { display: inline-block; height: auto; line-height: 1.4; padding: 8px 16px; text-align: left; } .as-go small { display: block; font-weight: 400; font-size: 11px; opacity: .9; }
+.as-go.disabled { background: #9aa5a1; border-color: #9aa5a1; pointer-events: none; }
+.as-qr { display: flex; gap: 14px; align-items: flex-start; } .as-qr svg { border: 1px solid var(--line); flex: none; }
+.as-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.as-note { margin: 18px 0 30px; font-size: 13px; color: var(--muted); } .as-note p { margin: 4px 0; }

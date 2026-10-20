@@ -45,13 +45,23 @@
     })();
     return _p;
   }
+  /** 路網指紋：車站名單＋連線（改了就代表版面要重算）。 */
+  function netKey(H) {
+    const nm = H.stations.map(st => st.zh + '@' + Math.round(st.x / 8) + ',' + Math.round(st.z / 8)).sort().join('|');
+    const ed = H.edges.map(e => (H.stName(e.a) < H.stName(e.b) ? H.stName(e.a) + '~' + H.stName(e.b) : H.stName(e.b) + '~' + H.stName(e.a))).sort().join('|');
+    let h = 5381; const str = nm + '#' + ed; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return 'v3:' + H.stations.length + ':' + H.edges.length + ':' + (h >>> 0).toString(36);
+  }
+  /** 版面：每次載入都依目前路網重算。順序：(1) 版面檔 data/layout.json 的 recipe 與目前路網指紋相同 → 直接重現（毫秒）；
+   *  (2) 瀏覽器快取（localStorage）有同一指紋的 recipe → 重現；(3) 即時搜尋（約 1～2 秒）並存入快取。路網一更新，指紋就變，一定重算。 */
   function computeLayout(H) {
-    const c = H.layoutCache, names = H.stations.map(st => st.zh).sort();
-    // 預算參數（recipe）只在「車站名單完全一致」時使用；路網改了（增減車站）就整個作廢、重新試算，避免舊資料卡住新路網
-    const same = c && c.version === 2 && c.recipe && Array.isArray(c.stationNames) && c.stationNames.length === names.length && c.stationNames.every((n, i) => n === names[i]);
-    const ov = (c && c.override) || {};
-    if (same) { try { return root.HK.map.layout(H, { override: ov, recipe: c.recipe }); } catch (e) { /* 退回試算 */ } }
-    return root.HK.map.layout(H, { override: ov, tries: 16, stopAtZero: true });
+    const key = netKey(H), c = H.layoutCache, ov = (c && c.override) || {};
+    const tryRecipe = r => { try { const L = root.HK.map.layout(H, { override: ov, recipe: r }); return L; } catch (e) { return null; } };
+    if (c && c.version === 3 && c.key === key && c.recipe) { const L = tryRecipe(c.recipe); if (L) return L; }
+    try { const raw = localStorage.getItem('hk-layout-' + key); if (raw) { const L = tryRecipe(JSON.parse(raw)); if (L) return L; } } catch (e) { /* 沒有快取就算了 */ }
+    const L = root.HK.map.layout(H, { override: ov, refineMs: 2500 });
+    try { localStorage.setItem('hk-layout-' + key, JSON.stringify(L.recipe)); } catch (e) { /* 無痕模式等，忽略 */ }
+    return L;
   }
 
   /* ───────── 路線圖 ───────── */
@@ -185,5 +195,5 @@
 
   const fmtDate = ms => { if (!ms) return ''; const d = new Date(Number(ms)); if (isNaN(d)) return ''; const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 
-  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, renderMap, typeTag, typeMark, fmtDate });
+  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, netKey, renderMap, typeTag, typeMark, fmtDate });
 })(window);

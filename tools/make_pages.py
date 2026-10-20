@@ -4,7 +4,7 @@ import os, html
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NAV = [
     ('timetable', 'timetable.html', '時刻表與班次/票價查詢', 'Timetable / Fares', False),
-    ('booking', 'booking.html', '線上訂票', 'Online Booking', True),
+    ('booking', 'booking.html', '線上訂票', 'Online Booking', False),
     ('live', 'live.html', '即時列車動態', 'Train Locator', False),
     ('airport', 'airport.html', '機場聯外交通', 'Airport Access', True),
 ]
@@ -14,7 +14,8 @@ def shell(page, title, body, extra_head='', desc=''):
         cur = ' aria-current="page"' if key == page else ''
         tag = '<span class="soon">準備中</span>' if soon else ''
         nav.append(f'<li><a href="{href}"{cur}>{label}{tag}<span class="en">{en}</span></a></li>')
-    nav.append('<li class="admin"><a id="adminlink" href="http://127.0.0.1:8888/hikarise/app/" target="_blank" rel="noopener">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li>')
+    acur = ' aria-current="page"' if page == 'atos' else ''
+    nav.append(f'<li class="admin"><a id="adminlink" href="atos.html"{acur}>企業管理登入<span class="en">Staff Login (ATOS)</span></a></li>')
     return f'''<!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -41,12 +42,11 @@ def shell(page, title, body, extra_head='', desc=''):
 <footer>
   <div class="wrap">
     <img src="assets/img/mark-dark.png" alt="">
-    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票（準備中）</a><a href="airport.html">機場聯外交通（準備中）</a></div>
+    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="airport.html">機場聯外交通（準備中）</a></div>
     <div class="copy">© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。</div>
   </div>
 </footer>
 <script src="assets/js/site-config.js"></script>
-<script>try{{var a=document.getElementById('adminlink');if(a&&window.HK_CONFIG&&HK_CONFIG.atosUrl)a.href=HK_CONFIG.atosUrl;}}catch(e){{}}</script>
 {{scripts}}
 </body>
 </html>
@@ -55,6 +55,7 @@ SCRIPTS = '''<script src="assets/js/atos-model.js"></script>
 <script src="assets/js/hk-core.js"></script>
 <script src="assets/js/hk-map.js"></script>
 <script src="assets/js/hk-ui.js"></script>
+<script src="assets/js/booking.js"></script>
 <script src="assets/js/site.js"></script>'''
 
 def write(name, page, title, body, scripts=True, desc=''):
@@ -104,11 +105,20 @@ write('live.html', 'live', '即時列車動態｜光瀨都市鉄道', '''<div cl
   <div id="app"></div>
 </div>''')
 
+write('atos.html', 'atos', '企業管理登入｜光瀨都市鉄道', '<div id="app"></div>', scripts=False)
+_p = os.path.join(ROOT, 'atos.html'); _t = open(_p, encoding='utf-8').read()
+_t = _t.replace('<script src="assets/js/site-config.js"></script>', '<script src="assets/js/site-config.js"></script>\n<script src="assets/js/hk-ui.js"></script>\n<script src="assets/js/qr.js"></script>\n<script src="assets/js/atos-status.js"></script>')
+open(_p, 'w', encoding='utf-8').write(_t)
+
 def soon(name, page, title, en, msg):
     write(name, page, title + '｜光瀨都市鉄道', f'''<div class="wrap">
   <div class="crumb"><a href="index.html">首頁</a> ＞ {title}</div>
   <div class="soonbox"><h2>{title}</h2><p style="margin:0 0 4px;color:var(--muted);font-size:12px;letter-spacing:.1em">{en}</p><p>{msg}</p><p><a class="btn" href="index.html">回到首頁</a></p></div>
 </div>''', scripts=False)
-soon('booking.html', 'booking', '線上訂票', 'ONLINE BOOKING', '線上訂票系統準備中，敬請期待。')
+write('booking.html', 'booking', '線上訂票｜光瀨都市鉄道', '''<div class="wrap">
+  <div class="crumb"><a href="index.html">首頁</a> ＞ 線上訂票</div>
+  <div class="pagehead"><h1>線上訂票</h1><p>Online Booking　特急・特快為全車指定席</p></div>
+  <div id="app"></div>
+</div>''', scripts=True)
 soon('airport.html', 'airport', '機場聯外交通', 'AIRPORT ACCESS', '機場聯外交通資訊準備中，敬請期待。')
 print('ok')
