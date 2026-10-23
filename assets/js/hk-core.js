@@ -53,11 +53,69 @@
     const dump = snapshot.data || snapshot.dump || snapshot;
     const net = A.buildNetwork(dump, {});
     if (snapshot.schedule && A.calibrate) A.calibrate(net, snapshot.schedule);
-    return index(net, dump);
+    return index(net, dump, snapshot.dispatch);
   }
 
-  function index(net, dump) {
+  /* ───────── 調度（離峰・深夜・收車）─────────
+   * ATOS 0.18.3：與 ATOS 網頁共用同一套判斷（atos-web/dispatchplan.js）。每一班依「它發車那一刻」的方案決定是否運行：
+   *  - 時段表啟用：該班發車時刻所在時段的方案（預設／離峰＝每 2 班 1 班／深夜＝每 3 班 1 班／收車＝不運行）。
+   *  - 目前方案（手動操作或時段套用）自 since 起到 until（下一個時段交界）為止有效；沒有時段表就持續到再次操作。
+   *  - 名次：該車庫全部發車時刻依當地時間排序，名次 % N == 0 才運行（與模組相同）；快照裡沒有的時刻一律運行。 */
+  const N = { default: 1, offpeak: 2, night: 3 };
+  function makeDispatchCore(disp) {
+    if (!disp || !disp.active) return null;
+    const off = disp.tzOffsetSec | 0;
+    const rules = (disp.schedule ? (disp.rules || []) : []).slice().sort((a, b) => a.m - b.m);
+    const rankOf = {};
+    Object.keys(disp.depots || {}).forEach(id => { const m = new Map(); disp.depots[id].forEach((u, i) => m.set(u, i)); rankOf[id] = m; });
+    const sinceS = disp.since ? Math.floor(disp.since / 1000) : 0;
+    let untilS = Infinity;
+    if (disp.until) untilS = Math.floor(disp.until / 1000);
+    else if (sinceS && rules.length) {
+      const sl = (((sinceS + off) % DAY) + DAY) % DAY, day0 = sinceS - sl;
+      untilS = Math.min(...rules.map(r => [day0 + r.m * 60, day0 + DAY + r.m * 60]).flat().filter(t => t > sinceS));
+    }
+    const stateAct = disp.recall ? 'recall' : (disp.mode || 'default');
+    const ruleAt = epochS => {
+      const m = Math.floor((((epochS + off) % DAY) + DAY) % DAY / 60); let best = rules[rules.length - 1];
+      for (const r of rules) if (r.m <= m) best = r;
+      return best.act;
+    };
+    /** epochS 這一刻適用的方案（default／offpeak／night／recall）。 */
+    const actAt = epochS => {
+      if (sinceS && epochS >= sinceS && epochS < untilS) return stateAct;
+      return rules.length ? ruleAt(epochS) : 'default';
+    };
+    return {
+      has: id => !!rankOf[id],
+      actAt,
+      /** depotId：車庫；raw：UTC 一天秒數的發車時刻；epochS：這一班發車的實際時間（epoch 秒）。 */
+      runs(depotId, raw, epochS) {
+        const m = rankOf[depotId]; if (!m) return true;
+        const a = actAt(epochS); if (a === 'recall') return false;
+        const n = N[a] || 1; if (n === 1) return true;
+        const i = m.get(raw); return i == null || i % n === 0;
+      },
+      current(nowS) { return actAt(nowS != null ? nowS : Math.floor(Date.now() / 1000)); },
+    };
+  }
+
+  function makeDispatch(disp, nowMs) {
+    const core = makeDispatchCore(disp); if (!core) return null;
+    const nowS = Math.floor((nowMs != null ? nowMs : Date.now()) / 1000);
+    const midnight = Math.floor((nowS + CFG.tzOffsetSec) / DAY) * DAY - CFG.tzOffsetSec;   // 這個網站時區今天 0:00 的 epoch 秒
+    return {
+      has: core.has,
+      /** raw：UTC 一天秒數的發車時刻；rel：這一班相對於「今天 0:00」的秒數（含跨日）。 */
+      runs: (depotId, raw, rel) => core.runs(depotId, raw, midnight + rel),
+      current: () => core.current(nowS),
+    };
+  }
+
+  function index(net, dump, disp) {
     const H = { net, cfg: CFG };
+    const DP = makeDispatch(disp);
+    H.dispatchNow = DP ? DP.current() : 'default';
     const minTransfer = (net.meta && net.meta.minTransferSec) || CFG.minTransferSec;
     H.minTransfer = minTransfer;
 
@@ -101,6 +159,7 @@
     for (let day = -1; day <= 2; day++) {
       for (const sv of svcs) {
         for (const D of sv.depot.departures) {
+          if (DP && !DP.runs(sv.depot.id, (((D - CFG.tzOffsetSec) % DAY) + DAY) % DAY, D + day * DAY)) continue;   // 調度：離峰・深夜・收車時停發的班次
           const base = D + day * DAY, ti = trips.length;
           trips.push({ sv, base });
           const st = sv.stops;

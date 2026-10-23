@@ -8,6 +8,11 @@
   const q = new URLSearchParams(location.search);
   const hm = t => HKc.hm(t);
   const DAY = 86400;
+  /** 調度（離峰・深夜・收車）時顯示給旅客的說明。 */
+  function dispNote(H) {
+    const t = { offpeak: '目前採用離峰時段班次，部分列車停駛（約每 2 班行駛 1 班）。', night: '目前採用深夜時段班次，列車班次減少（約每 3 班行駛 1 班）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow];
+    return t ? ' ' + t : '';
+  }
   const yen = n => '¥' + Number(n).toLocaleString('en-US');
 
   function stationSelect(H, id, label, onChange) {
@@ -56,7 +61,7 @@
     H.net.routes.forEach(r => { const ln = r.displayZh; const e = by.get(ln) || { n: 0, ok: false }; e.n++; if (r.status !== 'maintenance') e.ok = true; by.set(ln, e); });
     const tb = $('#status tbody');
     [...by.entries()].sort((a, b) => (b[1].ok - a[1].ok) || a[0].localeCompare(b[0], 'ja')).forEach(([ln, e]) => tb.append(h('tr', null, h('td', null, ln), h('td', { class: e.ok ? 'ok' : 'stop' }, e.ok ? '平常運轉' : '整修中（暫停運轉）'))));
-    const up = fmtDate(H.exportedAt); if (up) $('#status-note').textContent = `運行情報為時刻表資料記錄的狀態（資料時點 ${up}）。`;
+    const up = fmtDate(H.exportedAt); if (up) $('#status-note').textContent = `運行情報為時刻表資料記錄的狀態（資料時點 ${up}）。` + dispNote(H);
 
     // 最新消息
     const news = await HKc.getJSON('data/news.json', true);
@@ -94,7 +99,9 @@
     let dirKey = 'all', whole = false;
     const sel = stationSelect(H, sid, '車站', v => { sid = v; dirKey = 'all'; draw(); });
     const out = h('div');
-    root.append(h('div', { class: 'finder', style: 'margin-top:16px' }, h('form', { onsubmit: e => e.preventDefault(), style: 'grid-template-columns:minmax(0,320px)' }, field('車站', sel))), out);
+    root.append(h('div', { class: 'finder', style: 'margin-top:16px' }, h('form', { onsubmit: e => e.preventDefault(), style: 'grid-template-columns:minmax(0,320px)' }, field('車站', sel))));
+    if (dispNote(H)) root.append(h('p', { class: 'lead', style: 'margin-top:10px' }, dispNote(H).trim()));
+    root.append(out);
 
     function draw() {
       const evs = H.departures(sid);
