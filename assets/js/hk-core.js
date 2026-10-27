@@ -12,7 +12,13 @@
     fareStep: 200,                 // 每跨一個分區加算（円）
     seatFee: 500,                  // 指定席費用（円）
     seatsPerCar: 40,               // 2100 形每節座位數（2+2）
-    reserved: [{ re: '特急', cars: 8 }, { re: '特別快速|特快', cars: 6 }],   // 全車指定席的種別與編組節數
+    // 指定席政策（0.21.0）：特急＝全車指定席（另有立席特急券）；特快＝1・2 号車指定席、3 号車以後自由席。1 号車＝進行方向最前端。
+    reserved: [{ re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }],
+    standRatio: 0.5,               // 立席特急券＝指定席費用的比例
+    childRatio: 0.5, seniorRatio: 0.5,   // 乘車券折扣：12 歲以下、60 歲以上（指定席費用不打折）
+    maxTransfers: 2, maxWaitSec: 1800,   // 轉乘搜尋：最多轉乘次數、單次轉乘等待上限
+    // 可步行轉乘的車站（粗估 250–350 m）。a／b 為車站中文名稱的開頭；sec＝步行加緩衝所需時間
+    walkLinks: [{ a: '中央戸宮', b: '大學前', sec: 360 }],
     minTransferSec: 120,           // 轉乘最短時間（快照有值時以快照為準）
     zoneOverride: {},              // { "車站中文名": 分區編號 }：遊戲內沒設分區時，可在這裡補
   }, root.HK_CONFIG || {});
@@ -39,6 +45,11 @@
     for (const tk of TYPE_TOKENS) {
       if (name.length > tk.length && name.startsWith(tk)) return { line: name.slice(tk.length), type: tk, full: zh };
     }
+    // 0.21.0：種別在名稱中間（例：環狀快速白藏山線直通）也要認得，否則會被當成各停
+    for (const tk of TYPE_TOKENS) {
+      const k = name.indexOf(tk);
+      if (k > 0 && name.length > tk.length) return { line: name.slice(0, k) + name.slice(k + tk.length), type: tk, full: zh };
+    }
     return { line: name, type: '', full: zh };
   }
 
@@ -53,69 +64,11 @@
     const dump = snapshot.data || snapshot.dump || snapshot;
     const net = A.buildNetwork(dump, {});
     if (snapshot.schedule && A.calibrate) A.calibrate(net, snapshot.schedule);
-    return index(net, dump, snapshot.dispatch);
+    return index(net, dump);
   }
 
-  /* ───────── 調度（離峰・深夜・收車）─────────
-   * ATOS 0.18.3：與 ATOS 網頁共用同一套判斷（atos-web/dispatchplan.js）。每一班依「它發車那一刻」的方案決定是否運行：
-   *  - 時段表啟用：該班發車時刻所在時段的方案（預設／離峰＝每 2 班 1 班／深夜＝每 3 班 1 班／收車＝不運行）。
-   *  - 目前方案（手動操作或時段套用）自 since 起到 until（下一個時段交界）為止有效；沒有時段表就持續到再次操作。
-   *  - 名次：該車庫全部發車時刻依當地時間排序，名次 % N == 0 才運行（與模組相同）；快照裡沒有的時刻一律運行。 */
-  const N = { default: 1, offpeak: 2, night: 3 };
-  function makeDispatchCore(disp) {
-    if (!disp || !disp.active) return null;
-    const off = disp.tzOffsetSec | 0;
-    const rules = (disp.schedule ? (disp.rules || []) : []).slice().sort((a, b) => a.m - b.m);
-    const rankOf = {};
-    Object.keys(disp.depots || {}).forEach(id => { const m = new Map(); disp.depots[id].forEach((u, i) => m.set(u, i)); rankOf[id] = m; });
-    const sinceS = disp.since ? Math.floor(disp.since / 1000) : 0;
-    let untilS = Infinity;
-    if (disp.until) untilS = Math.floor(disp.until / 1000);
-    else if (sinceS && rules.length) {
-      const sl = (((sinceS + off) % DAY) + DAY) % DAY, day0 = sinceS - sl;
-      untilS = Math.min(...rules.map(r => [day0 + r.m * 60, day0 + DAY + r.m * 60]).flat().filter(t => t > sinceS));
-    }
-    const stateAct = disp.recall ? 'recall' : (disp.mode || 'default');
-    const ruleAt = epochS => {
-      const m = Math.floor((((epochS + off) % DAY) + DAY) % DAY / 60); let best = rules[rules.length - 1];
-      for (const r of rules) if (r.m <= m) best = r;
-      return best.act;
-    };
-    /** epochS 這一刻適用的方案（default／offpeak／night／recall）。 */
-    const actAt = epochS => {
-      if (sinceS && epochS >= sinceS && epochS < untilS) return stateAct;
-      return rules.length ? ruleAt(epochS) : 'default';
-    };
-    return {
-      has: id => !!rankOf[id],
-      actAt,
-      /** depotId：車庫；raw：UTC 一天秒數的發車時刻；epochS：這一班發車的實際時間（epoch 秒）。 */
-      runs(depotId, raw, epochS) {
-        const m = rankOf[depotId]; if (!m) return true;
-        const a = actAt(epochS); if (a === 'recall') return false;
-        const n = N[a] || 1; if (n === 1) return true;
-        const i = m.get(raw); return i == null || i % n === 0;
-      },
-      current(nowS) { return actAt(nowS != null ? nowS : Math.floor(Date.now() / 1000)); },
-    };
-  }
-
-  function makeDispatch(disp, nowMs) {
-    const core = makeDispatchCore(disp); if (!core) return null;
-    const nowS = Math.floor((nowMs != null ? nowMs : Date.now()) / 1000);
-    const midnight = Math.floor((nowS + CFG.tzOffsetSec) / DAY) * DAY - CFG.tzOffsetSec;   // 這個網站時區今天 0:00 的 epoch 秒
-    return {
-      has: core.has,
-      /** raw：UTC 一天秒數的發車時刻；rel：這一班相對於「今天 0:00」的秒數（含跨日）。 */
-      runs: (depotId, raw, rel) => core.runs(depotId, raw, midnight + rel),
-      current: () => core.current(nowS),
-    };
-  }
-
-  function index(net, dump, disp) {
+  function index(net, dump) {
     const H = { net, cfg: CFG };
-    const DP = makeDispatch(disp);
-    H.dispatchNow = DP ? DP.current() : 'default';
     const minTransfer = (net.meta && net.meta.minTransferSec) || CFG.minTransferSec;
     H.minTransfer = minTransfer;
 
@@ -159,7 +112,6 @@
     for (let day = -1; day <= 2; day++) {
       for (const sv of svcs) {
         for (const D of sv.depot.departures) {
-          if (DP && !DP.runs(sv.depot.id, (((D - CFG.tzOffsetSec) % DAY) + DAY) % DAY, D + day * DAY)) continue;   // 調度：離峰・深夜・收車時停發的班次
           const base = D + day * DAY, ti = trips.length;
           trips.push({ sv, base });
           const st = sv.stops;
@@ -184,44 +136,96 @@
       return (events.get(stationId) || []).filter(e => e.t >= 0 && e.t < DAY);
     };
 
-    /* ── 轉乘搜尋（Connection Scan） ── */
+    /* ── 轉乘搜尋（Connection Scan） ──
+     * 0.21.0：可指定經由車站（via）、可排除必須指定席的列車（noReserved，即特急）、可步行轉乘（walkLinks），
+     * 並限制轉乘次數與單次等待。 */
+    const normZh = z => String(z || '').replace(/戶/g, '戸');
+    const walkMap = new Map();
+    (CFG.walkLinks || []).forEach(w => {
+      const A = stations.find(s => normZh(s.zh).startsWith(normZh(w.a))), B = stations.find(s => normZh(s.zh).startsWith(normZh(w.b)));
+      if (!A || !B) return;
+      const ia = sIdx.get(A.id), ib = sIdx.get(B.id);
+      (walkMap.get(ia) || walkMap.set(ia, []).get(ia)).push({ to: ib, sec: w.sec });
+      (walkMap.get(ib) || walkMap.set(ib, []).get(ib)).push({ to: ia, sec: w.sec });
+    });
+    H.walkLinks = [...walkMap.entries()].flatMap(([a, l]) => l.map(x => ({ a: stations[a].id, b: stations[x.to].id, sec: x.sec })));
+    const svMustReserve = sv => { const ri = H.reserveInfo(sv); return !!(ri && ri.mode === 'all'); };
     function lowerBound(arr, t) { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m].dep < t) lo = m + 1; else hi = m; } return lo; }
-    function searchOnce(o, d, t0) {
+    function searchOnce(o, d, t0, opt) {
       const n = stations.length, arrive = new Float64Array(n).fill(Infinity), inConn = new Int32Array(n).fill(-1);
-      const boarded = new Map(); arrive[o] = t0;
+      const ready = new Float64Array(n).fill(Infinity), readySrc = new Int32Array(n).fill(-1);
+      const boarded = new Map(); arrive[o] = t0; ready[o] = t0; readySrc[o] = o;
+      const skipTrip = new Map(); let endWalkFrom = -1, endWalkSec = 0;
       for (let k = lowerBound(conns, t0); k < conns.length; k++) {
         const c = conns[k];
         if (c.dep > arrive[d] || c.dep > t0 + 30 * 3600) break;
-        let ok = boarded.has(c.trip);
-        if (!ok && arrive[c.from] !== Infinity) {
-          ok = c.from === o ? c.dep >= t0 : arrive[c.from] + minTransfer <= c.dep;
-          if (ok) boarded.set(c.trip, k);
+        if (opt && opt.noReserved) {
+          let sk = skipTrip.get(c.trip); if (sk === undefined) skipTrip.set(c.trip, sk = svMustReserve(trips[c.trip].sv));
+          if (sk) continue;
         }
-        if (ok && c.arr < arrive[c.to]) { arrive[c.to] = c.arr; inConn[c.to] = k; }
+        let b = boarded.get(c.trip);
+        if (!b && ready[c.from] <= c.dep && (ready[c.from] === t0 && readySrc[c.from] === o || c.dep - ready[c.from] <= CFG.maxWaitSec + minTransfer || c.from === o)) {
+          b = { k, src: readySrc[c.from] }; boarded.set(c.trip, b);
+        }
+        if (b && c.arr < arrive[c.to]) {
+          arrive[c.to] = c.arr; inConn[c.to] = k; if (c.to === d) endWalkFrom = -1;
+          const r = c.arr + minTransfer; if (r < ready[c.to]) { ready[c.to] = r; readySrc[c.to] = c.to; }
+          const ws = walkMap.get(c.to);
+          if (ws) for (const w of ws) { const rw = c.arr + w.sec; if (rw < ready[w.to]) { ready[w.to] = rw; readySrc[w.to] = c.to; } }
+        }
+        if (b) { const wd = walkMap.get(c.to); if (wd) for (const w of wd) if (w.to === d && c.arr + w.sec < arrive[d]) { arrive[d] = c.arr + w.sec; inConn[d] = k; endWalkFrom = c.to; endWalkSec = w.sec; } }
       }
       if (arrive[d] === Infinity) return null;
-      const legs = []; let st = d;
-      while (st !== o) {
-        const endC = conns[inConn[st]], bC = conns[boarded.get(endC.trip)], trip = trips[endC.trip];
-        const stops = trip.sv.stops.slice(bC.i, endC.i + 2).map(s => ({ station: s.station, arr: trip.base + s.arr, dep: trip.base + s.dep, platform: s.platformName }));
-        legs.unshift({ sv: trip.sv, stops, board: bC.i, trip: endC.trip });
-        st = bC.from;
+      const legs = []; let st = endWalkFrom >= 0 ? endWalkFrom : d, guard = 0;
+      while (guard++ < 12) {
+        const endC = conns[inConn[st === endWalkFrom && guard === 1 ? d : st]], b = boarded.get(endC.trip), bC = conns[b.k], trip = trips[endC.trip];
+        const stops = trip.sv.stops.slice(bC.i, endC.i + 2).map(s => ({ station: s.station, arr: trip.base + s.arr, dep: trip.base + s.dep, platform: s.platformName, pax: s.pax }));
+        const walk = b.src !== bC.from && b.src >= 0 ? { from: stations[b.src].id, to: stations[bC.from].id, sec: ((walkMap.get(b.src) || []).find(w => w.to === bC.from) || {}).sec || 0 } : null;
+        legs.unshift({ sv: trip.sv, stops, board: bC.i, trip: endC.trip, walk });
+        st = b.src;
+        if (st === o || st < 0) break;
       }
-      return { dep: legs[0].stops[0].dep, arr: arrive[d], legs };
+      return { dep: legs[0].stops[0].dep, arr: arrive[d], legs, endWalk: endWalkFrom >= 0 ? { from: stations[endWalkFrom].id, to: stations[d].id, sec: endWalkSec } : null };
     }
-    /** fromId → toId，t0 之後最早的 count 個選項（同到達時間者取最晚出發）。 */
-    H.search = function (fromId, toId, t0, count) {
-      const o = sIdx.get(fromId), d = sIdx.get(toId), out = []; count = count || 4;
+    /** 同到達時間者取最晚出發。 */
+    function bestFrom(o, d, t, opt) {
+      let j = searchOnce(o, d, t, opt); if (!j) return null;
+      for (let g = 0; g < 12; g++) { const j2 = searchOnce(o, d, j.dep + 1, opt); if (j2 && j2.arr <= j.arr) j = j2; else break; }
+      return j;
+    }
+    function viaJourney(o, v, d, t, opt) {
+      const j1 = bestFrom(o, v, t, opt); if (!j1) return null;
+      const last = j1.legs[j1.legs.length - 1];
+      let j2 = bestFrom(v, d, j1.arr, opt); if (!j2) return null;
+      if (j2.legs[0].trip !== last.trip && j2.dep < j1.arr + (j2.legs[0].walk ? 0 : minTransfer)) { j2 = bestFrom(v, d, j1.arr + minTransfer, opt); if (!j2) return null; }
+      const legs = j1.legs.slice();
+      j2.legs.forEach((lg, i) => {
+        if (i === 0 && lg.trip === last.trip) last.stops = last.stops.concat(lg.stops.slice(1));
+        else legs.push(lg);
+      });
+      return { dep: j1.dep, arr: j2.arr, legs, endWalk: j2.endWalk };
+    }
+    const okJourney = j => {
+      if (j.legs.length - 1 > CFG.maxTransfers) return false;
+      for (let i = 1; i < j.legs.length; i++) { const prev = j.legs[i - 1].stops, wait = j.legs[i].stops[0].dep - prev[prev.length - 1].arr; if (wait > CFG.maxWaitSec) return false; }
+      return true;
+    };
+    /** fromId → toId，t0 之後最早的 count 個選項。opt：{ via: 車站id, noReserved: true } */
+    H.searchEx = function (fromId, toId, t0, count, opt) {
+      opt = opt || {};
+      const o = sIdx.get(fromId), d = sIdx.get(toId), v = opt.via && opt.via !== fromId && opt.via !== toId ? sIdx.get(opt.via) : null, out = []; count = count || 4;
       if (o == null || d == null || o === d) return out;
       let t = t0;
-      for (let i = 0; i < count; i++) {
-        let j = searchOnce(o, d, t); if (!j) break;
-        for (let g = 0; g < 12; g++) { const j2 = searchOnce(o, d, j.dep + 1); if (j2 && j2.arr <= j.arr) j = j2; else break; }
-        if (!out.length || j.dep > out[out.length - 1].dep) out.push(j);
+      for (let i = 0, tries = 0; out.length < count && tries < count * 4; tries++) {
+        const j = v != null ? viaJourney(o, v, d, t, opt) : bestFrom(o, d, t, opt);
+        if (!j) break;
         t = j.dep + 1;
+        if (!okJourney(j)) continue;
+        if (!out.length || j.dep > out[out.length - 1].dep) out.push(j);
       }
       return out;
     };
+    H.search = function (fromId, toId, t0, count) { return H.searchEx(fromId, toId, t0, count, {}); };
 
     /* ── 實體鄰接圖（用在票價與路線圖） ──
      * 各停站的班次連出「相鄰站」；快速、特急跳站的連線如果被別的班次拆成經過中間站的路徑，就視為重複，丟掉。 */
@@ -335,17 +339,30 @@
       const total = base + zoneFee + seat;
       return { yen: base + zoneFee, base, step: CFG.fareStep, crossed: r.crossed, zones: r.crossed, zoneFee, seat, total, path: r.path, bounds: r.bounds, km: r.km };
     };
-    /** 這個班次（服務）是否全車指定席；回傳 { cars, seats, fee } 或 null。 */
+    /** 指定席資訊；沒有指定席的種別回傳 null。
+     *  mode 'all'＝全車指定席（可買立席特急券，費用為指定席的一半）；mode 'part'＝前 reservedCars 節指定席、其餘自由席（不收指定席費）。 */
     H.reserveInfo = function (sv) {
-      for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) return { cars: r.cars, seats: r.cars * CFG.seatsPerCar, fee: CFG.seatFee, perCar: CFG.seatsPerCar };
-      return null;
+      if (sv._ri !== undefined) return sv._ri;
+      let out = null;
+      for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) {
+        const rc = r.mode === 'part' ? r.reservedCars : r.cars;
+        out = { mode: r.mode || 'all', cars: r.cars, reservedCars: rc, seats: rc * CFG.seatsPerCar, fee: CFG.seatFee, standFee: r.mode === 'part' ? 0 : Math.round(CFG.seatFee * CFG.standRatio), perCar: CFG.seatsPerCar };
+        break;
+      }
+      return (sv._ri = out);
     };
+    /** 顯示文字：全車指定席／1・2号車指定席。 */
+    H.reserveLabel = function (sv) { const ri = H.reserveInfo(sv); if (!ri) return ''; return ri.mode === 'all' ? '全車指定席' : (ri.reservedCars === 1 ? '1号車' : '1・' + ri.reservedCars + '号車') + '指定席／' + (ri.reservedCars + 1) + '号車以後自由席'; };
     /** 編組節數（顯示用）：指定席種別依規定；其他用車庫內有出庫路徑的側線的編組。 */
     H.carsOf = function (sv) {
       const ri = H.reserveInfo(sv); if (ri) return ri.cars;
       const sd = ((sv.depot && sv.depot.sidings) || []).filter(x => x.cars > 0 && x.path !== false).map(x => x.cars);
       if (sd.length) { const c = new Map(); sd.forEach(n => c.set(n, (c.get(n) || 0) + 1)); return [...c.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0][0]; }
       return 8;
+    };
+    H.ticketFares = function (fromId, toId) {
+      const r = H.fare(fromId, toId); if (!r) return null;
+      return { adult: r.yen, child: Math.round(r.yen * CFG.childRatio), senior: Math.round(r.yen * CFG.seniorRatio), detail: r };
     };
     H.zonesConfigured = stations.some(s => s.zones.length);
 
