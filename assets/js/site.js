@@ -70,8 +70,9 @@
 
     // 簡易路線圖
     const L = computeLayout(H), box = $('#minimap');
-    renderMap(box, H, L, { fontSize: 13 });
-    box.addEventListener('click', () => { location.href = 'live.html'; }); box.style.cursor = 'pointer';
+    const mm = renderMap(box, H, L, { fontSize: 13, interactive: true });
+    const pop = h('div', { class: 'pop mappop', hidden: true }); box.parentNode.insertBefore(pop, box.nextSibling);
+    mm.onStation(st => { mm.mark(st.id, 'sel'); window.HK.stationPop(H, st, pop); });
   }
 
   /* ───────── 時刻表／乘車／票價 ───────── */
@@ -246,16 +247,12 @@
 
   function viewMap(H, root) {
     const L = computeLayout(H);
-    const box = h('div', { class: 'mapbox' }), info = h('div', { class: 'pop', hidden: true });
-    root.append(h('p', { class: 'lead', style: 'margin-top:16px' }, '點選車站，可查看停靠該站的路線並前往時刻表。'), box, info);
+    const box = h('div', { class: 'mapbox' }), info = h('div', { class: 'pop mappop', hidden: true });
+    root.append(h('p', { class: 'lead', style: 'margin-top:16px' }, '點選車站，查看停靠路線、接下來的發車，並前往時刻表或乘車查詢。'), box, info);
     const m = renderMap(box, H, L, { interactive: true });
-    m.onStation(st => {
-      m.mark(st.id, 'sel'); info.hidden = false;
-      const lines = new Map(); H.svcs.forEach(sv => { if (sv.stops.some(x => x.station === st.id && x.pax !== false)) { const k = sv.routeName; if (!lines.has(k)) lines.set(k, new Set()); } });
-      info.replaceChildren(h('strong', null, st.zh), st.en ? h('span', { style: 'margin-left:10px;color:var(--muted);font-size:12px' }, st.en) : null,
-        h('div', { style: 'margin:6px 0 8px;font-size:13px' }, '停靠路線：' + [...lines.keys()].join('、')),
-        h('a', { class: 'btn sm', href: `timetable.html?tab=station&s=${st.id}` }, '看這個車站的時刻表'));
-    });
+    const open = st => { m.mark(st.id, 'sel'); window.HK.stationPop(H, st, info); };
+    m.onStation(open);
+    const s0 = q.get('s'); if (s0 && H.stById[s0]) { open(H.stById[s0]); setTimeout(() => { try { info.scrollIntoView({ block: 'nearest' }); } catch (e) { } }, 50); }
     box.append(h('div', { class: 'legend' }, h('span', null, '○ 車站'), h('span', null, '◎ 轉乘站')));
   }
 
@@ -321,8 +318,10 @@
       else if (page === 'live') live(H);
       else if (page === 'booking') HK.booking(H, app);
       else if (page === 'routes') HK.viewLines(H, app);
-      else if (page === 'board') HK.viewBoard(H, app);
       else if (page === 'sights') await HK.viewSights(H, app);
+      else if (page === 'guide') HK.viewGuide(H, app);
+      else if (page === 'airport') HK.viewAirport(H, app);
+      else if (page === 'kobana') HK.viewKobana(H, app);
     } catch (e) {
       console.error(e);
       const t = h('div', { class: 'wrap' }, h('div', { class: 'soonbox' }, h('h2', null, '資料暫時無法顯示'), h('p', null, '載入時刻表資料時發生問題，請稍後再試。')));

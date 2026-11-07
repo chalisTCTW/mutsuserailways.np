@@ -116,7 +116,7 @@
     drawChips(); draw();
   }
 
-  /* ───────── 發車顯示 ───────── */
+  /* ───────── 車站發車看板（點選路線圖上的車站時顯示的小視窗；0.7 起不再有獨立的「發車顯示」頁） ───────── */
   function dirKeyOf(H, sid, e) {
     const sv = e.sv, first = sv.stops[0].station, last = sv.stops[sv.stops.length - 1].station;
     if (first === last) return { key: 'loop|' + sv.line + '|' + (sv.member.dir || ''), label: `${sv.line} ${sv.member.dir || '環狀'}` };
@@ -124,38 +124,21 @@
     const p = H.shortestPath(sid, nextSt), nb = p && p.length > 1 ? p[1] : nextSt;
     return { key: 'nb|' + nb, label: null, nb };
   }
-  function viewBoard(H, root) {
-    let sid = q.get('s') || safeGet('hk-board-st');
-    if (!sid || !H.stById[sid]) sid = (stByName(H, 'みつせ') || H.stations[0]).id;
-    let dir = 'all';
-    const sel = h('select', { 'aria-label': '車站' }, H.stations.map(s => h('option', { value: s.id }, s.zh)));
-    sel.value = sid;
-    sel.addEventListener('change', () => { sid = sel.value; dir = 'all'; safeSet('hk-board-st', sid); try { history.replaceState(null, '', '?s=' + encodeURIComponent(sid)); } catch (e) { } draw(); });
-    const clock = h('div', { class: 'pids-clock', 'aria-hidden': 'true' });
-    const title = h('div', { class: 'pids-st' });
+  /** 回傳 { el, stop }：el 是看板（每秒更新倒數），不用時呼叫 stop() 停止計時。 */
+  function pidsBoard(H, sid, max) {
+    max = max || 6;
+    let dir = 'all', lastMin = -1, timer = null;
     const dirs = h('div', { class: 'dirs pidsdirs', role: 'group', 'aria-label': '方向' });
     const list = h('div', { class: 'pids-list', 'aria-live': 'off' });
-    root.append(h('div', { class: 'finder', style: 'margin-top:16px' }, h('form', { onsubmit: e => e.preventDefault(), style: 'grid-template-columns:minmax(0,320px)' }, field('車站', sel))),
-      h('div', { class: 'pids' }, h('div', { class: 'pids-head' }, title, clock), dirs, list),
-      h('p', { class: 'note' }, '依時刻表顯示這個車站接下來的發車。時刻為預定時刻，實際運轉狀況請以現場公告為準。' + (dispNote(H) ? ' ' + dispNote(H) : '')),
-      h('p', { class: 'note' }, h('a', { href: 'timetable.html?s=' + encodeURIComponent(sid), id: 'tt-link' }, '查看這個車站的全日時刻表')));
-    let lastMin = -1;
-
-    function upcoming(nowS) {
-      const all = (H.events.get(sid) || []).filter(e => e.t >= nowS - 0).slice(0, 80);
-      return all;
-    }
-    function draw() {
-      const st = H.stById[sid];
-      title.replaceChildren(h('span', { class: 'pids-lab' }, '発車案内'), h('strong', null, st.zh), st.en ? h('small', null, st.en) : null);
-      const lk = document.getElementById('tt-link'); if (lk) lk.href = 'timetable.html?s=' + encodeURIComponent(sid);
-      lastMin = -1; tick(true);
-    }
+    const clock = h('div', { class: 'pids-clock', 'aria-hidden': 'true' });
+    const st0 = H.stById[sid];
+    const title = h('div', { class: 'pids-st' }, h('span', { class: 'pids-lab' }, '発車案内'), h('strong', null, st0 ? st0.zh : ''), st0 && st0.en ? h('small', null, st0.en) : null);
+    const el = h('div', { class: 'pids compact' }, h('div', { class: 'pids-head' }, title, clock), dirs, list);
     function tick(force) {
-      const nowS = H.nowSec(), d = new Date(Date.now() + 0);
+      const nowS = H.nowSec();
       clock.textContent = `${pad(Math.floor(nowS / 3600))}:${pad(Math.floor(nowS % 3600 / 60))}:${pad(Math.floor(nowS % 60))}`;
       const mn = Math.floor(nowS / 60); if (!force && mn === lastMin) return; lastMin = mn;
-      const evs = upcoming(nowS);
+      const evs = (H.events.get(sid) || []).filter(e => e.t >= nowS).slice(0, 80);
       const groups = new Map();
       evs.forEach(e => { const k = dirKeyOf(H, sid, e); const gg = groups.get(k.key) || groups.set(k.key, { key: k.key, label: k.label, nb: k.nb, n: 0, dests: new Map() }).get(k.key); gg.n++; const dn = H.destOf(e.sv, e.i); gg.dests.set(dn, (gg.dests.get(dn) || 0) + 1); e._k = k.key; });
       const gl = [...groups.values()];
@@ -163,7 +146,7 @@
       gl.sort((a, b) => b.n - a.n || a.label.localeCompare(b.label, 'ja'));
       if (dir !== 'all' && !groups.has(dir)) dir = 'all';
       dirs.replaceChildren(...[['all', '全部方向'], ...gl.map(g => [g.key, g.label])].map(([k, l]) => h('button', { type: 'button', 'aria-pressed': String(dir === k), onclick: () => { dir = k; lastMin = -1; tick(true); } }, l)));
-      const shown = evs.filter(e => dir === 'all' || e._k === dir).slice(0, 10);
+      const shown = evs.filter(e => dir === 'all' || e._k === dir).slice(0, max);
       if (!shown.length) { list.replaceChildren(h('div', { class: 'pids-empty' }, '這個車站沒有接下來的發車（可能是各路線的終點站，或已收車）。')); return; }
       list.replaceChildren(h('div', { class: 'pids-row pids-hd' }, h('span', null, '時刻'), h('span', null, '種別'), h('span', null, '行先'), h('span', null, '路線・備註'), h('span', { class: 'r' }, '發車まで')),
         ...shown.map((e, n) => {
@@ -179,7 +162,25 @@
             h('span', { class: 'r wt' }, nx));
         }));
     }
-    draw(); setInterval(() => tick(false), 1000);
+    tick(true); timer = setInterval(() => { if (!el.isConnected) { clearInterval(timer); return; } tick(false); }, 1000);
+    return { el, stop: () => clearInterval(timer) };
+  }
+  /** 點選路線圖車站後顯示的小視窗：停靠路線、接下來的發車、時刻表與乘車連結。 */
+  let _pop = null;
+  function stationPop(H, st, box) {
+    if (_pop) { _pop.stop(); _pop = null; }
+    const board = pidsBoard(H, st.id, 5); _pop = board;
+    const lines = chipLines(H, st.id, null);
+    box.hidden = false;
+    box.replaceChildren(...[
+      h('div', { class: 'pop-head' }, h('strong', null, st.zh), st.en ? h('span', { class: 'pop-en' }, st.en) : null, h('button', { type: 'button', class: 'pop-x', 'aria-label': '關閉', onclick: () => { board.stop(); box.hidden = true; } }, '×')),
+      lines.length ? h('div', { class: 'pop-lines' }, h('span', null, '停靠路線'), ...lines) : null,
+      board.el,
+      h('div', { class: 'pop-btns' },
+        h('a', { class: 'btn sm', href: 'timetable.html?tab=station&s=' + encodeURIComponent(st.id) }, '這個車站的全日時刻表'),
+        h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=route&from=' + encodeURIComponent(st.id) }, '從這裡出發'),
+        h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=route&to=' + encodeURIComponent(st.id) }, '前往這裡')),
+      dispNote(H) ? h('p', { class: 'note', style: 'margin:6px 0 0;padding:0 14px' }, dispNote(H)) : null].filter(Boolean));
   }
 
   /* ───────── 沿線景點 ───────── */
@@ -190,10 +191,18 @@
     root.append(h('p', { class: 'lead' }, '搭電車就能到的光瀨都市圈景點。每個景點都標示最近的車站，可以直接查時刻表或規劃乘車。'),
       h('nav', { class: 'lchips sjump', 'aria-label': '景點' }, data.map(d => h('a', { class: 'lchipbtn', href: '#' + d.id }, d.name))));
     data.forEach(d => {
-      const st = stByName(H, d.station), id = st && st.id;
       let ph = 0; const main = h('img', { src: d.photos[0].src, alt: d.photos[0].alt, loading: 'lazy' }), cap = h('figcaption', null, d.photos[0].cap || '');
       const thumbs = d.photos.length > 1 ? h('div', { class: 'sthumbs' }, d.photos.map((p, k) => h('button', { type: 'button', 'aria-label': p.alt, 'aria-pressed': String(k === 0), onclick: ev => { main.src = p.src; main.alt = p.alt; cap.textContent = p.cap || ''; ev.currentTarget.parentNode.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', String(j === k))); } }, h('img', { src: p.src, alt: '', loading: 'lazy' })))) : null;
-      const lines = id ? chipLines(H, id, null) : [];
+      // 最近車站可以有一個以上（例：平倉市革命紀念公園＝平倉公園西、東平倉）
+      const names = d.stations && d.stations.length ? d.stations : [d.station];
+      const nears = names.map(nm => {
+        const st = stByName(H, nm), id = st && st.id, lines = id ? chipLines(H, id, null) : [];
+        return h('div', { class: 'snear' }, h('strong', null, '最近車站'), h('span', { class: 'sn' }, nm), lines.length ? h('span', { class: 'sl' }, lines) : null,
+          id ? h('div', { class: 'sbtns' },
+            h('a', { class: 'btn sm', href: 'timetable.html?s=' + encodeURIComponent(id) }, '車站時刻表'),
+            h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=map&s=' + encodeURIComponent(id) }, '路線圖與接下來的發車'),
+            h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=route&to=' + encodeURIComponent(id) }, '前往這裡')) : h('p', { class: 'note', style: 'margin:6px 0 0' }, '這個車站尚未收錄在目前的時刻表資料中。'));
+      });
       root.append(h('article', { class: 'sight', id: d.id },
         h('figure', { class: 'sfig' }, main, cap, thumbs),
         h('div', { class: 'sbody' },
@@ -202,13 +211,9 @@
           h('p', { class: 'slead' }, d.lead),
           ...d.body.map(p => h('p', null, p)),
           h('ul', { class: 'spoints' }, d.points.map(p => h('li', null, p))),
-          h('div', { class: 'snear' }, h('strong', null, '最近車站'), h('span', { class: 'sn' }, d.station), lines.length ? h('span', { class: 'sl' }, lines) : null,
-            id ? h('div', { class: 'sbtns' },
-              h('a', { class: 'btn sm', href: 'timetable.html?s=' + encodeURIComponent(id) }, '車站時刻表'),
-              h('a', { class: 'btn sm ghost', href: 'board.html?s=' + encodeURIComponent(id) }, '發車顯示'),
-              h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=route&to=' + encodeURIComponent(id) }, '前往這裡')) : h('p', { class: 'note', style: 'margin:6px 0 0' }, '這個車站尚未收錄在目前的時刻表資料中。')))));
+          ...nears)));
     });
   }
 
-  Object.assign(HK, { viewLines, viewBoard, viewSights });
+  Object.assign(HK, { viewLines, viewSights, stationPop, pidsBoard, depTimes, groupsOf });
 })(window);

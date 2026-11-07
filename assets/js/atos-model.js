@@ -3,6 +3,14 @@
  * 輸入是與存檔欄位相同的 JSON；超過 2^53 的整數 id 以字串表示。 */
 (function (root) {
   'use strict';
+  /* 0.24.0 公車軌道記號（同 Java BusRail）：不可加速，且為 行駛(雙向或單方向 20/40/60)／速度20的月台／速度20的側線 */
+  function isBusRail(r) {
+    if (r.canAccelerate !== false) return false;
+    const a = r.speedLimit1, b = r.speedLimit2, ok = v => v === 20 || v === 40 || v === 60;
+    if (!r.isPlatform && !r.isSiding) return a === b ? ok(a) : (a === 0 && ok(b)) || (b === 0 && ok(a));
+    return a === 20 && b === 20 && (!!r.isPlatform !== !!r.isSiding);
+  }
+
 
   const KMH = 1 / 3.6;
   const DIRS = { N: [0, -1], NE: [1, -1], E: [1, 0], SE: [1, 1], S: [0, 1], SW: [-1, 1], W: [-1, 0], NW: [-1, -1] };
@@ -149,7 +157,7 @@
     const stations = new Map();
     for (const s of stationsRaw) {
       const [zh, en] = splitZhEn(s.name);
-      stations.set(S(s.id), { id: S(s.id), zh, en, color: s.color, x: (s.position1.x + s.position2.x) / 2, z: (s.position1.z + s.position2.z) / 2, platforms: [] });
+      stations.set(S(s.id), { id: S(s.id), zh, en, color: s.color, x: (s.position1.x + s.position2.x) / 2, z: (s.position1.z + s.position2.z) / 2, box: [Math.min(s.position1.x, s.position2.x), Math.min(s.position1.z, s.position2.z), Math.max(s.position1.x, s.position2.x), Math.max(s.position1.z, s.position2.z)], platforms: [] });
     }
     for (const p of plat.values()) stations.get(p.station).platforms.push({ id: p.id, name: p.name });
 
@@ -168,7 +176,7 @@
         stops.push({ station: p.station, platform: p.id, platformName: p.name, dest: rp.customDestination });
       }
       const dps = (depotOfRoute.get(S(r.id)) || []).filter(depotHasService);
-      members.push({ id: S(r.id), rawName: r.name, zh, en, dir: dirn, notes, number: r.routeNumber, color: r.color, circular: r.circularState,
+      members.push({ id: S(r.id), rawName: r.name, zh, en, dir: dirn, notes, number: r.routeNumber, color: r.color, rtype: String(r.routeType || ''), circular: r.circularState,
         stops, depots: dps.map(d => S(d.id)), operating: dps.length > 0 });
     }
 
@@ -176,8 +184,9 @@
     function mergeKey(m) {
       const ss = m.stops.map(s => s.station);
       if (!ss.length) return JSON.stringify(['empty', m.zh, m.en]);
-      if (ss[0] === ss[ss.length - 1]) return JSON.stringify(['loop', setKey(ss)]);
-      return JSON.stringify(['line', setKey(ss), setKey([ss[0], ss[ss.length - 1]])]);
+      // 0.25.2：路線種類（普通／高速）也列入合併條件；名稱、停靠站相近的特急（高速）與環狀快速（普通）不會被併成一條
+      if (ss[0] === ss[ss.length - 1]) return JSON.stringify(['loop', setKey(ss), m.zh, m.rtype]);
+      return JSON.stringify(['line', setKey(ss), setKey([ss[0], ss[ss.length - 1]]), m.zh, m.rtype]);
     }
     const groups = new Map();
     for (const m of members) { const k = mergeKey(m); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(m); }
@@ -191,6 +200,7 @@
     for (const ms of groups.values()) {
       const zhNames = new Set(ms.map(m => m.zh));
       if (zhNames.size > 1) warn(`合併了不同名稱的路線: ${JSON.stringify([...zhNames].sort())}`);
+      if (new Set(ms.map(m => m.color)).size > 1) warn(`路線「${[...zhNames][0]}」合併了顏色不同的成員（${ms.map(m => m.rawName + '＝' + m.color).join('、')}）；若其中有不同種別的路線被併在一起，請檢查名稱`);
       const zh = mostCommon(ms.map(m => m.zh));
       const enOpts = ms.filter(m => m.en).map(m => m.en);
       const en = cfg.routeNameOverrides[zh] || (enOpts.length ? mostCommon(enOpts) : '');
@@ -374,14 +384,21 @@
 
     /* 軌道 */
     const railsSeen = new Set(), railsOut = [];
+    /* 配線略圖用：每條軌道屬於哪個月台（月台本身就是一條軌道，兩端座標相同）、落在哪個車站的範圍內 */
+    const platByKey = new Map();
+    for (const p of platsRaw) { platByKey.set(posKey(p.position1) + '|' + posKey(p.position2), S(p.id)); platByKey.set(posKey(p.position2) + '|' + posKey(p.position1), S(p.id)); }
+    const zoneOf = (x, z) => { let best = null, ba = Infinity; for (const st of stArrEarly) { const b = st.box; if (b[0] <= x && x <= b[2] && b[1] <= z && z <= b[3]) { const ar = (b[2] - b[0]) * (b[3] - b[1]); if (ar < ba) { ba = ar; best = st.id; } } } return best; };
+    const stArrEarly = [...stations.values()];
     for (const r of railsRaw) {
+      if (r.speedLimit1 === 1 && r.speedLimit2 === 1) continue;   // 0.19.0：裝飾性軌道（兩向限速 1 km/h 的記號）完全不納入
+      if (isBusRail(r)) continue;   // 0.22.0／0.24.0：公車軌道（行駛 20/40/60、單方向、速度 20 的站台與側線；皆不可加速）不畫進底圖與配線略圖；營運路線的路徑仍照常顯示
       const a = r.position1, b = r.position2;
       const ka = [a.x, a.y, a.z], kb = [b.x, b.y, b.z];
       const cmp = (p, q) => { for (let i = 0; i < 3; i++) if (p[i] !== q[i]) return p[i] < q[i] ? -1 : 1; return 0; };
       const key = (cmp(ka, kb) <= 0 ? [ka, kb] : [kb, ka]).join('|');
       if (railsSeen.has(key)) continue; railsSeen.add(key);
       const pts = bezierPoints({ startPosition: a, endPosition: b, startAngle: r.angle1, endAngle: r.angle2 });
-      railsOut.push({ pts: pts.flatMap(pt => pt.map(c => pyRound(c, 1))), v: Math.min(r.speedLimit1, r.speedLimit2), kind: r.isPlatform ? 'platform' : r.isSiding ? 'siding' : 'rail', e: [posKey(a), posKey(b)], ...(r.signalColors && r.signalColors.length ? { sig: [...new Set(r.signalColors)] } : {}) });
+      railsOut.push({ pts: pts.flatMap(pt => pt.map(c => pyRound(c, 1))), v: Math.min(r.speedLimit1, r.speedLimit2), kind: r.isPlatform ? 'platform' : r.isSiding ? 'siding' : 'rail', e: [posKey(a), posKey(b)], ...(platByKey.has(posKey(a) + '|' + posKey(b)) ? { pl: platByKey.get(posKey(a) + '|' + posKey(b)) } : {}), ...(zoneOf((a.x + b.x) / 2, (a.z + b.z) / 2) ? { zn: zoneOf((a.x + b.x) / 2, (a.z + b.z) / 2) } : {}), ...(r.signalColors && r.signalColors.length ? { sig: [...new Set(r.signalColors)] } : {}), ...(r.angle1 && r.angle2 ? { ag: [String(r.angle1), String(r.angle2)] } : {}) });
     }
     const stArr = [...stations.values()];
     const xs = [], zs = [];
