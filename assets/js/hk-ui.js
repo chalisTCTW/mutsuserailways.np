@@ -191,7 +191,7 @@
   /** 種別標籤（白綠配色：特急類＝綠底白字、急行／快速類＝綠框、各停＝灰框）。 */
   function typeTag(sv) { const st = sv.color ? `background:${sv.color};border-color:${sv.color};color:${sv.ink}` : null; return sv.type ? h('span', { class: 'ttag t-' + sv.tcls, style: st }, sv.type) : h('span', { class: 'ttag t-loc', style: st }, '各停'); }
   /** 以最簡短的字呈現種別（時刻表格子用）。 */
-  function typeMark(sv) { return sv.tcls === 'ltd' ? '特' : sv.tcls === 'exp' ? '快' : ''; }
+  function typeMark(sv) { return root.HK.typeMarkOf(sv.type); }
 
   const fmtDate = ms => { if (!ms) return ''; const d = new Date(Number(ms)); if (isNaN(d)) return ''; const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 

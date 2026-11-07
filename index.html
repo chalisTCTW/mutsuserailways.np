@@ -16,7 +16,7 @@
     <img class="photo" src="assets/photo/banner.webp" alt="">
     <div class="wrap"><a class="logo-panel" href="index.html" aria-label="光瀨都市鉄道 首頁"><img src="assets/img/logo-dark-960.png" alt="光瀨都市鉄道" width="300" height="78"></a></div>
   </div>
-  <nav class="gnav" aria-label="主要選單"><ul><li><a href="timetable.html">時刻表與班次/票價查詢<span class="en">Timetable / Fares</span></a></li><li><a href="booking.html">線上訂票<span class="en">Online Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li><a href="airport.html">機場聯外交通<span class="soon">準備中</span><span class="en">Airport Access</span></a></li><li class="admin"><a id="adminlink" href="atos.html">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav>
+  <nav class="gnav" aria-label="主要選單"><ul><li><a href="timetable.html">時刻表・票價<span class="en">Timetable / Fares</span></a></li><li><a href="routes.html">路線資訊<span class="en">Lines</span></a></li><li><a href="board.html">發車顯示<span class="en">Departures</span></a></li><li><a href="booking.html">線上訂票<span class="en">Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li><a href="sights.html">沿線景點<span class="en">Sights</span></a></li><li><a href="airport.html">機場聯外交通<span class="soon">準備中</span><span class="en">Airport</span></a></li><li class="admin"><a id="adminlink" href="atos.html">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav>
 </header>
 <main>
 <section class="hero" id="hero" aria-roledescription="carousel" aria-label="最新資訊">
@@ -25,12 +25,16 @@
 </section>
 <div class="wrap">
   <section class="sec" aria-labelledby="h-find"><h2 id="h-find">時刻表・票價查詢</h2><div class="finder" id="finder"></div></section>
+  <section class="sec" aria-labelledby="h-go"><h2 id="h-go">ご案内<small>Guide</small></h2>
+    <div class="tiles"><a href="routes.html"><strong>路線資訊</strong><span>各路線的停靠站、所要時間、班距與首末班</span></a><a href="board.html"><strong>發車顯示</strong><span>選一個車站，顯示接下來的發車與倒數</span></a><a href="sights.html"><strong>沿線景點</strong><span>光瀨城、勝守漁港、天鳥崎神社與更多</span></a></div></section>
   <div class="cols">
     <section class="sec" aria-labelledby="h-st"><h2 id="h-st">運行情報<small>Service Status</small></h2>
       <table class="tbl" id="status"><thead><tr><th>路線</th><th>運行狀況</th></tr></thead><tbody></tbody></table>
       <p class="note" id="status-note"></p></section>
     <section class="sec" aria-labelledby="h-news"><h2 id="h-news">最新消息<small>News</small></h2><dl class="news" id="news"></dl></section>
   </div>
+  <section class="sec" aria-labelledby="h-spot"><h2 id="h-spot">沿線景點<small>Sights</small></h2>
+    <div class="spots"><a href="sights.html#castle"><img src="assets/photo/castle1.webp" alt="" loading="lazy"><span>光瀨城<small>船井大島</small></span></a><a href="sights.html#port"><img src="assets/photo/port1.webp" alt="" loading="lazy"><span>勝守漁港<small>勝守</small></span></a><a href="sights.html#shrine"><img src="assets/photo/shrine1.webp" alt="" loading="lazy"><span>天鳥崎神社<small>天鳥崎中央</small></span></a><a href="sights.html#museum"><img src="assets/photo/museum1.webp" alt="" loading="lazy"><span>光瀨市立博物館<small>ひがしいち</small></span></a><a href="sights.html#kuribashi"><img src="assets/photo/kuri1.webp" alt="" loading="lazy"><span>九里橋商圈<small>九里橋三丁目</small></span></a></div></section>
   <section class="sec" aria-labelledby="h-map"><h2 id="h-map">路線圖<small>Route Map</small></h2><div class="mapbox" id="minimap"></div><p class="note">點選路線圖可前往「即時列車動態」。</p></section>
 </div>
 <div id="app" hidden></div>
@@ -38,7 +42,7 @@
 <footer>
   <div class="wrap">
     <img src="assets/img/mark-dark.png" alt="">
-    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="airport.html">機場聯外交通（準備中）</a></div>
+    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="routes.html">路線資訊</a><a href="board.html">發車顯示</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="sights.html">沿線景點</a><a href="airport.html">機場聯外交通（準備中）</a></div>
     <div class="copy">© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。</div>
   </div>
 </footer>
@@ -48,6 +52,7 @@
 <script src="assets/js/hk-map.js"></script>
 <script src="assets/js/hk-ui.js"></script>
 <script src="assets/js/booking.js"></script>
+<script src="assets/js/pages2.js"></script>
 <script src="assets/js/site.js"></script>
 </body>
 </html>

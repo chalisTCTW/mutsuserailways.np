@@ -21,6 +21,7 @@
     walkLinks: [{ a: '中央戸宮', b: '大學前', sec: 360 }],
     minTransferSec: 120,           // 轉乘最短時間（快照有值時以快照為準）
     zoneOverride: {},              // { "車站中文名": 分區編號 }：遊戲內沒設分區時，可在這裡補
+    typeMarks: {},                 // 時刻表格子裡的種別略稱；沒寫的種別用種別名稱的第一個字。例：{ '環状快速': '環' }
   }, root.HK_CONFIG || {});
 
   const pad = n => String(n).padStart(2, '0');
@@ -39,6 +40,9 @@
   }
   function parseRouteName(zh) {
     let name = String(zh || '').replace(/\s+/g, '');
+    // 0.26：環狀快速（環快）是獨立的種別，不是一般的「快速」。路線名稱仍保留「環状」，避免與其他路線混在一起。
+    const loopExp = name.match(/環[状狀]快速/);
+    if (loopExp) return { line: name.replace(loopExp[0], '環状'), type: '環状快速', full: zh };
     for (const tk of TYPE_TOKENS) {
       if (name.length > tk.length && name.endsWith(tk)) return { line: name.slice(0, -tk.length), type: tk, full: zh };
     }
@@ -447,7 +451,9 @@
     return H;
   }
 
-  const api = { build, index, parseRouteName, typeClass, hm, shiftDay, nowSec, CFG, DAY };
+  /** 種別略稱（時刻表格子用）：各停不標示；其他種別取種別名稱的第一個字（可用 typeMarks 覆寫）。 */
+  function typeMarkOf(type) { return type && typeClass(type) !== 'loc' ? (CFG.typeMarks[type] || Array.from(type)[0]) : ''; }
+  const api = { build, index, parseRouteName, typeClass, typeMarkOf, hm, shiftDay, nowSec, CFG, DAY };
   root.HK = Object.assign(root.HK || {}, api);
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

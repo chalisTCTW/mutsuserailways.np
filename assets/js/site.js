@@ -8,11 +8,6 @@
   const q = new URLSearchParams(location.search);
   const hm = t => HKc.hm(t);
   const DAY = 86400;
-  /** 調度（離峰・深夜・收車）時顯示給旅客的說明。 */
-  function dispNote(H) {
-    const t = { offpeak: '目前採用離峰時段班次，部分列車停駛（約每 2 班行駛 1 班）。', night: '目前採用深夜時段班次，列車班次減少（約每 3 班行駛 1 班）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow];
-    return t ? ' ' + t : '';
-  }
   const yen = n => '¥' + Number(n).toLocaleString('en-US');
 
   function stationSelect(H, id, label, onChange) {
@@ -22,6 +17,11 @@
     return sel;
   }
   const field = (label, el) => h('label', { class: 'f' }, h('span', null, label), el);
+  /** 調度（離峰・深夜・收車）時顯示給旅客的說明。 */
+  function dispNote(H) {
+    const t = { offpeak: '目前採用離峰時段班次，部分列車停駛（約每 2 班行駛 1 班）。', night: '目前採用深夜時段班次，列車班次減少（約每 3 班行駛 1 班）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow];
+    return t ? ' ' + t : '';
+  }
 
   /* ───────── 首頁 ───────── */
   function carousel() {
@@ -138,9 +138,10 @@
       show.forEach(g => out.append(timetableTable(H, g, whole)));
       // 圖例
       const types = new Map(); show.forEach(g => g.evs.forEach(e => { const k = e.sv.type || '各停'; if (!types.has(k)) types.set(k, e.sv); }));
-      const leg = h('div', { class: 'tlegend' }, [...types.values()].map(sv => h('span', null, typeTag(sv))));
+      const order = sv => (sv.type ? 1 : 0) + (sv.tcls === 'exp' ? 1 : 0) + (sv.tcls === 'ltd' ? 2 : 0);
+      const leg = h('div', { class: 'tlegend' }, [...types.values()].sort((a, b) => order(a) - order(b)).map(sv => h('span', null, typeMark(sv) ? h('b', { class: 'mk ' + sv.tcls }, typeMark(sv)) : null, typeTag(sv))));
       out.append(leg);
-      out.append(h('p', { class: 'note' }, '時刻為各班次在本站的發車時刻。方格內的「特」「快」標示特急類、急行・快速類班次，無標示者為各站停車；右上角小字為行先。'));
+      out.append(h('p', { class: 'note' }, '時刻為各班次在本站的發車時刻。方格內有字的是各停以外的種別（字為種別略稱，例：特＝特急・特別快速、快＝快速、環＝環狀快速），沒有標示的是各站停車；右上角小字為行先。'));
     }
     draw();
   }
@@ -319,6 +320,9 @@
       else if (page === 'timetable') timetable(H);
       else if (page === 'live') live(H);
       else if (page === 'booking') HK.booking(H, app);
+      else if (page === 'routes') HK.viewLines(H, app);
+      else if (page === 'board') HK.viewBoard(H, app);
+      else if (page === 'sights') await HK.viewSights(H, app);
     } catch (e) {
       console.error(e);
       const t = h('div', { class: 'wrap' }, h('div', { class: 'soonbox' }, h('h2', null, '資料暫時無法顯示'), h('p', null, '載入時刻表資料時發生問題，請稍後再試。')));
