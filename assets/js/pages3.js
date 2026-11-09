@@ -225,7 +225,7 @@
         h('div', null, h('dt', null, '全程所要時間'), h('dd', null, `約 ${Math.round((sv.stops[sv.stops.length - 1].arr - sv.stops[0].dep) / 60)} 分`)),
         h('div', null, h('dt', null, '首班／末班'), h('dd', null, tt.length ? `${hm(tt[0])}／${hm(tt[tt.length - 1])}` : '本日無班次')),
         h('div', null, h('dt', null, '本日班次'), h('dd', null, `${tt.length} 班`))));
-      const rows = []; sv.stops.forEach((s, i) => { if (s.pax === false) return; rows.push(h('tr', null, h('td', null, h('a', { href: 'timetable.html?s=' + encodeURIComponent(s.station) }, H.stName(s.station))), h('td', { class: 'tm' }, i === 0 ? '起點' : `${Math.round((s.arr - sv.stops[0].arr) / 60)} 分`))); });
+      const rows = []; sv.stops.forEach((s, i) => { if (s.pax === false) return; rows.push(h('tr', null, h('td', null, h('a', { href: 'timetable.html?s=' + encodeURIComponent(s.station) }, H.codeBadges(s.station), H.stName(s.station))), h('td', { class: 'tm' }, i === 0 ? '起點' : `${Math.round((s.arr - sv.stops[0].arr) / 60)} 分`))); });
       dyn.append(h('div', { class: 'tscroll' }, h('table', { class: 'tbl', style: 'max-width:420px' }, h('thead', null, h('tr', null, h('th', null, '停靠站'), h('th', null, '自起點'))), h('tbody', null, rows))),
         h('p', { class: 'note' }, (all.length > 1 ? '另有反方向的班次。' : '') + dispNote(H)),
         h('p', null, h('a', { class: 'btn ghost', href: 'routes.html?r=' + encodeURIComponent(sv.routeName) }, '路線資訊'), ' ', h('a', { class: 'btn ghost', href: 'timetable.html' }, '時刻表')));

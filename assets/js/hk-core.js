@@ -161,6 +161,13 @@
     const sIdx = new Map(stations.map((s, i) => [s.id, i]));
     H.sIdx = sIdx;
     H.stName = id => (H.stById[id] || stById[id] || { zh: '?' }).zh;
+    /* 車站編碼（0.26.0）：id → ['H05','KU01']；徽章用路線色。沒有編碼的車站回傳空陣列／null，畫面維持原樣。 */
+    H.codes = id => ((H.stById[id] || stById[id] || {}).codes) || [];
+    H.codeColor = c => { const m = String(c).match(/^[A-Z]+/); const cc = (CFG.codeColors || {}); return (m && (cc[c] || cc[m[0]])) || '#6b7280'; };
+    H.codeBadges = id => { const cs = H.codes(id); if (!cs.length) return null; const w = document.createElement('span'); w.className = 'scodes'; cs.forEach(c => { const b = document.createElement('b'); b.className = 'scode'; b.textContent = c; b.style.background = H.codeColor(c); b.style.color = '#fff'; w.append(b); }); return w; };
+    if (window.HK_I18N) window.HK_I18N.names(net.stations.filter(s => s.codes && s.codes.length && s.en).map(s => [s.codes.join('/') + ' ' + s.zh, s.codes.join('/') + ' ' + s.en]));
+    H.codeText = id => { const cs = H.codes(id); return cs.length ? cs.join('/') : ''; };
+    if (window.HK_I18N) window.HK_I18N.names(net.stations.map(s => [s.zh, s.en]).concat((net.routes || []).map(r => [r.zh, r.en]), (net.routes || []).map(r => [r.displayZh, r.en])));
 
     H.destOf = (sv, i) => {
       const out = i != null && sv.stops[i] && sv.stops[i].out;

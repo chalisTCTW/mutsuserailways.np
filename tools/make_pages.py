@@ -20,7 +20,7 @@ def shell(page, title, body, extra_head='', desc=''):
     acur = ' aria-current="page"' if page == 'atos' else ''
     nav.append(f'<li class="admin"><a id="adminlink" href="atos.html"{acur}>企業管理登入<span class="en">Staff Login (ATOS)</span></a></li>')
     return f'''<!doctype html>
-<html lang="zh-Hant">
+<html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,7 +31,7 @@ def shell(page, title, body, extra_head='', desc=''):
 {extra_head}
 </head>
 <body data-page="{page}">
-<div class="util"><div class="wrap"><span>光瀨都市鉄道　公式網站</span><span>Minecraft 架空鐵路</span></div></div>
+<div class="util"><div class="wrap"><span>光瀨都市鉄道　公式網站</span><span class="util-sub">Minecraft 架空鐵路</span></div></div>
 <header>
   <div class="banner">
     <img class="photo" src="assets/photo/banner.webp" alt="">
@@ -39,6 +39,7 @@ def shell(page, title, body, extra_head='', desc=''):
   </div>
   <nav class="gnav" aria-label="主要選單"><ul>{''.join(nav)}</ul></nav>
 </header>
+<div id="svcbar" class="svcbar" role="status" hidden></div>
 <main>
 {body}
 </main>
@@ -50,6 +51,9 @@ def shell(page, title, body, extra_head='', desc=''):
   </div>
 </footer>
 <script src="assets/js/site-config.js"></script>
+<script src="assets/js/i18n-dict.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/hk-status.js"></script>
 {{scripts}}
 </body>
 </html>
@@ -57,6 +61,7 @@ def shell(page, title, body, extra_head='', desc=''):
 SCRIPTS = '''<script src="assets/js/atos-model.js"></script>
 <script src="assets/js/hk-core.js"></script>
 <script src="assets/js/hk-map.js"></script>
+<script src="assets/js/layout-seed.js"></script>
 <script src="assets/js/hk-ui.js"></script>
 <script src="assets/js/booking.js"></script>
 <script src="assets/js/pages2.js"></script>
@@ -133,7 +138,7 @@ write('sights.html', 'sights', '沿線景點｜光瀨都市鉄道', '''<div clas
 
 write('atos.html', 'atos', '企業管理登入｜光瀨都市鉄道', '<div id="app"></div>', scripts=False)
 _p = os.path.join(ROOT, 'atos.html'); _t = open(_p, encoding='utf-8').read()
-_t = _t.replace('<script src="assets/js/site-config.js"></script>', '<script src="assets/js/site-config.js"></script>\n<script src="assets/js/hk-ui.js"></script>\n<script src="assets/js/qr.js"></script>\n<script src="assets/js/atos-status.js"></script>')
+_t = _t.replace('<script src="assets/js/site-config.js"></script>', '<script src="assets/js/site-config.js"></script>\n<script src="assets/js/layout-seed.js"></script>\n<script src="assets/js/hk-ui.js"></script>\n<script src="assets/js/qr.js"></script>\n<script src="assets/js/atos-status.js"></script>')
 open(_p, 'w', encoding='utf-8').write(_t)
 
 def soon(name, page, title, en, msg):

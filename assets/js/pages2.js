@@ -38,7 +38,7 @@
     if (first === last) return sv.member.dir || '環狀';
     return `${H.stName(first)} → ${H.stName(last)}`;
   }
-  const stLink = (H, id, cls) => { const st = H.stById[id]; return st ? h('a', { href: 'timetable.html?s=' + encodeURIComponent(id), class: cls || null }, st.zh) : h('span', null, H.stName(id)); };
+  const stLink = (H, id, cls) => { const st = H.stById[id]; return st ? h('a', { href: 'timetable.html?s=' + encodeURIComponent(id), class: cls || null }, H.codeBadges(id), st.zh) : h('span', null, H.stName(id)); };
   const chipLines = (H, id, except) => {
     const seen = new Map();
     H.svcs.forEach(sv => { if (sv.routeName === except) return; if (sv.stops.some(s => s.station === id && s.pax !== false)) { if (!seen.has(sv.line)) seen.set(sv.line, sv.color); } });
@@ -109,7 +109,7 @@
       }).filter(c => c.n >= Math.min(3, rowSt.length));
       if (cols.length > 1) {
         const hd = h('tr', null, h('th'), ...cols.map(c => h('th', { class: c.o === g ? 'cur' : null }, h('a', { href: '?r=' + encodeURIComponent(c.o.name), onclick: e => { e.preventDefault(); cur = c.o; di = 0; draw(); drawChips(); try { history.replaceState(null, '', '?r=' + encodeURIComponent(c.o.name)); } catch (er) { } window.scrollTo(0, 0); } }, c.o.type ? typeMark(c.o.sv) + ' ' : '', c.o.name))));
-        const body = rowSt.map(s => h('tr', null, h('th', { scope: 'row' }, s.station && H.stName(s.station)), ...cols.map(c => h('td', { class: c.o === g ? 'cur' : null }, c.cover.has(s.station) ? (c.cover.get(s.station) ? '●' : '｜') : ''))));
+        const body = rowSt.map(s => h('tr', null, h('th', { scope: 'row' }, s.station && H.codeBadges(s.station), s.station && H.stName(s.station)), ...cols.map(c => h('td', { class: c.o === g ? 'cur' : null }, c.cover.has(s.station) ? (c.cover.get(s.station) ? '●' : '｜') : ''))));
         out.append(h('h3', { class: 'h3' }, '停車一覽（各種別比較）'), h('div', { class: 'tscroll' }, h('table', { class: 'matrix' }, h('thead', null, hd), h('tbody', null, body))), h('p', { class: 'note' }, '●＝停車，｜＝通過，空白＝不經過。欄名可點選切換路線。'));
       }
     }
@@ -132,7 +132,7 @@
     const list = h('div', { class: 'pids-list', 'aria-live': 'off' });
     const clock = h('div', { class: 'pids-clock', 'aria-hidden': 'true' });
     const st0 = H.stById[sid];
-    const title = h('div', { class: 'pids-st' }, h('span', { class: 'pids-lab' }, '発車案内'), h('strong', null, st0 ? st0.zh : ''), st0 && st0.en ? h('small', null, st0.en) : null);
+    const title = h('div', { class: 'pids-st' }, h('span', { class: 'pids-lab' }, '発車案内'), h('strong', null, st0 ? H.codeBadges(st0.id) : null, st0 ? st0.zh : ''), st0 && st0.en ? h('small', null, st0.en) : null);
     const el = h('div', { class: 'pids compact' }, h('div', { class: 'pids-head' }, title, clock), dirs, list);
     function tick(force) {
       const nowS = H.nowSec();
@@ -173,7 +173,7 @@
     const lines = chipLines(H, st.id, null);
     box.hidden = false;
     box.replaceChildren(...[
-      h('div', { class: 'pop-head' }, h('strong', null, st.zh), st.en ? h('span', { class: 'pop-en' }, st.en) : null, h('button', { type: 'button', class: 'pop-x', 'aria-label': '關閉', onclick: () => { board.stop(); box.hidden = true; } }, '×')),
+      h('div', { class: 'pop-head' }, h('strong', null, H.codeBadges(st.id), st.zh), st.en ? h('span', { class: 'pop-en' }, st.en) : null, h('button', { type: 'button', class: 'pop-x', 'aria-label': '關閉', onclick: () => { board.stop(); box.hidden = true; } }, '×')),
       lines.length ? h('div', { class: 'pop-lines' }, h('span', null, '停靠路線'), ...lines) : null,
       board.el,
       h('div', { class: 'pop-btns' },
@@ -197,7 +197,7 @@
       const names = d.stations && d.stations.length ? d.stations : [d.station];
       const nears = names.map(nm => {
         const st = stByName(H, nm), id = st && st.id, lines = id ? chipLines(H, id, null) : [];
-        return h('div', { class: 'snear' }, h('strong', null, '最近車站'), h('span', { class: 'sn' }, nm), lines.length ? h('span', { class: 'sl' }, lines) : null,
+        return h('div', { class: 'snear' }, h('strong', null, '最近車站'), h('span', { class: 'sn' }, id ? H.codeBadges(id) : null, nm), lines.length ? h('span', { class: 'sl' }, lines) : null,
           id ? h('div', { class: 'sbtns' },
             h('a', { class: 'btn sm', href: 'timetable.html?s=' + encodeURIComponent(id) }, '車站時刻表'),
             h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=map&s=' + encodeURIComponent(id) }, '路線圖與接下來的發車'),

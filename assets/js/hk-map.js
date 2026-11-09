@@ -200,10 +200,62 @@
   })();
   const scoreOf = r => r.crossings * 1000 + r.touch * 500 + r.near * 90 + r.bends * 45 + r.offGrid * 120 + r.dev * 1.5 + Math.max(0, Math.max(r.width, r.height) - 900) * 0.4;
 
+  /** 邊的穩定鍵（車站 id，不受改名影響）與「從較小 id 看較大 id」的方向。 */
+  const edgeKey = (a, b) => (String(a) < String(b) ? a + '~' + b : b + '~' + a);
+  function seedOf(H, dirs) {
+    const st = H.stations, ok = new Set(st.map(q => q.id)), out = {}; let k = 0;
+    H.edges.forEach(e => { if (!ok.has(e.a) || !ok.has(e.b) || e.a === e.b) return; const d = dirs[k++]; out[edgeKey(e.a, e.b)] = String(e.a) < String(e.b) ? d : (d + 4) % 8; });
+    return out;
+  }
+  /** 以舊版面（seed）為起點：沿用還在的連線的方向；新增／改變的連線取實際方位或鄰近舊線的方向，再只對「新線與它的鄰線」做有限次數的區域搜尋（次數固定，不看時間，所以每台裝置結果相同）。 */
+  function layoutSeeded(H, opts, prm, seed) {
+    const st = H.stations, idx = new Map(st.map((q, i) => [q.id, i]));
+    const E = []; H.edges.forEach(e => { const i = idx.get(e.a), j = idx.get(e.b); if (i != null && j != null && i !== j) E.push({ i, j, a: e.a, b: e.b }); });
+    const m = E.length, dirs = new Array(m).fill(-1), free = new Array(m).fill(false);
+    E.forEach((e, k) => { const sd = seed[edgeKey(e.a, e.b)]; if (sd != null) dirs[k] = String(e.a) < String(e.b) ? sd : (sd + 4) % 8; });
+    const geoOf = k => angIdx(st[E[k].j].x - st[E[k].i].x, st[E[k].j].z - st[E[k].i].z);
+    const seedAt = new Map();                    // 車站 id → 舊版面中從該站出發的各方向
+    Object.keys(seed).forEach(key => { const [u, w] = key.split('~'); const d = seed[key]; (seedAt.get(u) || seedAt.set(u, []).get(u)).push(d); (seedAt.get(w) || seedAt.set(w, []).get(w)).push((d + 4) % 8); });
+    for (let k = 0; k < m; k++) if (dirs[k] < 0) {
+      free[k] = true; const g = geoOf(k); let pick = Math.round(g) % 8, bd = 9;
+      // 新站插進舊線中間時，沿用舊線在這一端的方向（與實際方位相差 ≤45°），線形不變
+      const cand = (seedAt.get(String(E[k].a)) || []).concat((seedAt.get(String(E[k].b)) || []).map(d => (d + 4) % 8));
+      cand.forEach(d => { const c = cdiff(g, d); if (c <= 1 && c < bd) { bd = c; pick = d; } });
+      dirs[k] = pick;
+    }
+    const withDirs = (d) => Object.assign({}, prm, { dirs: d });
+    let best = layoutOnce(H, opts, withDirs(dirs)); best.score = scoreOf(best); best.prm = prm;
+    const nFree = free.filter(Boolean).length;
+    if (nFree || best.crossings || best.touch || best.near) {
+      // 只動：新增的線、與新線相鄰的線；若仍有交叉／過近則放寬到全部。次數固定
+      const touchNew = new Set(); E.forEach((e, k) => { if (free[k]) { touchNew.add(k); E.forEach((f, q) => { if (f.i === e.i || f.i === e.j || f.j === e.i || f.j === e.j) touchNew.add(q); }); } });
+      const rounds = [[...touchNew], [...Array(m).keys()]];
+      let evals = 0; const cap = 700;
+      for (const set of rounds) {
+        let improved = true, pass = 0;
+        while (improved && pass < 4 && evals < cap) {
+          improved = false; pass++;
+          for (const k of set) {
+            if (evals >= cap) break;
+            for (const dd of [1, 7, 2, 6]) {
+              const d2 = best.dirs.slice(); d2[k] = (d2[k] + dd) % 8;
+              const r = layoutOnce(H, opts, withDirs(d2)); evals++; r.score = scoreOf(r); r.prm = prm;
+              if (r.score < best.score - 1e-6) { best = r; improved = true; break; }
+            }
+          }
+        }
+        if (!best.crossings && !best.touch && !best.near) break;
+      }
+    }
+    best.recipe = { prm, dirs: best.dirs, seed: seedOf(H, best.dirs) };
+    return best;
+  }
+
   /** 版面。recipe＝{ prm, dirs }：直接重現（不搜尋）。否則：固定參數組各算一次，再對最好的一組做「逐條線改方向」的區域搜尋，降低交叉、過近與轉折。 */
   function layout(H, opts) {
     opts = opts || {};
     const withDirs = (prm, dirs) => Object.assign({}, prm, { dirs });
+    if (opts.seed && !opts.recipe) { const r = layoutSeeded(H, opts, opts.seedPrm || COMBOS[4], opts.seed); r.seeded = true; return r; }
     if (opts.recipe) { const r = layoutOnce(H, opts, withDirs(opts.recipe.prm || opts.recipe, opts.recipe.dirs)); r.recipe = opts.recipe; r.score = scoreOf(r); return r; }
     const n = Math.max(1, Math.min(COMBOS.length, opts.tries && opts.tries < COMBOS.length ? opts.tries : COMBOS.length));
     let best = null;
@@ -244,7 +296,7 @@
         }
       }
     }
-    best.recipe = { prm: best.prm, dirs: best.dirs };
+    best.recipe = { prm: best.prm, dirs: best.dirs, seed: seedOf(H, best.dirs) };
     return best;
   }
 
@@ -257,7 +309,7 @@
     return pts[pts.length - 1];
   }
 
-  const api = { layout, pointAt, GRID };
+  const api = { layout, pointAt, GRID, seedOf };
   root.HK = Object.assign(root.HK || {}, { map: api });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

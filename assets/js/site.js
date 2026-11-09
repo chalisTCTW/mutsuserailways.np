@@ -11,7 +11,7 @@
   const yen = n => '¥' + Number(n).toLocaleString('en-US');
 
   function stationSelect(H, id, label, onChange) {
-    const sel = h('select', { 'aria-label': label }, H.stations.map(st => h('option', { value: st.id }, st.zh)));
+    const sel = h('select', { 'aria-label': label }, H.stations.map(st => h('option', { value: st.id }, (H.codeText(st.id) ? H.codeText(st.id) + ' ' : '') + st.zh)));
     if (id) sel.value = id;
     if (onChange) sel.addEventListener('change', () => onChange(sel.value));
     return sel;
@@ -111,7 +111,7 @@
       const evs = H.departures(sid);
       out.replaceChildren();
       const st = H.stById[sid];
-      out.append(h('h2', { class: 'h2', style: 'margin-top:22px' }, st.zh, st.en ? h('small', null, st.en) : null));
+      out.append(h('h2', { class: 'h2', style: 'margin-top:22px' }, H.codeBadges(sid), st.zh, st.en ? h('small', null, st.en) : null));
       if (!evs.length) { out.append(h('p', { class: 'lead' }, '這個車站沒有發車的班次（可能是各路線的終點站）。')); return; }
       // 分組
       const groups = new Map();
@@ -201,13 +201,13 @@
     j.legs.forEach((leg, li) => {
       const s0 = leg.stops[0], sN = leg.stops[leg.stops.length - 1], sv = leg.sv;
       lis.push(h('li', { class: li === 0 ? 'first' : '' }, h('div', { class: 'tm' }, hm(s0.dep)), h('div', { class: 'rl' }, h('i')),
-        h('div', { class: 'wh' }, h('strong', null, H.stName(s0.station)), s0.platform ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `${s0.platform} 號月台`) : null,
+        h('div', { class: 'wh' }, h('strong', null, H.codeBadges(s0.station), H.stName(s0.station)), s0.platform ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `${s0.platform} 號月台`) : null,
           h('div', { class: 'ride' }, typeTag(sv), h('span', null, sv.routeName), h('span', null, `${H.destOf(sv, leg.board)}行`), h('span', null, `${leg.stops.length - 1} 站・${Math.max(1, Math.round((sN.arr - s0.dep) / 60))} 分`), H.reserveLabel(sv) ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null))));
       const nxt = j.legs[li + 1];
       if (nxt) {
-        lis.push(h('li', { class: 'walk' }, h('div', { class: 'tm' }, hm(sN.arr), h('span', null, hm(nxt.stops[0].dep))), h('div', { class: 'rl' }, h('i')), h('div', { class: 'wh' }, h('strong', null, H.stName(sN.station)), nxt.walk ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `徒歩 → ${H.stName(nxt.walk.to)}（約 ${Math.round(nxt.walk.sec / 60)} 分）・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`) : h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `轉乘・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`))));
+        lis.push(h('li', { class: 'walk' }, h('div', { class: 'tm' }, hm(sN.arr), h('span', null, hm(nxt.stops[0].dep))), h('div', { class: 'rl' }, h('i')), h('div', { class: 'wh' }, h('strong', null, H.codeBadges(sN.station), H.stName(sN.station)), nxt.walk ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `徒歩 → ${H.stName(nxt.walk.to)}（約 ${Math.round(nxt.walk.sec / 60)} 分）・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`) : h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `轉乘・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`))));
       } else {
-        lis.push(h('li', { class: 'last' }, h('div', { class: 'tm' }, hm(sN.arr)), h('div', { class: 'rl' }, h('i')), h('div', { class: 'wh' }, h('strong', null, H.stName(sN.station)), sN.platform ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `${sN.platform} 號月台`) : null)));
+        lis.push(h('li', { class: 'last' }, h('div', { class: 'tm' }, hm(sN.arr)), h('div', { class: 'rl' }, h('i')), h('div', { class: 'wh' }, h('strong', null, H.codeBadges(sN.station), H.stName(sN.station)), sN.platform ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `${sN.platform} 號月台`) : null)));
       }
     });
     return h('article', { class: 'jr' },
@@ -284,7 +284,7 @@
         const past = k < i || (k === i && !tr.dwelling && false), here = k === i && tr.dwelling, nextS = k === i + 1;
         const first = k === 0, last = k === st.length - 1;
         rows.push(h('tr', { class: (k < i ? 'past ' : '') + (here ? 'here ' : '') + (nextS ? 'next' : '') },
-          h('td', { class: 'mk' }, here ? '●' : nextS ? '▶' : ''), h('td', null, H.stName(s.station), s.platformName ? h('small', null, ` ${s.platformName}番線`) : null),
+          h('td', { class: 'mk' }, here ? '●' : nextS ? '▶' : ''), h('td', null, H.codeBadges(s.station), H.stName(s.station), s.platformName ? h('small', null, ` ${s.platformName}番線`) : null),
           h('td', { class: 'tm' }, first ? '' : hm(base + s.arr)), h('td', { class: 'tm' }, last ? '' : hm(base + s.dep))));
       });
       return h('div', { class: 'tinfo' },

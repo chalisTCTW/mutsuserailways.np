@@ -157,7 +157,7 @@
     const stations = new Map();
     for (const s of stationsRaw) {
       const [zh, en] = splitZhEn(s.name);
-      stations.set(S(s.id), { id: S(s.id), zh, en, color: s.color, x: (s.position1.x + s.position2.x) / 2, z: (s.position1.z + s.position2.z) / 2, box: [Math.min(s.position1.x, s.position2.x), Math.min(s.position1.z, s.position2.z), Math.max(s.position1.x, s.position2.x), Math.max(s.position1.z, s.position2.z)], platforms: [] });
+      stations.set(S(s.id), { id: S(s.id), zh, en, codes: (dump.stationCodes && dump.stationCodes[S(s.id)]) || [], color: s.color, x: (s.position1.x + s.position2.x) / 2, z: (s.position1.z + s.position2.z) / 2, box: [Math.min(s.position1.x, s.position2.x), Math.min(s.position1.z, s.position2.z), Math.max(s.position1.x, s.position2.x), Math.max(s.position1.z, s.position2.z)], platforms: [] });
     }
     for (const p of plat.values()) stations.get(p.station).platforms.push({ id: p.id, name: p.name });
 

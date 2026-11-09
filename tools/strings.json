@@ -1,0 +1,2462 @@
+{
+"戸": [
+"assets/js/hk-core.js",
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"目前採用離峰時段班次（部分列車停駛）。": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"目前採用深夜時段班次（班次減少）。": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"目前為收車時段，不再發出新的班次。": [
+"assets/js/pages2.js",
+"assets/js/pages3.js",
+"assets/js/site.js"
+],
+"各停": [
+"assets/js/hk-core.js",
+"assets/js/hk-ui.js",
+"assets/js/pages3.js",
+"assets/js/site.js"
+],
+"快速類": [
+"assets/js/pages3.js"
+],
+"特急・特快類": [
+"assets/js/pages3.js"
+],
+"第一次搭乘光瀨都市鉄道？這裡整理了各種別的差別、座席與票券、避免搭錯車的方法，以及常見問題。": [
+"assets/js/pages3.js"
+],
+"本頁內容": [
+"assets/js/pages3.js"
+],
+"乘車指南": [
+"assets/js/pages3.js"
+],
+"常見問題": [
+"assets/js/pages3.js"
+],
+"各種別的差別": [
+"assets/js/pages3.js"
+],
+"同一條路線上會有不同「種別」的列車，差別在於停靠的車站與座席。月台的發車顯示與時刻表上都會標示種別，上車前請確認。": [
+"assets/js/pages3.js"
+],
+"種別": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"停靠站": [
+"assets/js/pages2.js",
+"assets/js/pages3.js",
+"assets/js/site.js"
+],
+"座席": [
+"assets/js/pages3.js"
+],
+"另需費用": [
+"assets/js/pages3.js"
+],
+"適合": [
+"assets/js/pages3.js"
+],
+"每一站都停": [
+"assets/js/pages3.js"
+],
+"全車自由席": [
+"assets/js/pages3.js"
+],
+"不需要": [
+"assets/js/pages3.js"
+],
+"短程移動、前往小站": [
+"assets/js/pages3.js"
+],
+"快速": [
+"assets/js/hk-core.js",
+"assets/js/pages3.js"
+],
+"停靠主要車站，部分小站通過": [
+"assets/js/pages3.js"
+],
+"中距離、想比各停快又不想多花錢": [
+"assets/js/pages3.js"
+],
+"環狀快速": [
+"assets/js/pages3.js"
+],
+"行駛環狀區間，停站比一般快速更精簡（時刻表與發車顯示以「環」標示）": [
+"assets/js/pages3.js"
+],
+"環狀線與直通區間的移動；與一般「快速」是不同的種別": [
+"assets/js/pages3.js"
+],
+"特快": [
+"assets/js/hk-core.js",
+"assets/js/pages3.js"
+],
+"停靠站更少的優等列車（特別快速）": [
+"assets/js/pages3.js"
+],
+"1・2 号車為指定席、3 号車以後為自由席": [
+"assets/js/pages3.js"
+],
+"搭乘指定席車廂需指定席券（${yen(sf)}）；自由席車廂不用": [
+"assets/js/pages3.js"
+],
+"想快一點，但不一定要訂位": [
+"assets/js/pages3.js"
+],
+"特急": [
+"assets/js/hk-core.js",
+"assets/js/pages3.js"
+],
+"停靠站最少，如特急あおさぎ、特急こばな、空港LINER": [
+"assets/js/pages3.js"
+],
+"全車指定席（另有立席特急券）": [
+"assets/js/pages3.js"
+],
+"指定席券 ${yen(sf)}；立席特急券 ${yen(st)}（為指定席的一半）": [
+"assets/js/pages3.js"
+],
+"長距離與機場往返，最快最舒適": [
+"assets/js/pages3.js"
+],
+"乘車券（依距離計算）是每個人都需要的；指定席券與立席特急券是搭乘指定席列車時額外加收的費用。詳細票價請見「": [
+"assets/js/pages3.js"
+],
+"票價查詢": [
+"assets/js/pages3.js",
+"assets/js/site.js"
+],
+"座席與票券：指定席、自由席、立席特急券": [
+"assets/js/pages3.js"
+],
+"指定席": [
+"assets/js/booking.js",
+"assets/js/pages3.js"
+],
+"保證有座位，可以選擇座位。特急的所有車廂、特快的 1・2 号車都是指定席。": [
+"assets/js/pages3.js"
+],
+"線上訂票": [
+"airport.html",
+"assets/js/pages3.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"自由席": [
+"assets/js/booking.js",
+"assets/js/pages3.js"
+],
+"不需另付": [
+"assets/js/pages3.js"
+],
+"不必訂位，先到先坐。各停、快速、環狀快速全車自由席；特快 3 号車以後也是自由席。尖峰時段可能沒有座位。": [
+"assets/js/pages3.js"
+],
+"立席特急券": [
+"assets/js/booking.js",
+"assets/js/pages3.js"
+],
+"只有特急才有。價格是指定席的一半，不保證有座位、也不能選座位。座位坐滿時，請站在車廂連接處或門邊，並抓好扶手。": [
+"assets/js/pages3.js"
+],
+"怎麼選車": [
+"assets/js/pages3.js"
+],
+"先看目的地": [
+"assets/js/pages3.js"
+],
+"用「乘車・轉乘查詢」輸入出發站與目的地，系統會列出所有可搭乘的列車與所要時間。": [
+"assets/js/pages3.js"
+],
+"決定要快還是省": [
+"assets/js/pages3.js"
+],
+"想最快抵達：特急或特快（需要指定席券，特急可買立席特急券）。想省錢：快速、環狀快速或各停（自由席）。": [
+"assets/js/pages3.js"
+],
+"確認有沒有停": [
+"assets/js/pages3.js"
+],
+"到「路線資訊」的「停車一覽」確認你要去的車站是否停車；再看月台的發車顯示核對種別與行先。": [
+"assets/js/pages3.js"
+],
+"每小時各種別的發車班次數": [
+"assets/js/pages3.js"
+],
+"${i} 時：各停 ${per.loc[i]}／快速類 ${per.exp[i]}／特急・特快類 ${per.ltd[i]}（共 ${n} 班）": [
+"assets/js/pages3.js"
+],
+"一天的發車班次": [
+"assets/js/pages3.js"
+],
+"下面是全線各種別一天內每小時從起點發車的班次數（依目前的調度方案；尖峰時段班次多、離峰與深夜班次較少）。班次多的時段等車時間短；班次少的時段，請先查好時刻表再出發。": [
+"assets/js/pages3.js"
+],
+"目前沒有班次資料。": [
+"assets/js/pages3.js"
+],
+"班次最多的是 ${peakH} 時台（${tot[peakH]} 班），最少的是 ${quiet[1]} 時台（${quiet[0]} 班）。": [
+"assets/js/pages3.js"
+],
+"目前各時段的班次數相近。": [
+"assets/js/pages3.js"
+],
+"等": [
+"assets/js/pages3.js"
+],
+"怎麼避免搭錯車": [
+"assets/js/pages3.js"
+],
+"先看種別，再看行先。": [
+"assets/js/pages3.js"
+],
+"同一個月台常有不同種別的列車進站，行先相同但停的站不同。": [
+"assets/js/pages3.js"
+],
+"核對路線名稱。": [
+"assets/js/pages3.js"
+],
+"「環狀快速」和「快速」名稱相近，但是是不同的種別，停靠站不一樣；上車前請看清楚完整的名稱。": [
+"assets/js/pages3.js"
+],
+"用「停車一覽」確認目的地有停。": [
+"assets/js/pages3.js"
+],
+"特急、特快會通過許多小站；如果你的目的地是小站，搭到不停的車會被載過站。": [
+"assets/js/pages3.js"
+],
+"特急、特快 1・2 号車要有指定席券。": [
+"assets/js/pages3.js"
+],
+"沒有指定席券請坐自由席車廂；特急沒有自由席，沒有指定席券時請改買立席特急券或改搭其他種別。": [
+"assets/js/pages3.js"
+],
+"時刻表的格子會用一個字標示種別。": [
+"assets/js/pages3.js"
+],
+"各停不標示；其他種別以略稱的第一個字標示（例如「特」「快」「環」）。": [
+"assets/js/pages3.js"
+],
+"搭錯車了？": [
+"assets/js/pages3.js"
+],
+"不要慌張，在下一個停靠站下車，改搭反方向或正確的列車即可。如果超過購買的區間，請在出站前向站務人員補票。": [
+"assets/js/pages3.js"
+],
+"目前運行中的種別與時刻表上的標示：": [
+"assets/js/pages3.js"
+],
+"目前沒有資料。": [
+"assets/js/pages3.js"
+],
+"延誤・退票": [
+"assets/js/pages3.js"
+],
+"列車延誤時怎麼辦？": [
+"assets/js/pages3.js"
+],
+"請先看站內的廣播與發車顯示，也可以到": [
+"assets/js/pages3.js"
+],
+"即時列車動態": [
+"airport.html",
+"assets/js/pages3.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"查看列車位置（位置依時刻表推算，並非實際車輛位置）。延誤時間較長時，可以用": [
+"assets/js/pages3.js"
+],
+"乘車・轉乘查詢": [
+"assets/js/pages3.js",
+"assets/js/site.js"
+],
+"改搭其他路線繞行。": [
+"assets/js/pages3.js"
+],
+"若因天氣、天災造成延誤，可以到本網站下載「延誤證明」，並可申請退票。需要的時候會在「最新消息」公告下載連結與申請方式。": [
+"assets/js/pages3.js"
+],
+"因為天候或天災停駛，已經買的票可以退嗎？": [
+"assets/js/pages3.js"
+],
+"因天氣、天災造成停駛或嚴重延誤時，可以申請退票。請保留乘車券與指定席券，並依本網站公告的方式申請；詳細的手續與期限，以公告為準。": [
+"assets/js/pages3.js"
+],
+"我搭的車延誤了，會趕不上轉乘怎麼辦？": [
+"assets/js/pages3.js"
+],
+"請在下一個車站向站務人員說明，並出示延誤證明（如有）。也可以用「乘車・轉乘查詢」重新查詢，系統會從目前的時間找出最快的搭乘方式。": [
+"assets/js/pages3.js"
+],
+"票券・料金": [
+"assets/js/pages3.js"
+],
+"乘車券的價格怎麼算？": [
+"assets/js/pages3.js"
+],
+"乘車券由起步票價 ${yen(base)} 加上跨越的收費區數，每跨越一個收費區加 ${yen(step)}。有多條路徑時，採跨越收費區最少、其次距離最短的路徑。": [
+"assets/js/pages3.js"
+],
+"輸入出發站與抵達站就能看到金額。": [
+"assets/js/pages3.js"
+],
+"兒童與長者有折扣嗎？": [
+"assets/js/pages3.js"
+],
+"12 歲以下與 60 歲以上的乘車券為大人的一半（四捨五入到整數）。指定席券與立席特急券不打折。": [
+"assets/js/pages3.js"
+],
+"指定席券與立席特急券是多少錢？": [
+"assets/js/pages3.js"
+],
+"指定席券 ${yen(sf)}；特急的立席特急券為指定席的一半（${yen(st)}），不保證有座位，也不能選座位。特快只有 1・2 号車是指定席，3 号車以後為自由席，不用另外付費。": [
+"assets/js/pages3.js"
+],
+"哪些列車需要指定席？": [
+"assets/js/pages3.js"
+],
+"特急為全車指定席；特快的 1・2 号車為指定席。各停、快速、環狀快速都是全車自由席。": [
+"assets/js/pages3.js"
+],
+"有周遊券或優惠套票嗎？": [
+"assets/js/pages3.js"
+],
+"有。往返機場的旅客可以使用「三日券」（3,900 円）與「五日券」（4,800 円），期間內可無限次搭乘光瀨都市鉄道所有非指定席列車；搭乘指定席列車時只需另付指定席費用。詳細請見": [
+"assets/js/pages3.js"
+],
+"機場聯外交通": [
+"airport.html",
+"assets/js/pages3.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"在哪裡買指定席券？": [
+"assets/js/pages3.js"
+],
+"可以到": [
+"assets/js/pages3.js"
+],
+"選擇列車與座位。": [
+"assets/js/pages3.js"
+],
+"乘車": [
+"assets/js/pages3.js"
+],
+"時刻表上「特」「快」「環」是什麼意思？": [
+"assets/js/pages3.js"
+],
+"那是種別的略稱：不是各停、快速的列車，會以種別名稱的第一個字標示（例如特急＝「特」、特快＝「特」、環狀快速＝「環」）。各停不標示。完整的種別請看列車名稱。": [
+"assets/js/pages3.js"
+],
+"發車顯示怎麼看？": [
+"assets/js/pages3.js"
+],
+"在": [
+"assets/js/pages3.js"
+],
+"路線圖": [
+"assets/js/pages3.js",
+"assets/js/site.js",
+"board.html",
+"index.html",
+"make_pages"
+],
+"點選車站，就會看到這個車站接下來的發車、種別、行先與倒數時間。": [
+"assets/js/pages3.js"
+],
+"坐過站了怎麼辦？": [
+"assets/js/pages3.js"
+],
+"在下一個停靠站下車，改搭反方向的列車回去。若超過原本購買的區間，請在出站前向站務人員補票。": [
+"assets/js/pages3.js"
+],
+"末班車與深夜的班次怎麼查？": [
+"assets/js/pages3.js"
+],
+"各路線的首末班在": [
+"assets/js/pages3.js"
+],
+"路線資訊": [
+"airport.html",
+"assets/js/pages3.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"。深夜與離峰時段班次會減少，時刻表會依目前的時段自動顯示正在運行的班次。": [
+"assets/js/pages3.js"
+],
+"即時列車動態的位置準嗎？": [
+"assets/js/pages3.js"
+],
+"列車位置是依時刻表推算，不是實際車輛位置，實際運轉狀況可能因延誤而不同，請以站內公告為準。": [
+"assets/js/pages3.js"
+],
+"怎麼去松澤國際機場？": [
+"assets/js/pages3.js"
+],
+"搭乘特急或特快，一車直達，最快 11 分鐘。詳細的乘車方式與班次請見": [
+"assets/js/pages3.js"
+],
+"其他": [
+"assets/js/pages3.js"
+],
+"輪椅或嬰兒車需要協助時怎麼辦？": [
+"assets/js/pages3.js"
+],
+"請向各站的站務人員說明，站務人員會協助您上下車。": [
+"assets/js/pages3.js"
+],
+"遺失物怎麼辦？": [
+"assets/js/pages3.js"
+],
+"請告知下車的車站與搭乘的列車，向站務人員查詢。": [
+"assets/js/pages3.js"
+],
+"這個網站上的時刻表會和實際一樣嗎？": [
+"assets/js/pages3.js"
+],
+"網站的時刻表來自營運系統定期匯出的資料，會跟著調度方案（離峰、深夜、收車）變化。臨時的調整與延誤請以站內公告為準。": [
+"assets/js/pages3.js"
+],
+"松沢国際空港": [
+"assets/js/pages3.js"
+],
+"松澤": [
+"assets/js/pages3.js"
+],
+"松沢": [
+"assets/js/pages3.js"
+],
+"みつせ": [
+"assets/js/pages3.js",
+"assets/js/site.js"
+],
+"空港LINER與松澤國際機場": [
+"assets/js/pages3.js"
+],
+"空港LINER": [
+"assets/js/pages3.js",
+"data/news.json",
+"index.html",
+"make_pages"
+],
+"松澤國際機場　⇄　光瀨市區": [
+"assets/js/pages3.js"
+],
+"一車直達，最快 11 分鐘。": [
+"assets/js/pages3.js"
+],
+"松澤國際機場（松沢国際空港站）有特急與特快直達光瀨市區，不需要轉乘。下面是搭乘方式、所要時間、班次，以及專為旅客準備的三日券與五日券。": [
+"assets/js/pages3.js"
+],
+"搭乘方式": [
+"assets/js/pages3.js"
+],
+"前往松沢国際空港站。": [
+"assets/js/pages3.js"
+],
+"機場站設有月台直達光瀨市區的列車。": [
+"assets/js/pages3.js"
+],
+"選擇特急或特快。": [
+"assets/js/pages3.js"
+],
+"特急為全車指定席；特快為 1・2 号車指定席、3 号車以後自由席。兩者都是直達列車，中途停靠站少，所要時間最短。": [
+"assets/js/pages3.js"
+],
+"準備票券。": [
+"assets/js/pages3.js"
+],
+"需要「乘車券」；搭乘特急需指定席券（${yen(sf)}）或立席特急券（${yen(st)}）；搭乘特快 1・2 号車需指定席券（${yen(sf)}），坐 3 号車以後的自由席不用另付。": [
+"assets/js/pages3.js"
+],
+"依發車顯示上車。": [
+"assets/js/pages3.js"
+],
+"請確認種別與行先；各停與快速也行駛於這個區間，但停站較多，所需時間較長。": [
+"assets/js/pages3.js"
+],
+"所要時間與班次": [
+"assets/js/pages3.js"
+],
+"最快的特急一車直達，只需 11 分鐘左右。下表依目前的時刻表計算（含調度方案），各種別的所要時間與日間班次如下。": [
+"assets/js/pages3.js"
+],
+"時刻表資料更新後會在這裡顯示各種別的所要時間與班次。": [
+"assets/js/pages3.js"
+],
+"目前的時刻表資料中沒有從機場站發車的班次。": [
+"assets/js/pages3.js"
+],
+"列車": [
+"assets/js/pages3.js"
+],
+"行先": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"到${center.zh}": [
+"assets/js/pages3.js"
+],
+"所要時間": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"日間（9–16 時）": [
+"assets/js/pages3.js"
+],
+"本日班次": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"約 ${Math.round(g.mins / 60)} 分": [
+"assets/js/pages3.js"
+],
+"${g.day} 班（約 ${Math.round(7 * 60 / g.day)} 分一班）": [
+"assets/js/pages3.js"
+],
+"${g.ev} 班": [
+"assets/js/pages3.js"
+],
+"班次為從松沢国際空港站發車的本日班次。": [
+"assets/js/pages3.js"
+],
+"優惠套票　三日券・五日券": [
+"assets/js/pages3.js"
+],
+"專為旅客準備的套票。購買後，在使用期間內可以「無限次搭乘光瀨都市鉄道所有非指定席列車」，搭乘指定席列車時，只需要另外付指定席費用（不需再付乘車券）。": [
+"assets/js/pages3.js"
+],
+"三日券": [
+"assets/js/pages3.js"
+],
+"3,900 円": [
+"assets/js/pages3.js"
+],
+"適合：3 天 2 夜的短期旅行": [
+"assets/js/pages3.js"
+],
+"連續 3 天內無限次搭乘": [
+"assets/js/pages3.js"
+],
+"各停、快速、環狀快速、特快自由席都能搭": [
+"assets/js/pages3.js"
+],
+"搭乘特急、特快指定席只需另付指定席券 ${yen(sf)}": [
+"assets/js/pages3.js"
+],
+"五日券": [
+"assets/js/pages3.js"
+],
+"4,800 円": [
+"assets/js/pages3.js"
+],
+"適合：長假與慢遊": [
+"assets/js/pages3.js"
+],
+"連續 5 天內無限次搭乘": [
+"assets/js/pages3.js"
+],
+"參考：${ap.zh}～${center.zh} 單程乘車券 ${yen(fareLine.one)}、來回 ${yen(fareLine.rt)}。三日券（3,900 円）大約搭 ${Math.ceil(3900 / fareLine.one)} 次這樣的單程就回本；五日券（4,800 円）約 ${Math.ceil(4800 / fareLine.one)} 次。以每天往返市區與景點計算，通常很划算。": [
+"assets/js/pages3.js"
+],
+"套票購買方式與販售地點，將於本網站公告。": [
+"assets/js/pages3.js"
+],
+"注意事項": [
+"assets/js/pages3.js"
+],
+"特急為全車指定席；沒有指定席券時，可購買立席特急券，但不保證有座位。": [
+"assets/js/pages3.js"
+],
+"行李較多時，請盡量使用指定席車廂的行李放置處，避免阻擋走道與車門。": [
+"assets/js/pages3.js"
+],
+"時刻為預定時刻，實際運轉狀況請以站內公告為準。": [
+"assets/js/pages3.js"
+],
+"行駛在高架橋上的新8000形特急こばな": [
+"assets/js/pages3.js"
+],
+"新列車　特急": [
+"assets/js/pages3.js",
+"index.html",
+"make_pages"
+],
+"特急こばな": [
+"airport.html",
+"assets/js/pages3.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"勝守、天鳥崎、本磯島　一車直達": [
+"assets/js/pages3.js",
+"index.html",
+"make_pages"
+],
+"特急こばな直達勝守、天鳥崎、本磯島，沿線是漁港、神社與海岸風景。使用最新的 8000 形，最高時速 160 公里，全車指定席，備有 USB 充電口。": [
+"assets/js/pages3.js"
+],
+"新 8000 形": [
+"assets/js/pages3.js",
+"make_pages"
+],
+"特急こばな使用全新的 8000 形。白色車身配上紅色的線條，流線型的車頭在高架橋與鐵橋上特別顯眼。全車為指定席，並備有 USB 充電口，長途乘車也能放心使用手機。": [
+"assets/js/pages3.js"
+],
+"最高速度": [
+"assets/js/pages3.js"
+],
+"座位設備": [
+"assets/js/pages3.js"
+],
+"備有 USB 充電口": [
+"assets/js/pages3.js"
+],
+"車廂": [
+"assets/js/pages3.js"
+],
+"流線型車頭，白色車身搭配紅色線條": [
+"assets/js/pages3.js"
+],
+"費用": [
+"assets/js/pages3.js"
+],
+"乘車券＋指定席券 ${yen(sf)}（立席特急券 ${yen(st)}）": [
+"assets/js/pages3.js"
+],
+"8000形特急こばな的車頭": [
+"assets/js/pages3.js"
+],
+"流線型的車頭": [
+"assets/js/pages3.js"
+],
+"沿線景點": [
+"airport.html",
+"assets/js/pages3.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"搭特急こばな，可以直達這些景點：": [
+"assets/js/pages3.js"
+],
+"勝守漁港": [
+"assets/js/pages3.js",
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"日出與朝市、現撈海鮮。搭早班列車，到港邊吃早餐。": [
+"assets/js/pages3.js"
+],
+"最近車站：勝守": [
+"assets/js/pages3.js"
+],
+"天鳥崎神社": [
+"assets/js/pages3.js",
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"海岸、夕陽、神社與參拜街道。傍晚前往最美。": [
+"assets/js/pages3.js"
+],
+"最近車站：天鳥崎中央": [
+"assets/js/pages3.js"
+],
+"停靠站與時刻": [
+"assets/js/pages3.js"
+],
+"主要停靠站：勝守、天鳥崎、本磯島。詳細的停靠站與時刻會在時刻表資料更新後顯示在這裡。": [
+"assets/js/pages3.js"
+],
+"前往時刻表": [
+"assets/js/pages3.js"
+],
+"運行區間": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"${pax.length} 站": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"全程所要時間": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"約 ${Math.round((sv.stops[sv.stops.length - 1].arr - sv.stops[0].dep) / 60)} 分": [
+"assets/js/pages3.js"
+],
+"首班／末班": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"${hm(tt[0])}／${hm(tt[tt.length - 1])}": [
+"assets/js/pages3.js"
+],
+"本日無班次": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"${tt.length} 班": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"起點": [
+"assets/js/pages2.js",
+"assets/js/pages3.js"
+],
+"${Math.round((s.arr - sv.stops[0].arr) / 60)} 分": [
+"assets/js/pages3.js"
+],
+"自起點": [
+"assets/js/pages3.js"
+],
+"另有反方向的班次。": [
+"assets/js/pages3.js"
+],
+"時刻表": [
+"assets/js/pages3.js",
+"data/news.json"
+],
+"乘車資訊": [
+"assets/js/pages3.js"
+],
+"全車指定席。請先購買乘車券與指定席券；也有立席特急券，但不保證有座位。": [
+"assets/js/pages3.js"
+],
+"特急通過許多小站，請先確認目的地是否停車；停靠站請見上表或「路線資訊」。": [
+"assets/js/pages3.js"
+],
+"往機場請搭乘空港LINER；往勝守、天鳥崎、本磯島請搭乘特急こばな。": [
+"assets/js/pages3.js"
+],
+"乘車指南與常見問題": [
+"airport.html",
+"assets/js/pages3.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"月台 ${p.name}（座標 ${trunc(x)}, ${trunc(z)}）對應到 ${owner.length} 個車站，未納入": [
+"assets/js/atos-model.js"
+],
+"路線 ${r.name} 引用了不存在的月台": [
+"assets/js/atos-model.js"
+],
+"路線「${kk[1]}」有方向尚未設定停靠站，已併入同名路線": [
+"assets/js/atos-model.js"
+],
+"合併了不同名稱的路線: ${JSON.stringify([...zhNames].sort())}": [
+"assets/js/atos-model.js"
+],
+"路線「${[...zhNames][0]}」合併了顏色不同的成員（${ms.map(m => m.rawName + '＝' + m.color).join('、')}）；若其中有不同種別的路線被併在一起，請檢查名稱": [
+"assets/js/atos-model.js"
+],
+"路線「${zh}」成員英文名不一致 ${JSON.stringify([...new Set(enOpts)].sort())}，請在 config.json 的 routeNameOverrides 指定": [
+"assets/js/atos-model.js"
+],
+"單向": [
+"assets/js/atos-model.js"
+],
+"路線工務中": [
+"assets/js/atos-model.js"
+],
+"${r.zh}（${r.directions.map(dd => dd.label).join('／')}）": [
+"assets/js/atos-model.js"
+],
+"有 ${c} 條路線同名「${z}」但停靠站不同，未合併；營運中的保留原名，其餘名稱後加方向區分": [
+"assets/js/atos-model.js"
+],
+"車庫 ${d.name} 找不到可用側線，無法估算出庫時間": [
+"assets/js/atos-model.js"
+],
+"車庫 ${d.name}：路線站數 (${totalStops}) 與路徑停靠點數 (${stopEvents.length + 1}) 不一致，略過": [
+"assets/js/atos-model.js"
+],
+"車庫 ${d.name}：${ph1 === 0 ? '出庫' : '主路徑'} 與下一段路徑在地圖上不相連（差 ${trunc(hyp(e1.endPosition.x - e2.startPosition.x, e1.endPosition.z - e2.startPosition.z))} 格）": [
+"assets/js/atos-model.js"
+],
+"回送": [
+"assets/js/atos-model.js"
+],
+"車庫「${d.name}」沒有掛任何路線": [
+"assets/js/atos-model.js"
+],
+"路線「${r.zh}」無車庫與排班 → 路線工務中": [
+"assets/js/atos-model.js"
+],
+"地圖幾何：軌道 ${railsOut.length} 條、列車路徑片段 ${segTable.length} 種、實體列車時間軸 ${trainsOut.length} 組": [
+"assets/js/atos-model.js"
+],
+"路段長度：側線實測查表 ${stats.lookup} 段，幾何近似 ${stats.geom} 段；幾何公式對實測平均誤差 ${(100 * (ge.length ? sum(ge) / ge.length : 0)).toFixed(1)}%（最大 ${(100 * (ge.length ? Math.max(...ge) : 0)).toFixed(1)}%）": [
+"assets/js/atos-model.js"
+],
+"光瀬都市高速鉄道｜ATOS": [
+"assets/js/atos-model.js"
+],
+"時刻 = 車庫 realTimeDepartures（出庫時刻）+ 估算的出庫行駛時間；各站時間為速度曲線估算值，需與遊戲實測校正。": [
+"assets/js/atos-model.js"
+],
+"行駛時間依軌道限速、側線設定的加減速度計算，不含車輛本身最高速度限制。": [
+"assets/js/atos-model.js"
+],
+"班次時刻以當日 0–24 時循環，對應真實時鐘；出庫時刻指離開側線（已與遊戲設定確認）。存檔以 UTC 記錄出庫時刻，網頁依瀏覽器所在時區換成當地時間。": [
+"assets/js/atos-model.js"
+],
+"地圖上的列車位置是由班表與速度曲線推算的，遊戲開著時尚未接上實際位置。": [
+"assets/js/atos-model.js"
+],
+"時刻 =": [
+"assets/js/atos-model.js"
+],
+"各站到發時間來自遊戲內 MTR 實際展開的班表（Siding.trips），與遊戲內一致；地圖位置依這些時間對齊速度曲線。": [
+"assets/js/atos-model.js"
+],
+"（QR code 無法產生）": [
+"assets/js/atos-status.js"
+],
+"1 分鐘內": [
+"assets/js/atos-status.js"
+],
+"${m} 分鐘前": [
+"assets/js/atos-status.js"
+],
+"${Math.round(m / 60)} 小時前": [
+"assets/js/atos-status.js"
+],
+"${Math.round(m / 1440)} 天前": [
+"assets/js/atos-status.js"
+],
+"首頁": [
+"airport.html",
+"assets/js/atos-status.js",
+"booking.html",
+"guide.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"＞ 企業管理登入": [
+"assets/js/atos-status.js"
+],
+"企業管理登入": [
+"airport.html",
+"assets/js/atos-status.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"Staff Login　ATOS（自動列車運行管理系統）": [
+"assets/js/atos-status.js"
+],
+"已複製": [
+"assets/js/atos-status.js"
+],
+"複製網址": [
+"assets/js/atos-status.js"
+],
+"ATOS系統運作中": [
+"assets/js/atos-status.js"
+],
+"未上線": [
+"assets/js/atos-status.js"
+],
+"最後確認 ${fmt(j.updatedAt)}（${ago(ageMs)}）　ATOS ${j.version || ''}": [
+"assets/js/atos-status.js"
+],
+"無法確認狀態（網路或 GitHub 連線問題）。稍後再試。": [
+"assets/js/atos-status.js"
+],
+"遊戲／ATOS 目前沒有運作。最後確認 ${fmt(j.updatedAt)}（${ago(ageMs)}）": [
+"assets/js/atos-status.js"
+],
+"尚未收到過 ATOS 的狀態回報。": [
+"assets/js/atos-status.js"
+],
+"確認中…": [
+"assets/js/atos-status.js"
+],
+"重新確認": [
+"assets/js/atos-status.js"
+],
+"手機（Tailscale）": [
+"assets/js/atos-status.js"
+],
+"外出時也能使用": [
+"assets/js/atos-status.js"
+],
+"手機": [
+"assets/js/atos-status.js"
+],
+"手機（同一 Wi-Fi）": [
+"assets/js/atos-status.js"
+],
+"在遊戲電腦的同一個區網時": [
+"assets/js/atos-status.js"
+],
+"用手機相機掃描，或直接點按鈕。": [
+"assets/js/atos-status.js"
+],
+"這次沒有收到可用的手機連線位址。": [
+"assets/js/atos-status.js"
+],
+"遊戲開啟後會顯示手機用的連結。": [
+"assets/js/atos-status.js"
+],
+"在手機上開啟 ATOS。": [
+"assets/js/atos-status.js"
+],
+"電腦": [
+"assets/js/atos-status.js"
+],
+"在執行遊戲的這台電腦上開啟 ATOS（127.0.0.1）。": [
+"assets/js/atos-status.js"
+],
+"電腦（本機）": [
+"assets/js/atos-status.js"
+],
+"只有遊戲所在的電腦打得開": [
+"assets/js/atos-status.js"
+],
+"區網": [
+"assets/js/atos-status.js"
+],
+"其他裝置": [
+"assets/js/atos-status.js"
+],
+"其他電腦、平板：與遊戲電腦在同一區網或同一個 Tailscale 網路時可用。": [
+"assets/js/atos-status.js"
+],
+"位址回報已關閉（heartbeat.ips=off）。請使用上面既有的連結。": [
+"assets/js/atos-status.js"
+],
+"遊戲開啟後會顯示。": [
+"assets/js/atos-status.js"
+],
+"• 狀態每": [
+"assets/js/atos-status.js"
+],
+"秒自動更新；ATOS 每分鐘回報一次，超過": [
+"assets/js/atos-status.js"
+],
+"分鐘沒有回報就視為未上線。": [
+"assets/js/atos-status.js"
+],
+"• 這個頁面只負責「找到入口」；連線是直接從你的裝置連到遊戲所在的電腦。": [
+"assets/js/atos-status.js"
+],
+"其他裝置連線時需要輸入 ATOS 的存取密碼。": [
+"assets/js/atos-status.js"
+],
+"• 遊戲未開啟時，下面連結即使點了也打不開：": [
+"assets/js/atos-status.js"
+],
+"環狀": [
+"assets/js/hk-core.js",
+"assets/js/pages2.js"
+],
+"路線": [
+"assets/js/pages2.js",
+"index.html",
+"make_pages"
+],
+"選擇路線，查看停靠站、各站所要時間、班距與首末班。時間依目前的時刻表（含調度方案）計算。": [
+"assets/js/pages2.js"
+],
+"約 ${total} 分": [
+"assets/js/pages2.js"
+],
+"${hm(tt[0])}／${hm(tt[tt.length - 1])}（${H.stName(st[0].station)} 發車）": [
+"assets/js/pages2.js"
+],
+"編組": [
+"assets/js/pages2.js"
+],
+"${cars} 両編成${ri ? '・' + ri : ''}": [
+"assets/js/pages2.js"
+],
+"方向": [
+"assets/js/pages2.js",
+"assets/js/site.js"
+],
+"通過": [
+"assets/js/pages2.js"
+],
+"${s.platformName}番線": [
+"assets/js/pages2.js",
+"assets/js/site.js"
+],
+"${mins} 分": [
+"assets/js/pages2.js"
+],
+"停靠站與所要時間": [
+"assets/js/pages2.js"
+],
+"車站": [
+"assets/js/pages2.js",
+"assets/js/site.js"
+],
+"可轉乘": [
+"assets/js/pages2.js"
+],
+"首班列車的時刻": [
+"assets/js/pages2.js"
+],
+"早晨": [
+"assets/js/pages2.js"
+],
+"日間": [
+"assets/js/pages2.js"
+],
+"傍晚": [
+"assets/js/pages2.js"
+],
+"夜間": [
+"assets/js/pages2.js"
+],
+"深夜": [
+"assets/js/pages2.js"
+],
+"${nm}　${a}–${b} 時": [
+"assets/js/pages2.js"
+],
+"${n} 班": [
+"assets/js/pages2.js"
+],
+"約 ${Math.round((b - a) * 60 / n * 10) / 10} 分一班": [
+"assets/js/pages2.js"
+],
+"每小時班次數": [
+"assets/js/pages2.js"
+],
+"${hh} 時：${n} 班": [
+"assets/js/pages2.js"
+],
+"班距": [
+"assets/js/pages2.js"
+],
+"時段": [
+"assets/js/pages2.js"
+],
+"班次": [
+"assets/js/pages2.js"
+],
+"平均班距": [
+"assets/js/pages2.js"
+],
+"每小時的班次數（本日，從起點發車）": [
+"assets/js/pages2.js"
+],
+"｜": [
+"assets/js/pages2.js"
+],
+"停車一覽（各種別比較）": [
+"assets/js/pages2.js"
+],
+"●＝停車，｜＝通過，空白＝不經過。欄名可點選切換路線。": [
+"assets/js/pages2.js"
+],
+"${sv.line} ${sv.member.dir || '環狀'}": [
+"assets/js/pages2.js"
+],
+"発車案内": [
+"assets/js/pages2.js"
+],
+"${best ? best[0] : H.stName(gg.nb)}　方面": [
+"assets/js/pages2.js"
+],
+"全部方向": [
+"assets/js/pages2.js",
+"assets/js/site.js"
+],
+"這個車站沒有接下來的發車（可能是各路線的終點站，或已收車）。": [
+"assets/js/pages2.js"
+],
+"時刻": [
+"assets/js/pages2.js",
+"assets/js/site.js"
+],
+"路線・備註": [
+"assets/js/pages2.js"
+],
+"發車まで": [
+"assets/js/pages2.js"
+],
+"${stop.platformName}番線": [
+"assets/js/pages2.js"
+],
+"まもなく": [
+"assets/js/pages2.js"
+],
+"${Math.floor(m / 60)} 時間 ${m % 60} 分": [
+"assets/js/pages2.js"
+],
+"${m} 分": [
+"assets/js/pages2.js"
+],
+"行": [
+"assets/js/booking.js",
+"assets/js/pages2.js"
+],
+"關閉": [
+"assets/js/pages2.js"
+],
+"停靠路線": [
+"assets/js/pages2.js"
+],
+"這個車站的全日時刻表": [
+"assets/js/pages2.js"
+],
+"從這裡出發": [
+"assets/js/pages2.js"
+],
+"前往這裡": [
+"assets/js/pages2.js"
+],
+"景點資料暫時無法顯示": [
+"assets/js/pages2.js"
+],
+"請稍後再試。": [
+"assets/js/pages2.js"
+],
+"搭電車就能到的光瀨都市圈景點。每個景點都標示最近的車站，可以直接查時刻表或規劃乘車。": [
+"assets/js/pages2.js"
+],
+"景點": [
+"assets/js/pages2.js"
+],
+"最近車站": [
+"assets/js/pages2.js"
+],
+"車站時刻表": [
+"assets/js/pages2.js",
+"assets/js/site.js"
+],
+"路線圖與接下來的發車": [
+"assets/js/pages2.js"
+],
+"這個車站尚未收錄在目前的時刻表資料中。": [
+"assets/js/pages2.js"
+],
+"光瀨都市鉄道 路線圖": [
+"assets/js/hk-ui.js"
+],
+"${tr.sv.routeName} ${H.destOf(tr.sv, tr.i)}行き": [
+"assets/js/hk-ui.js"
+],
+"${car + 1}号車 ${Math.floor(k / 4) + 1}${COLS[k % 4]}": [
+"assets/js/booking.js"
+],
+"出發站": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"抵達站": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"經由": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"（不指定）": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"位": [
+"assets/js/booking.js"
+],
+"大人": [
+"assets/js/booking.js"
+],
+"兒童（12 歲以下）": [
+"assets/js/booking.js"
+],
+"優待（60 歲以上）": [
+"assets/js/booking.js"
+],
+"經由（可不選）": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"乘車日": [
+"assets/js/booking.js"
+],
+"出發時刻": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"查詢班次": [
+"assets/js/booking.js"
+],
+"特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。": [
+"assets/js/booking.js"
+],
+"請選擇不同的出發站與抵達站。": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"旅客人數請設定為 1～6 位。": [
+"assets/js/booking.js"
+],
+"${dIn.value}　${tIn.value} 以後${vSel.value ?": [
+"assets/js/booking.js"
+],
+"查不到兩站之間的路徑。": [
+"assets/js/booking.js"
+],
+"這個時間之後沒有含特急／特快（可預約）的行程。可改用「時刻表與班次」查詢一般班次。": [
+"assets/js/booking.js"
+],
+"查詢所有班次（含轉乘）": [
+"assets/js/booking.js"
+],
+"＋": [
+"assets/js/booking.js"
+],
+"轉乘 ${c.legs.length - 1} 次": [
+"assets/js/booking.js"
+],
+"直達": [
+"assets/js/booking.js"
+],
+"價格為大人 1 位的乘車券；指定席／立席費用在下一步依各段選擇加算。": [
+"assets/js/booking.js"
+],
+"（乘車券のみ）": [
+"assets/js/booking.js"
+],
+"行程與座位": [
+"assets/js/booking.js"
+],
+"${HK.hm(S.c.j.dep)} 發　旅客 ${P.n} 位": [
+"assets/js/booking.js"
+],
+"徒歩連絡：${H.stName(l.leg.walk.from)} → ${H.stName(l.leg.walk.to)}（約 ${Math.round(l.leg.walk.sec / 60)} 分）": [
+"assets/js/booking.js"
+],
+"指定席なし": [
+"assets/js/booking.js"
+],
+"この種別は指定席がありません。乘車券のみで乘車できます。": [
+"assets/js/booking.js"
+],
+"指定席 ${yen(l.ri.fee)}／位${seatDisabled ? '（空席不足）' : ''}": [
+"assets/js/booking.js"
+],
+"立席特急券 ${yen(l.ri.standFee)}／位（座位なし）": [
+"assets/js/booking.js"
+],
+"自由席 ${yen(0)}（${l.ri.reservedCars + 1}号車以後・座位なし）": [
+"assets/js/booking.js"
+],
+"立席特急券は座位が保証されません。座位の指定はできません。": [
+"assets/js/booking.js"
+],
+"自由席は座位が保証されません。座位の指定はできません。（${l.ri.reservedCars + 1}～${l.ri.cars}号車）": [
+"assets/js/booking.js"
+],
+"確認並發行車票": [
+"assets/js/booking.js"
+],
+"乘車券（${H.stName(fSel.value)}→${H.stName(tSel.value)}）": [
+"assets/js/booking.js"
+],
+"大人 ${P.a} × ${yen(tf.adult)}": [
+"assets/js/booking.js"
+],
+"／兒童 ${P.c} × ${yen(tf.child)}": [
+"assets/js/booking.js"
+],
+"／優待 ${P.s} × ${yen(tf.senior)}": [
+"assets/js/booking.js"
+],
+"合計": [
+"assets/js/booking.js"
+],
+"乘車券以出發站～抵達站全程的最短路徑計算一次：": [
+"assets/js/booking.js"
+],
+"（步行連絡區間不另收費）": [
+"assets/js/booking.js"
+],
+"※ 收費區資料尚未設定，目前以未跨越任何區間計算。": [
+"assets/js/booking.js",
+"assets/js/site.js"
+],
+"空位": [
+"assets/js/booking.js"
+],
+"已選": [
+"assets/js/booking.js"
+],
+"已被預約": [
+"assets/js/booking.js"
+],
+"1 号車＝進行方向最前端。": [
+"assets/js/booking.js"
+],
+"指定席為 1～${ri.reservedCars} 号車。": [
+"assets/js/booking.js"
+],
+"${ci + 1}号車": [
+"assets/js/booking.js"
+],
+"空${free}${mine ?": [
+"assets/js/booking.js"
+],
+"${seatName(st.car, k)} ${free ? '空位' : '已被預約'}": [
+"assets/js/booking.js"
+],
+"已選（${st.seats.length}／${P.n}）：": [
+"assets/js/booking.js"
+],
+"尚未選擇座位（需要 ${P.n} 個）": [
+"assets/js/booking.js"
+],
+"立席（座位なし）": [
+"assets/js/booking.js"
+],
+"自由席（${l.ri.reservedCars + 1}号車以後）": [
+"assets/js/booking.js"
+],
+"${modeLabel(l, st.mode)}：${seat}": [
+"assets/js/booking.js"
+],
+"乘車券 大人 ${P.a} × ${yen(tf.adult)}": [
+"assets/js/booking.js"
+],
+"乘車券 兒童 ${P.c} × ${yen(tf.child)}": [
+"assets/js/booking.js"
+],
+"乘車券 優待 ${P.s} × ${yen(tf.senior)}": [
+"assets/js/booking.js"
+],
+"光瀨都市鉄道": [
+"airport.html",
+"assets/js/booking.js",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"乗車券・特急券 / TICKET": [
+"assets/js/booking.js"
+],
+"発": [
+"assets/js/booking.js"
+],
+"着": [
+"assets/js/booking.js"
+],
+"乗車日": [
+"assets/js/booking.js"
+],
+"旅客": [
+"assets/js/booking.js"
+],
+"大人 ${P.a}": [
+"assets/js/booking.js"
+],
+"／兒童 ${P.c}": [
+"assets/js/booking.js"
+],
+"／優待 ${P.s}": [
+"assets/js/booking.js"
+],
+"券番": [
+"assets/js/booking.js"
+],
+"本券為模擬發行，不會儲存。": [
+"assets/js/booking.js"
+],
+"車票": [
+"assets/js/booking.js"
+],
+"列印": [
+"assets/js/booking.js"
+],
+"重新查詢": [
+"assets/js/booking.js"
+],
+"目前採用離峰時段班次，部分列車停駛（約每 2 班行駛 1 班）。": [
+"assets/js/site.js"
+],
+"目前採用深夜時段班次，列車班次減少（約每 3 班行駛 1 班）。": [
+"assets/js/site.js"
+],
+"${i + 1} 件目": [
+"assets/js/site.js"
+],
+"自動切換 暫停／繼續": [
+"assets/js/site.js"
+],
+"乘車・轉乘・票價查詢": [
+"assets/js/site.js"
+],
+"查詢時刻表": [
+"assets/js/site.js"
+],
+"查詢": [
+"assets/js/site.js"
+],
+"平常運轉": [
+"assets/js/site.js"
+],
+"整修中（暫停運轉）": [
+"assets/js/site.js"
+],
+"運行情報為時刻表資料記錄的狀態（資料時點 ${up}）。": [
+"assets/js/site.js"
+],
+"${sv.line}　${sv.member.dir || '環狀'}": [
+"assets/js/site.js"
+],
+"這個車站沒有發車的班次（可能是各路線的終點站）。": [
+"assets/js/site.js"
+],
+"${best ? best[0] : H.stName(g.nb)}　方面": [
+"assets/js/site.js"
+],
+"只看現在前後的時段": [
+"assets/js/site.js"
+],
+"顯示全日時刻表": [
+"assets/js/site.js"
+],
+"顯示全日的發車時刻。": [
+"assets/js/site.js"
+],
+"顯示現在前後的時段（黃底為目前的時段）。": [
+"assets/js/site.js"
+],
+"時刻為各班次在本站的發車時刻。方格內有字的是各停以外的種別（字為種別略稱，例：特＝特急・特別快速、快＝快速、環＝環狀快速），沒有標示的是各站停車；右上角小字為行先。": [
+"assets/js/site.js"
+],
+"${e.sv.routeName} ${H.destOf(e.sv, e.i)}行": [
+"assets/js/site.js"
+],
+"${mark.get(dn)}＝${dn}行": [
+"assets/js/site.js"
+],
+"出發・抵達互換": [
+"assets/js/site.js"
+],
+"不搭乘指定席列車（特急）": [
+"assets/js/site.js"
+],
+"${hm(t0)} 之後的班次${vSel.value ?": [
+"assets/js/site.js"
+],
+": ''}${noRes.checked ? '　不搭乘指定席列車' : ''}": [
+"assets/js/site.js"
+],
+"在這個時間之後沒有找到符合條件的班次（轉乘最多 2 次、單次等候 30 分以內）。可以改個時刻或條件再查查看。": [
+"assets/js/site.js"
+],
+"轉乘時間以最短": [
+"assets/js/site.js"
+],
+"分鐘計算（中央戸宮／光大前與大學前可步行轉乘，約 6 分鐘）。乘車券依出發站到抵達站的最短路徑計算，與搭乘的班次無關；特急為全車指定席（也有半價的立席特急券），特快的 1・2 号車為指定席、3 号車以後為自由席。": [
+"assets/js/site.js"
+],
+"${s0.platform} 號月台": [
+"assets/js/site.js"
+],
+"${H.destOf(sv, leg.board)}行": [
+"assets/js/site.js"
+],
+"${leg.stops.length - 1} 站・${Math.max(1, Math.round((sN.arr - s0.dep) / 60))} 分": [
+"assets/js/site.js"
+],
+"徒歩 → ${H.stName(nxt.walk.to)}（約 ${Math.round(nxt.walk.sec / 60)} 分）・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分": [
+"assets/js/site.js"
+],
+"轉乘・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分": [
+"assets/js/site.js"
+],
+"${sN.platform} 號月台": [
+"assets/js/site.js"
+],
+"${hm(j.dep)} → ${hm(j.arr)}${j.arr >= DAY ? '（翌日）' : ''}": [
+"assets/js/site.js"
+],
+"${dur} 分　${transfers ?": [
+"assets/js/site.js"
+],
+": '不需轉乘'}": [
+"assets/js/site.js"
+],
+"單程": [
+"assets/js/site.js"
+],
+"計算票價": [
+"assets/js/site.js"
+],
+"票價制度": [
+"assets/js/site.js"
+],
+"基本運費": [
+"assets/js/site.js"
+],
+"${yen(C.fareBase)}（含同一收費區內）": [
+"assets/js/site.js"
+],
+"區間加算": [
+"assets/js/site.js"
+],
+"每跨越一個收費區加 ${yen(C.fareStep)}（依實際經過的路徑計算跨越次數，而非區號差）": [
+"assets/js/site.js"
+],
+"指定席費用": [
+"assets/js/site.js"
+],
+"${yen(C.seatFee)}（特急為全車指定席；特快為 1・2 号車指定席，3 号車以後為自由席不收費）。特急的立席特急券為指定席的一半（${yen(Math.round(C.seatFee * C.standRatio))}），不保證有位置、不能選座位。": [
+"assets/js/site.js"
+],
+"兒童・優待": [
+"assets/js/site.js"
+],
+"12 歲以下、60 歲以上的乘車券為大人的一半（四捨五入到整數）；指定席費用不打折。": [
+"assets/js/site.js"
+],
+"路徑的取法": [
+"assets/js/site.js"
+],
+"有多條路徑時，取跨越收費區最少、其次距離最短的路徑。": [
+"assets/js/site.js"
+],
+"這兩站之間查不到路徑。": [
+"assets/js/site.js"
+],
+"跨越分區 ${f.zones}　經過 ${f.path.length - 1} 區間　約 ${f.km.toFixed(1)} km": [
+"assets/js/site.js"
+],
+"跨越收費區 ${f.crossed} 個 × ${yen(f.step)}": [
+"assets/js/site.js"
+],
+"乘車券合計": [
+"assets/js/site.js"
+],
+"兒童（12 歲以下）・優待（60 歲以上）": [
+"assets/js/site.js"
+],
+"搭乘特急（指定席）／特快 1・2 号車（指定席）另加": [
+"assets/js/site.js"
+],
+"（合計": [
+"assets/js/site.js"
+],
+"）": [
+"assets/js/site.js"
+],
+"立席特急券（特急）": [
+"assets/js/site.js"
+],
+"計算所用的路徑：": [
+"assets/js/site.js"
+],
+"點選車站，查看停靠路線、接下來的發車，並前往時刻表或乘車查詢。": [
+"assets/js/site.js"
+],
+"○ 車站": [
+"assets/js/site.js"
+],
+"◎ 轉乘站": [
+"assets/js/site.js"
+],
+"回到現在": [
+"assets/js/site.js"
+],
+"列車の色は各路線のイメージカラーです。位置依時刻表推算，並非實際車輛位置。": [
+"assets/js/site.js"
+],
+"運行中的列車": [
+"assets/js/site.js"
+],
+"両編成": [
+"assets/js/site.js"
+],
+"${dest}行": [
+"assets/js/site.js"
+],
+"${cars} 両編成": [
+"assets/js/site.js"
+],
+"${H.stName(tr.from)} 停車中（${hm(tr.dep)} 發車）": [
+"assets/js/site.js"
+],
+"${H.stName(tr.from)} → ${H.stName(tr.to)} 運行中": [
+"assets/js/site.js"
+],
+"到": [
+"assets/js/site.js"
+],
+"發": [
+"assets/js/site.js"
+],
+"${H.destOf(tr.sv, tr.i)}行": [
+"assets/js/site.js"
+],
+"${H.stName(tr.from)} 停車中": [
+"assets/js/site.js"
+],
+"目前沒有運行中的班次。": [
+"assets/js/site.js"
+],
+"資料暫時無法顯示": [
+"assets/js/site.js"
+],
+"載入時刻表資料時發生問題，請稍後再試。": [
+"assets/js/site.js"
+],
+"特別快速|特快": [
+"assets/js/hk-core.js"
+],
+"中央戸宮": [
+"assets/js/hk-core.js"
+],
+"大學前": [
+"assets/js/hk-core.js"
+],
+"快速特急": [
+"assets/js/hk-core.js"
+],
+"特別快速": [
+"assets/js/hk-core.js"
+],
+"通勤特急": [
+"assets/js/hk-core.js"
+],
+"通勤快速": [
+"assets/js/hk-core.js"
+],
+"快速急行": [
+"assets/js/hk-core.js"
+],
+"通勤急行": [
+"assets/js/hk-core.js"
+],
+"区間急行": [
+"assets/js/hk-core.js"
+],
+"区間快速": [
+"assets/js/hk-core.js"
+],
+"急行": [
+"assets/js/hk-core.js"
+],
+"準急": [
+"assets/js/hk-core.js"
+],
+"快特": [
+"assets/js/hk-core.js"
+],
+"各駅停車": [
+"assets/js/hk-core.js"
+],
+"普通": [
+"assets/js/hk-core.js"
+],
+"環状": [
+"assets/js/hk-core.js"
+],
+"環状快速": [
+"assets/js/hk-core.js"
+],
+"model.js 尚未載入": [
+"assets/js/hk-core.js"
+],
+"全車指定席": [
+"assets/js/hk-core.js"
+],
+"1号車": [
+"assets/js/hk-core.js"
+],
+"1・": [
+"assets/js/hk-core.js"
+],
+"号車": [
+"assets/js/hk-core.js"
+],
+"指定席／": [
+"assets/js/hk-core.js"
+],
+"号車以後自由席": [
+"assets/js/hk-core.js"
+],
+"發車顯示｜光瀨都市鉄道": [
+"board.html",
+"make_pages"
+],
+"發車顯示已移到「": [
+"board.html",
+"make_pages"
+],
+"」：點選車站即可查看接下來的發車。": [
+"board.html"
+],
+"時刻表與班次/票價查詢｜光瀨都市鉄道": [
+"make_pages",
+"timetable.html"
+],
+"光瀨都市鉄道　公式網站": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"Minecraft 架空鐵路": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"時刻表・票價": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"乘車指南・FAQ": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"＞ 時刻表與班次/票價查詢": [
+"timetable.html"
+],
+"時刻表與班次／票價查詢": [
+"make_pages",
+"timetable.html"
+],
+"時刻表與班次/票價查詢": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"光瀨都市鉄道 公式網站：時刻表、票價、即時列車動態。（Minecraft 架空鐵路）": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"光瀨都市鉄道 首頁": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"主要選單": [
+"airport.html",
+"atos.html",
+"booking.html",
+"guide.html",
+"index.html",
+"kobana.html",
+"live.html",
+"make_pages",
+"routes.html",
+"sights.html",
+"timetable.html"
+],
+"機場聯外交通｜光瀨都市鉄道": [
+"airport.html",
+"make_pages"
+],
+"＞ 機場聯外交通": [
+"airport.html"
+],
+"Airport Access　松澤國際機場": [
+"airport.html"
+],
+"松澤國際機場　一車直達": [
+"index.html",
+"make_pages"
+],
+"特急・特快直達光瀨市區，最快 11 分鐘。三日券 3,900 円、五日券 4,800 円，可無限次搭乘所有非指定席列車。": [
+"index.html",
+"make_pages"
+],
+"詳細": [
+"index.html",
+"make_pages"
+],
+"特急こばな　登場": [
+"index.html",
+"make_pages"
+],
+"勝守、天鳥崎、本磯島　一車直達。新 8000 形，最高時速 160 公里，全車指定席，備有 USB 充電口。": [
+"index.html",
+"make_pages"
+],
+"新型列車": [
+"data/news.json",
+"index.html",
+"make_pages"
+],
+"新2100形　營運開始": [
+"index.html",
+"make_pages"
+],
+"2026年10月起投入營運，最高時速 160 公里。連結機場，也行駛名島、勝守、平倉方向，通勤與出遊都更從容。": [
+"index.html"
+],
+"感謝與道別": [
+"index.html",
+"make_pages"
+],
+"10000系　即將退役": [
+"index.html"
+],
+"陪伴大家 26 年的 10000系，預定於 2026 年底退役。歡迎把握最後的乘車機會。": [
+"index.html",
+"make_pages"
+],
+"時刻表・票價改訂": [
+"index.html",
+"make_pages"
+],
+"尖峰時段增加班次，等車時間更短。": [
+"index.html",
+"make_pages"
+],
+"時刻表・票價查詢": [
+"index.html",
+"make_pages"
+],
+"ご案内": [
+"index.html",
+"make_pages"
+],
+"各路線的停靠站、所要時間、班距與首末班": [
+"index.html",
+"make_pages"
+],
+"種別的差別、指定席與自由席、延誤時怎麼辦": [
+"index.html",
+"make_pages"
+],
+"光瀨城、勝守漁港、多見瀨河濱公園與更多": [
+"index.html",
+"make_pages"
+],
+"運行情報": [
+"index.html",
+"make_pages"
+],
+"運行狀況": [
+"index.html",
+"make_pages"
+],
+"最新消息": [
+"index.html",
+"make_pages"
+],
+"光瀨城": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"船井大島": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"勝守": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"天鳥崎中央": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"光瀨市立博物館": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"ひがしいち": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"九里橋商圈": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"九里橋三丁目": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"多見瀨河濱公園": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"多見瀨": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"平倉市革命紀念公園": [
+"data/sights.json",
+"index.html",
+"make_pages"
+],
+"平倉公園西・東平倉": [
+"index.html",
+"make_pages"
+],
+"點選車站，可查看接下來的發車與時刻表；想看列車位置請到「即時列車動態」。": [
+"index.html",
+"make_pages"
+],
+"最新資訊": [
+"index.html",
+"make_pages"
+],
+"松澤國際機場": [
+"index.html",
+"make_pages"
+],
+"特急こばな 新8000形": [
+"index.html",
+"make_pages"
+],
+"新2100形": [
+"index.html",
+"make_pages"
+],
+"10000系": [
+"index.html"
+],
+"即時列車動態｜光瀨都市鉄道": [
+"live.html",
+"make_pages"
+],
+"＞ 即時列車動態": [
+"live.html"
+],
+"Train Locator　依時刻表推算各班次的目前位置（拓樸路線圖）": [
+"live.html"
+],
+"線上訂票｜光瀨都市鉄道": [
+"booking.html",
+"make_pages"
+],
+"＞ 線上訂票": [
+"booking.html"
+],
+"Online Booking　特急・特快為全車指定席": [
+"booking.html"
+],
+"特急こばな｜光瀨都市鉄道": [
+"kobana.html",
+"make_pages"
+],
+"＞ 特急こばな": [
+"kobana.html"
+],
+"Limited Express KOBANA　新 8000 形": [
+"kobana.html"
+],
+"路線資訊｜光瀨都市鉄道": [
+"make_pages",
+"routes.html"
+],
+"＞ 路線資訊": [
+"routes.html"
+],
+"Lines　停靠站・所要時間・班距・首末班": [
+"routes.html"
+],
+"沿線景點｜光瀨都市鉄道": [
+"make_pages",
+"sights.html"
+],
+"＞ 沿線景點": [
+"sights.html"
+],
+"乘車指南與常見問題｜光瀨都市鉄道": [
+"guide.html",
+"make_pages"
+],
+"＞ 乘車指南與常見問題": [
+"guide.html"
+],
+"企業管理登入｜光瀨都市鉄道": [
+"atos.html",
+"make_pages"
+],
+"新列車": [
+"data/news.json"
+],
+"特急こばな　登場　勝守、天鳥崎、本磯島一車直達（新 8000 形）": [
+"data/news.json"
+],
+"機場三日券（3,900 円）・五日券（4,800 円）　可無限次搭乘所有非指定席列車": [
+"data/news.json"
+],
+"新2100形　營運開始　最高時速 160 公里": [
+"data/news.json"
+],
+"空港LINER 增班　松澤國際機場～光瀨市區一車直達，最快 11 分": [
+"data/news.json"
+],
+"退役": [
+"data/news.json"
+],
+"10000系　即將退役　服務 26 年，預定 2026 年底退役": [
+"data/news.json"
+],
+"時刻表・票價改訂　尖峰時段增加班次": [
+"data/news.json"
+],
+"ひかりせじょう": [
+"data/sights.json"
+],
+"城郭・歷史": [
+"data/sights.json"
+],
+"1702年建立，是目前全島保存最完整的城郭。": [
+"data/sights.json"
+],
+"光瀨城建於 1702 年，由大祁宣武皇帝在白令海戰爭結束後下令興建，既是戰後重整秩序的象徵，也是統治海峽航路的據點。三百多年來，層層疊起的天守、環繞的曲輪與石垣、白牆與灰瓦的迴廊大半維持原樣，是全島保存最完整的城郭。": [
+"data/sights.json"
+],
+"登上高處眺望，白牆、黑色木格與灰色屋瓦在松林與庭園之間層層展開；晴天時天守的金色鯱瓦會在天空下閃閃發亮，起霧的清晨則像浮在雲海上。從船井大島站下車後，沿著護城河邊走向城門，一路都是好拍照的角度。": [
+"data/sights.json"
+],
+"1702年建立，大祁宣武皇帝於白令海戰爭後興建": [
+"data/sights.json"
+],
+"全島保存最完整的城郭": [
+"data/sights.json"
+],
+"天守、石垣、白牆與瓦葺迴廊": [
+"data/sights.json"
+],
+"起霧的清晨與晴天的天守各有風情": [
+"data/sights.json"
+],
+"晨霧中的光瀨城天守與城郭": [
+"data/sights.json"
+],
+"晨霧中的天守與城郭": [
+"data/sights.json"
+],
+"俯瞰光瀨城的屋瓦與迴廊": [
+"data/sights.json"
+],
+"層層屋瓦與迴廊": [
+"data/sights.json"
+],
+"かつもりぎょこう": [
+"data/sights.json"
+],
+"港口・美食": [
+"data/sights.json"
+],
+"日出與朝市、現撈海鮮的港町。": [
+"data/sights.json"
+],
+"勝守漁港是光瀨都市圈最靠海的一站。天剛亮，漁船便陸續靠岸，港面被晨光染成金色，是欣賞日出的好地方；岸邊的朝市也跟著熱鬧起來，現撈的魚貨一箱箱搬上攤位。": [
+"data/sights.json"
+],
+"市場周邊的食堂與小店供應當天捕獲的海鮮：生魚片、海鮮丼、烤魚與熱湯，最適合搭早班電車過來，吃完早餐再慢慢逛港邊。高架軌道就在港區後方，等車的空檔也能看見列車從港邊駛過。": [
+"data/sights.json"
+],
+"日出與朝市": [
+"data/sights.json"
+],
+"現撈海鮮、海鮮丼": [
+"data/sights.json"
+],
+"漁船與港景": [
+"data/sights.json"
+],
+"建議搭早班電車前往": [
+"data/sights.json"
+],
+"勝守漁港的漁船與後方的高架車站": [
+"data/sights.json"
+],
+"港邊的漁船，後方是高架軌道與車站": [
+"data/sights.json"
+],
+"あまとりざきじんじゃ": [
+"data/sights.json"
+],
+"神社・海岸": [
+"data/sights.json"
+],
+"面向海岸的神社，黃昏的夕陽與參拜街道是最大的看點。": [
+"data/sights.json"
+],
+"天鳥崎神社位於海岸邊，參拜者沿著街道一路走向鳥居與社殿，鹹鹹的海風會陪著你走完整段路。": [
+"data/sights.json"
+],
+"傍晚是這裡最迷人的時段：夕陽把海面與屋瓦染成橘紅色，社殿的剪影映在天色裡。參拜之後可以回到參拜街道，逛逛沿路的小店，再搭電車回程。從天鳥崎中央站步行即可抵達。": [
+"data/sights.json"
+],
+"海岸與夕陽": [
+"data/sights.json"
+],
+"神社與參拜街道": [
+"data/sights.json"
+],
+"適合傍晚前往": [
+"data/sights.json"
+],
+"從天鳥崎中央站步行可達": [
+"data/sights.json"
+],
+"夕陽下染成橘紅色的站房與電車": [
+"data/sights.json"
+],
+"夕陽下的天鳥崎一帶": [
+"data/sights.json"
+],
+"ひかりせしりつはくぶつかん": [
+"data/sights.json"
+],
+"博物館・文化": [
+"data/sights.json"
+],
+"一次看完歷史、鐵路、城市發展史與港都文物。": [
+"data/sights.json"
+],
+"光瀨市立博物館以玻璃帷幕大樓與球形展廳為特色，館內展示光瀨一地的歷史、鐵路的發展、城市的成長軌跡，以及港都長年累積下來的文物。": [
+"data/sights.json"
+],
+"想知道這座城市如何從城下町與港口，發展成今天的鐵路都會，從這裡開始最清楚。遇到下雨天或想慢慢逛的下午，也很適合安排進行程。從ひがしいち站步行即可抵達。": [
+"data/sights.json"
+],
+"歷史、鐵路、城市發展史": [
+"data/sights.json"
+],
+"港都文物": [
+"data/sights.json"
+],
+"玻璃帷幕大樓與球形展廳": [
+"data/sights.json"
+],
+"雨天也能安排": [
+"data/sights.json"
+],
+"博物館的玻璃大樓與球形展廳": [
+"data/sights.json"
+],
+"玻璃大樓與球形展廳": [
+"data/sights.json"
+],
+"館內大廳": [
+"data/sights.json"
+],
+"くりばししょうけん": [
+"data/sights.json"
+],
+"美食・購物・緣結": [
+"data/sights.json"
+],
+"美食、商店與緣結神社齊聚的熱鬧商圈。": [
+"data/sights.json"
+],
+"九里橋商圈沿著高架軌道向外展開：屋頂庭園上有成排的櫻花與攤位，樓下是密密麻麻的餐廳與商店，想吃的、想逛的一次就能解決。": [
+"data/sights.json"
+],
+"商圈裡有一間祈求良緣的緣結神社，朱紅色的牌坊隱身在大樓之間，許多人會在購物前後順道來參拜、買個御守。從九里橋三丁目站出站後，沿著人潮走就能到。": [
+"data/sights.json"
+],
+"美食與商店": [
+"data/sights.json"
+],
+"屋頂庭園的櫻花與攤位": [
+"data/sights.json"
+],
+"緣結神社": [
+"data/sights.json"
+],
+"從九里橋三丁目站出站即達": [
+"data/sights.json"
+],
+"九里橋商圈屋頂庭園的櫻花與攤位": [
+"data/sights.json"
+],
+"商圈大樓與朱紅色牌坊": [
+"data/sights.json"
+],
+"大樓之間的朱紅色牌坊": [
+"data/sights.json"
+],
+"とみせかわべこうえん": [
+"data/sights.json"
+],
+"河濱・四季": [
+"data/sights.json"
+],
+"安靜的川濱步道，可以欣賞夕陽與穿越鐵橋的列車。": [
+"data/sights.json"
+],
+"多見瀨河濱公園是一處沿著河岸展開的安靜步道。寬闊的河面映著天空，石階一路通到水邊，不用走遠就能找到一個坐下來發呆的地方。遠處的鐵橋橫跨河面，電車緩緩駛過，是這裡最有代表性的風景。": [
+"data/sights.json"
+],
+"傍晚是最推薦的時段：夕陽把天空與河面染成粉橘色，列車的剪影從橋上滑過，倒影在水面輕輕晃動。春天沿岸的櫻花盛開，秋天則換上一整排楓紅，一年四季各有不同的表情。從多見瀨站下車後，沿著河岸走即可到達。": [
+"data/sights.json"
+],
+"河濱步道與石階，安靜適合散步": [
+"data/sights.json"
+],
+"夕陽與穿越鐵橋的列車": [
+"data/sights.json"
+],
+"春天賞櫻、秋天賞楓": [
+"data/sights.json"
+],
+"最近車站：多見瀨": [
+"data/sights.json"
+],
+"夕陽下穿越鐵橋的列車與河面": [
+"data/sights.json"
+],
+"夕陽中穿越鐵橋的列車": [
+"data/sights.json"
+],
+"へいくらしかくめいきねんこうえん": [
+"data/sights.json"
+],
+"平倉公園西": [
+"data/sights.json"
+],
+"東平倉": [
+"data/sights.json"
+],
+"紀念・歷史": [
+"data/sights.json"
+],
+"雄武的飛鳥雕像，紀念 1947 年立憲運動與和平民主化。": [
+"data/sights.json"
+],
+"平倉市革命紀念公園是為了紀念 1947 年的立憲運動而設立的公園。園內矗立著一座雄武的飛鳥雕像，展開的雙翼象徵人民追求自由與和平的意志，也象徵這座城市從此走上民主的道路。": [
+"data/sights.json"
+],
+"公園腹地寬廣，草坪與樹木環繞著雕像，晴天的藍天與白色雕像形成鮮明的對比。鐵道從公園旁經過，雕像和列車常常同時入鏡，是拍照的熱門地點。從平倉公園西站或東平倉站都可以步行前往。": [
+"data/sights.json"
+],
+"1947 年立憲運動與和平民主化的紀念": [
+"data/sights.json"
+],
+"雄武的飛鳥雕像": [
+"data/sights.json"
+],
+"鐵道旁的寬廣草坪": [
+"data/sights.json"
+],
+"最近車站：平倉公園西、東平倉": [
+"data/sights.json"
+],
+"飛鳥雕像與行駛中的列車": [
+"data/sights.json"
+],
+"飛鳥雕像與鐵道": [
+"data/sights.json"
+],
+"產生各頁 HTML（共用的標題、選單、頁尾放在這裡）。用法：python3 tools/make_pages.py": [
+"make_pages"
+],
+"準備中": [
+"make_pages"
+],
+"架空鐵路": [
+"make_pages"
+],
+"光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。": [
+"make_pages"
+],
+"首頁 ──": [
+"make_pages"
+],
+"年10月起投入營運，最高時速 160 公里。連結機場，也行駛名島、勝守、平倉方向，通勤與出遊都更從容。": [
+"make_pages"
+],
+"系　即將退役": [
+"make_pages"
+],
+"系": [
+"make_pages"
+],
+"時刻表 ──": [
+"make_pages"
+],
+"即時 ──": [
+"make_pages"
+],
+"依時刻表推算各班次的目前位置（拓樸路線圖）": [
+"make_pages"
+],
+"停靠站・所要時間・班距・首末班": [
+"make_pages"
+],
+"發車顯示頁已併入「路線圖」的車站小視窗；保留這個轉址頁，舊連結不會失效": [
+"make_pages"
+],
+"點選車站即可查看接下來的發車。": [
+"make_pages"
+],
+"回到首頁": [
+"make_pages"
+],
+"特急・特快為全車指定席": [
+"make_pages"
+]
+}

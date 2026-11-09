@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,7 @@
 
 </head>
 <body data-page="home">
-<div class="util"><div class="wrap"><span>光瀨都市鉄道　公式網站</span><span>Minecraft 架空鐵路</span></div></div>
+<div class="util"><div class="wrap"><span>光瀨都市鉄道　公式網站</span><span class="util-sub">Minecraft 架空鐵路</span></div></div>
 <header>
   <div class="banner">
     <img class="photo" src="assets/photo/banner.webp" alt="">
@@ -18,6 +18,7 @@
   </div>
   <nav class="gnav" aria-label="主要選單"><ul><li><a href="timetable.html">時刻表・票價<span class="en">Timetable / Fares</span></a></li><li><a href="routes.html">路線資訊<span class="en">Lines</span></a></li><li><a href="booking.html">線上訂票<span class="en">Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li><a href="sights.html">沿線景點<span class="en">Sights</span></a></li><li><a href="guide.html">乘車指南・FAQ<span class="en">Guide / FAQ</span></a></li><li><a href="airport.html">機場聯外交通<span class="en">Airport</span></a></li><li class="admin"><a id="adminlink" href="atos.html">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav>
 </header>
+<div id="svcbar" class="svcbar" role="status" hidden></div>
 <main>
 <section class="hero" id="hero" aria-roledescription="carousel" aria-label="最新資訊">
 <div class="slide on" role="group" aria-roledescription="slide" aria-label="1 / 5"><img src="assets/photo/ad2.webp" alt="松澤國際機場"><div class="cap"><span class="tag">空港LINER</span><h2>松澤國際機場　一車直達</h2><p>特急・特快直達光瀨市區，最快 11 分鐘。三日券 3,900 円、五日券 4,800 円，可無限次搭乘所有非指定席列車。</p><a class="more" href="airport.html">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="2 / 5"><img src="assets/photo/ad_kobana.webp" alt="特急こばな 新8000形"><div class="cap"><span class="tag">新列車　特急</span><h2>特急こばな　登場</h2><p>勝守、天鳥崎、本磯島　一車直達。新 8000 形，最高時速 160 公里，全車指定席，備有 USB 充電口。</p><a class="more" href="kobana.html">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="3 / 5"><img src="assets/photo/ad1.webp" alt="新2100形"><div class="cap"><span class="tag">新型列車</span><h2>新2100形　營運開始</h2><p>2026年10月起投入營運，最高時速 160 公里。連結機場，也行駛名島、勝守、平倉方向，通勤與出遊都更從容。</p><a class="more" href="index.html#n1">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="4 / 5"><img src="assets/photo/ad3.webp" alt="10000系"><div class="cap"><span class="tag">感謝與道別</span><h2>10000系　即將退役</h2><p>陪伴大家 26 年的 10000系，預定於 2026 年底退役。歡迎把握最後的乘車機會。</p><a class="more" href="index.html#n3">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="5 / 5"><div class="plain" aria-hidden="true"><img src="assets/img/mark-dark.png" alt=""></div><div class="cap"><span class="tag">時刻表・票價</span><h2>時刻表・票價改訂</h2><p>尖峰時段增加班次，等車時間更短。</p><a class="more" href="timetable.html">詳細</a></div></div>
@@ -47,9 +48,13 @@
   </div>
 </footer>
 <script src="assets/js/site-config.js"></script>
+<script src="assets/js/i18n-dict.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/hk-status.js"></script>
 <script src="assets/js/atos-model.js"></script>
 <script src="assets/js/hk-core.js"></script>
 <script src="assets/js/hk-map.js"></script>
+<script src="assets/js/layout-seed.js"></script>
 <script src="assets/js/hk-ui.js"></script>
 <script src="assets/js/booking.js"></script>
 <script src="assets/js/pages2.js"></script>

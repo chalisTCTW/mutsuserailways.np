@@ -494,3 +494,36 @@ footer .copy { width: 100%; font-size: 12px; opacity: .85; border-top: 1px solid
 .gsec .spoints li { display: list-item; background: none; border: 0; padding: 2px 0; margin: 0; font-size: 14.5px; line-height: 1.8; }
 
 .tiles { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+
+/* ── 語言切換（最上方細條） ── */
+.langsw { display: inline-flex; gap: 2px; margin-left: auto; }
+.langsw button { background: transparent; color: #cfe3da; border: 1px solid rgba(207, 227, 218, .45); padding: 0 9px; line-height: 22px; font-size: 12px; cursor: pointer; }
+.langsw button[aria-pressed="true"] { background: #fff; color: var(--g0); border-color: #fff; font-weight: 700; }
+.util .wrap { align-items: center; }
+.util .util-sub { margin-left: 4px; }
+html[lang="en"] .gnav .en, html[lang="en"] .sec > h2 small, html[lang="en"] .h2 small { display: none; }
+
+/* ── 營運狀況列 ── */
+.svcbar { border-bottom: 1px solid var(--line); background: var(--g4); font-size: 14px; }
+.svcbar[hidden] { display: none; }
+.svcbar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding-top: 8px; padding-bottom: 8px; }
+.svc-badge { font-size: 12px; font-weight: 700; padding: 0 8px; line-height: 22px; color: #fff; background: var(--g1); }
+.svc-main { font-weight: 700; }
+.svc-list { display: inline-flex; flex-wrap: wrap; gap: 2px 14px; }
+.svc-item { display: inline-flex; gap: 6px; align-items: baseline; }
+.svc-item b { font-weight: 700; }
+.svc-at { color: var(--muted); font-size: 12px; margin-left: auto; }
+.svc-more-link { font-weight: 700; }
+.svcbar.ok { background: #e8f3ed; } .svcbar.ok .svc-badge { background: var(--g1); }
+.svcbar.idle { background: var(--g4); } .svcbar.idle .svc-badge { background: var(--muted); }
+.svcbar.delay { background: #fbf0d4; border-bottom-color: #d9c389; } .svcbar.delay .svc-badge { background: #7a5200; }
+.svcbar.stop { background: #f9e1dc; border-bottom-color: #d9a59b; } .svcbar.stop .svc-badge { background: #a8381d; }
+.svcbar.unknown { background: #eceeed; } .svcbar.unknown .svc-badge { background: #5a6661; }
+@media (max-width: 640px) { .svc-at { margin-left: 0; } }
+
+/* ── 車站編碼（0.26.0 / v8.1）：站名旁的編碼徽章，用路線色 ── */
+.scodes { display: inline-flex; gap: 3px; margin-right: 6px; vertical-align: middle; flex-wrap: nowrap; }
+.scode { font: 700 .72em/1 ui-monospace, Menlo, Consolas, "Roboto Mono", monospace; letter-spacing: .02em; padding: 3px 5px 2px; border-radius: 4px; color: #fff; white-space: nowrap; }
+h2 .scode, .pop-head .scode { font-size: .6em; }
+.rmap .st-name .st-code { font: 700 10px ui-monospace, Menlo, Consolas, monospace; fill: var(--muted, #556); }
+.rmap .st-name { white-space: pre; }

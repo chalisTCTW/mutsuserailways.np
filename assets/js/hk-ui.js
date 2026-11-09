@@ -56,11 +56,16 @@
    *  (2) 瀏覽器快取（localStorage）有同一指紋的 recipe → 重現；(3) 即時搜尋（約 1～2 秒）並存入快取。路網一更新，指紋就變，一定重算。 */
   function computeLayout(H) {
     const key = netKey(H), c = H.layoutCache, ov = (c && c.override) || {};
+    const LS = 'hk-layout4-' + key;       // 第四版快取：舊版（即時搜尋、受裝置速度影響）存的粗糙結果不再沿用
     const tryRecipe = r => { try { const L = root.HK.map.layout(H, { override: ov, recipe: r }); return L; } catch (e) { return null; } };
     if (c && c.version === 3 && c.key === key && c.recipe) { const L = tryRecipe(c.recipe); if (L) return L; }
-    try { const raw = localStorage.getItem('hk-layout-' + key); if (raw) { const L = tryRecipe(JSON.parse(raw)); if (L) return L; } } catch (e) { /* 沒有快取就算了 */ }
-    const L = root.HK.map.layout(H, { override: ov, refineMs: 2500 });
-    try { localStorage.setItem('hk-layout-' + key, JSON.stringify(L.recipe)); } catch (e) { /* 無痕模式等，忽略 */ }
+    try { const raw = localStorage.getItem(LS); if (raw) { const L = tryRecipe(JSON.parse(raw)); if (L) return L; } } catch (e) { /* 沒有快取就算了 */ }
+    // 路網變了：以舊版面（layout.json 的 seed，或內建 HK.LAYOUT_SEED）為底，只調整新增／改變的線；次數固定，每台裝置結果一致
+    const seed = (c && c.recipe && c.recipe.seed) || root.HK.LAYOUT_SEED;
+    let L = null;
+    if (seed) { try { L = root.HK.map.layout(H, { override: ov, seed }); } catch (e) { L = null; } }
+    if (!L) L = root.HK.map.layout(H, { override: ov, refineMs: 2500 });
+    try { localStorage.setItem(LS, JSON.stringify(L.recipe)); } catch (e) { /* 無痕模式等，忽略 */ }
     return L;
   }
 
@@ -101,7 +106,7 @@
     const order = [...H.stations].sort((a, b) => (H.adj.get(b.id).length - H.adj.get(a.id).length));
     const labelPos = new Map();
     for (const st of order) {
-      const q = L.pos.get(st.id), w = textW(st.zh, FS), hgt = FS + 2, r = linesAt.get(st.id).size > 1 ? 11 : 8, gap = r + 3;
+      const q = L.pos.get(st.id), cstr = H.codeText ? H.codeText(st.id) : '', w = textW(st.zh, FS) + (cstr ? textW(cstr, FS - 3) + 5 : 0), hgt = FS + 2, r = linesAt.get(st.id).size > 1 ? 11 : 8, gap = r + 3;
       const cands = [
         { dx: gap, dy: hgt / 2 - 3, a: 'start', box: { x: q.x + gap, y: q.y - hgt / 2 - 1, w, h: hgt } },
         { dx: -gap, dy: hgt / 2 - 3, a: 'end', box: { x: q.x - gap - w, y: q.y - hgt / 2 - 1, w, h: hgt } },
@@ -136,7 +141,7 @@
       const g = s('g', { class: 'st' + (multi ? ' xfer' : ''), 'data-id': st.id, tabindex: opts.interactive ? '0' : null, role: opts.interactive ? 'button' : null, 'aria-label': opts.interactive ? st.zh : null });
       if (multi) g.append(s('circle', { cx: q.x, cy: q.y, r: 11, class: 'st-ring' }));
       g.append(s('circle', { cx: q.x, cy: q.y, r: multi ? 6.5 : 8, class: 'st-dot' }));
-      const label = s('text', { x: q.x + lp.dx, y: q.y + lp.dy, 'text-anchor': lp.a, class: 'st-name' }, st.zh);
+      const label = s('text', { x: q.x + lp.dx, y: q.y + lp.dy, 'text-anchor': lp.a, class: 'st-name' }, (H.codes(st.id).length ? [s('tspan', { class: 'st-code' }, H.codeText(st.id)), s('tspan', { dx: 4 }, st.zh)] : st.zh));
       g.append(label);
       if (opts.interactive) {
         g.append(s('circle', { cx: q.x, cy: q.y, r: 16, class: 'st-hit' }));
