@@ -7,7 +7,7 @@ NAV = [
     ('routes', 'routes.html', '路線資訊', 'Lines', False),
     ('booking', 'booking.html', '線上訂票', 'Booking', False),
     ('live', 'live.html', '即時列車動態', 'Train Locator', False),
-    ('sights', 'sights.html', '沿線景點', 'Sights', False),
+    ('sights', 'sights.html', '沿線景點與車站介紹', 'Sights & Stations', False),
     ('guide', 'guide.html', '乘車指南・FAQ', 'Guide / FAQ', False),
     ('airport', 'airport.html', '機場聯外交通', 'Airport', False),
 ]
@@ -46,7 +46,7 @@ def shell(page, title, body, extra_head='', desc=''):
 <footer>
   <div class="wrap">
     <img src="assets/img/mark-dark.png" alt="">
-    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="routes.html">路線資訊</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="sights.html">沿線景點</a><a href="guide.html">乘車指南與常見問題</a><a href="airport.html">機場聯外交通</a><a href="kobana.html">特急こばな</a></div>
+    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="routes.html">路線資訊</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="sights.html">沿線景點與車站介紹</a><a href="guide.html">乘車指南與常見問題</a><a href="airport.html">機場聯外交通</a><a href="kobana.html">特急こばな</a></div>
     <div class="copy">© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。</div>
   </div>
 </footer>
@@ -92,7 +92,7 @@ home = f'''<section class="hero" id="hero" aria-roledescription="carousel" aria-
 <div class="wrap">
   <section class="sec" aria-labelledby="h-find"><h2 id="h-find">時刻表・票價查詢</h2><div class="finder" id="finder"></div></section>
   <section class="sec" aria-labelledby="h-go"><h2 id="h-go">ご案内<small>Guide</small></h2>
-    <div class="tiles"><a href="routes.html"><strong>路線資訊</strong><span>各路線的停靠站、所要時間、班距與首末班</span></a><a href="guide.html"><strong>乘車指南與常見問題</strong><span>種別的差別、指定席與自由席、延誤時怎麼辦</span></a><a href="sights.html"><strong>沿線景點</strong><span>光瀨城、勝守漁港、多見瀨河濱公園與更多</span></a><a href="kobana.html"><strong>特急こばな</strong><span>勝守、天鳥崎、本磯島　一車直達</span></a></div></section>
+    <div class="tiles"><a href="routes.html"><strong>路線資訊</strong><span>各路線的停靠站、所要時間、班距與首末班</span></a><a href="guide.html"><strong>乘車指南與常見問題</strong><span>種別的差別、指定席與自由席、延誤時怎麼辦</span></a><a href="sights.html"><strong>沿線景點與車站介紹</strong><span>光瀨城、勝守漁港、車站專屬頁面與沿線餐廳</span></a><a href="kobana.html"><strong>特急こばな</strong><span>勝守、天鳥崎、本磯島　一車直達</span></a></div></section>
   <div class="cols">
     <section class="sec" aria-labelledby="h-st"><h2 id="h-st">運行情報<small>Service Status</small></h2>
       <table class="tbl" id="status"><thead><tr><th>路線</th><th>運行狀況</th></tr></thead><tbody></tbody></table>

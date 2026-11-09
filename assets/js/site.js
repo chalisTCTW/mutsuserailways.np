@@ -112,6 +112,7 @@
       out.replaceChildren();
       const st = H.stById[sid];
       out.append(h('h2', { class: 'h2', style: 'margin-top:22px' }, H.codeBadges(sid), st.zh, st.en ? h('small', null, st.en) : null));
+      if (HK.sdEntry && HK.sdEntry(st.zh)) out.append(h('p', { style: 'margin:0 0 10px' }, h('a', { class: 'btn sm', href: HK.stationHref(H, st.zh) }, '車站介紹（照片・月台・附近景點與餐廳）')));
       if (!evs.length) { out.append(h('p', { class: 'lead' }, '這個車站沒有發車的班次（可能是各路線的終點站）。')); return; }
       // 分組
       const groups = new Map();
@@ -319,6 +320,7 @@
       else if (page === 'booking') HK.booking(H, app);
       else if (page === 'routes') HK.viewLines(H, app);
       else if (page === 'sights') await HK.viewSights(H, app);
+      else if (page === 'station') await HK.viewStationPage(H, app);
       else if (page === 'guide') HK.viewGuide(H, app);
       else if (page === 'airport') HK.viewAirport(H, app);
       else if (page === 'kobana') HK.viewKobana(H, app);

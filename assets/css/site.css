@@ -527,3 +527,71 @@ html[lang="en"] .gnav .en, html[lang="en"] .sec > h2 small, html[lang="en"] .h2 
 h2 .scode, .pop-head .scode { font-size: .6em; }
 .rmap .st-name .st-code { font: 700 10px ui-monospace, Menlo, Consolas, monospace; fill: var(--muted, #556); }
 .rmap .st-name { white-space: pre; }
+
+/* ───────── v8.2：景點／餐廳分頁、餐廳卡片 ───────── */
+.stabs { display: flex; gap: 0; margin: 10px 0 4px; border-bottom: 2px solid var(--g1); }
+.stab { padding: 9px 26px; font-size: 15px; font-weight: 700; border: 1px solid var(--line); border-bottom: 0; background: #fff; color: var(--g1); cursor: pointer; margin-right: 4px; font-family: inherit; }
+.stab[aria-selected="true"] { background: var(--g1); border-color: var(--g1); color: #fff; }
+.dfilter { display: flex; flex-wrap: wrap; align-items: end; gap: 10px 18px; margin: 10px 0 14px; }
+.dfilter .lchips { margin: 0; } .dsel { min-width: 180px; } .dsel select { height: 34px; width: 100%; border: 1px solid var(--line); background: #fff; padding: 0 8px; font: inherit; }
+.dcount { margin: 0 0 0 auto; font-weight: 700; color: var(--g0); }
+.dgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dcard { border: 1px solid var(--line); background: #fff; border-top: 5px solid var(--g1); padding: 12px 14px 14px; display: flex; flex-direction: column; }
+.dcard.t2 { border-top-color: #b8862a; } .dcard.t3 { border-top-color: #6b2d4f; }
+.dhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; }
+.dtag { padding: 1px 9px; font-weight: 700; color: #fff; background: var(--g1); } .dtag.t2 { background: #b8862a; } .dtag.t3 { background: #6b2d4f; }
+.dgenre { color: var(--muted); }
+.dcard h3 { margin: 8px 0 4px; font-size: 19px; line-height: 1.35; } .dcard h3 small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; letter-spacing: .06em; }
+.ddish { margin: 2px 0 4px; font-size: 14px; } .ddish strong { font-size: 11px; color: var(--g1); margin-right: 8px; border: 1px solid var(--g1); padding: 0 6px; }
+.dblurb { margin: 0 0 10px; font-size: 14px; line-height: 1.75; }
+.dinfo { display: grid; grid-template-columns: 5.5em 1fr; gap: 3px 8px; margin: 0 0 10px; font-size: 13px; line-height: 1.6; background: var(--g4); padding: 8px 10px; }
+.dinfo dt { color: var(--muted); font-weight: 700; } .dinfo dd { margin: 0; }
+.dcard .sbtns { margin-top: auto; }
+@media (max-width: 960px) { .dgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .dgrid { grid-template-columns: 1fr; } .dcount { margin-left: 0; } .stab { padding: 9px 20px; } }
+
+/* ───────── v8.3：車站專屬頁面、車站介紹一覽 ───────── */
+
+.sp-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;margin:18px 0 0}
+.sp-hero img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--g3)}
+.sp-name{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0}
+.sp-name h1{margin:0;font-size:36px;line-height:1.2}
+.sp-sub{color:var(--muted);letter-spacing:.08em;margin:2px 0 10px}
+.scode{display:inline-block;color:#fff;font-weight:700;font-size:12px;padding:1px 7px;margin-right:4px;border-radius:2px}
+.sp-facts{display:grid;grid-template-columns:7em 1fr;gap:5px 10px;margin:12px 0;background:var(--g4);padding:10px 14px;font-size:14px}
+.sp-facts dt{color:var(--muted);font-weight:700}.sp-facts dd{margin:0}
+.sp-sec{margin:34px 0 0;padding-top:22px;border-top:1px solid var(--line)}
+.sp-sec>h2{margin:0 0 12px;font-size:21px;border-left:6px solid var(--g1);padding-left:10px}
+.sp-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.sp-tbl{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+.sp-tbl th,.sp-tbl td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+.sp-tbl th{background:var(--g3)}
+.sp-tbl .y{color:var(--g1);font-weight:700;text-align:center}.sp-tbl .n{color:#aaa;text-align:center}
+.sp-dep{background:#0e2a22;color:#e7fff4;padding:6px 0}
+.sp-dep div{display:grid;grid-template-columns:62px 1fr 78px;gap:8px;padding:6px 14px;border-bottom:1px solid #1e4a3d;font-size:15px}
+.sp-dep b{font-variant-numeric:tabular-nums;font-size:19px}.sp-dep em{font-style:normal;color:#8fd3b6;text-align:right;font-variant-numeric:tabular-nums}
+.sp-dep .tg{display:inline-block;background:#fff;color:#123f31;font-size:11px;font-weight:700;padding:0 5px;margin-right:6px}
+.sp-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;padding:3px 10px;font-size:13px;margin:0 6px 6px 0}
+.sp-chip i{width:12px;height:12px;display:inline-block;border:1px solid rgba(0,0,0,.25)}
+.sp-ex{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sp-ex div{border:1px solid var(--line);border-left:6px solid var(--g1);background:#fff;padding:8px 12px;font-size:14px}.sp-ex strong{display:block;font-size:16px}
+.sp-fac{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}.sp-fac span{background:var(--g3);padding:4px 12px;font-size:13px}.sp-fac span.off{background:#f1f1f1;color:#999;text-decoration:line-through}
+.sp-near{align-items:start;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.sp-card{border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);display:block}
+.sp-card img{width:100%;aspect-ratio:16/9;object-fit:cover}.sp-card div{padding:8px 12px 12px;font-size:13px}.sp-card strong{display:block;font-size:16px;color:var(--g0)}
+.sp-card .t{font-size:11px;font-weight:700;color:#fff;background:#b8862a;display:inline-block;padding:0 7px;margin-right:6px}.sp-card .t.s{background:var(--g1)}
+.sp-ng{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.sp-ng a{border:1px solid var(--line);background:#fff;padding:8px 10px;font-size:13px;text-decoration:none;color:var(--ink)}.sp-ng strong{display:block;font-size:15px}
+@media(max-width:760px){.sp-hero,.sp-two,.sp-near,.sp-ex{grid-template-columns:1fr}.sp-ng{grid-template-columns:repeat(2,minmax(0,1fr))}.sp-name h1{font-size:30px}}
+
+.sp-hero.nophoto{grid-template-columns:1fr}.sp-btns{margin:0;display:flex;flex-wrap:wrap;gap:8px}.sp-intro{margin:0 0 10px}
+.sp-facts .sl{display:inline-flex;flex-wrap:wrap;gap:4px 10px}
+.sp-h3{margin:22px 0 10px;font-size:17px}
+.sp-hub{border:1px solid var(--line);background:#fff;padding:8px 10px;font-size:13px;text-decoration:none;color:var(--ink)}.sp-hub strong{display:block;font-size:15px;color:var(--g0)}
+.tblwrap{overflow-x:auto}.dot{display:inline-block;width:12px;height:12px;border:1px solid rgba(0,0,0,.25);margin-right:7px;vertical-align:-1px}
+.stgrid .stcard{text-decoration:none;color:var(--ink)}.stgrid .stcard:hover{border-color:var(--g1)}.stgrid .stcard img{width:calc(100% + 28px);margin:-12px -14px 8px;max-width:none;aspect-ratio:16/9;object-fit:cover}
+.stgrid .stcard h3 .scodes{margin-right:6px}.stgrid .sl{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:12px;margin:0 0 6px}
+.sp-ng{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:760px){.sp-ng{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.gnav li:has(> a[href="sights.html"]) { flex: 1.55 1 0; }
+@media (max-width: 760px) { .gnav li:has(> a[href="sights.html"]) { flex: none; } }
