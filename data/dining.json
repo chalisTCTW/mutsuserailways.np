@@ -53,7 +53,7 @@
    "en": "Chicken-paitan soy ramen is the signature: rich but not heavy. Expect a line at lunch.",
    "nameEn": "Mendokoro Tanikaze",
    "dishEn": "Chicken-paitan soy ramen",
-   "addressEn": "1-5-2 Taniyama-cho, Taniyama-ku, Hikarise"
+   "addressEn": "1-5-2 Taniyama-cho, Taniyama Ward, Hikarise City"
   },
   {
    "id": "r02",
@@ -65,7 +65,7 @@
    "genreEn": "Set meals",
    "price": "850〜1,200円",
    "walk": "徒歩2分",
-   "address": "光瀨市浦川区浦川2-11-7",
+   "address": "光瀨市谷山区浦川2-11-7",
    "hours": "10:30〜21:00（L.O. 20:30）",
    "closed": "不定休",
    "dish": "焼き魚定食",
@@ -74,7 +74,7 @@
    "en": "A daily grilled-fish set with a small side dish and miso soup; rice refills are free.",
    "nameEn": "Teishokuya Kawasemi",
    "dishEn": "Grilled-fish set meal",
-   "addressEn": "2-11-7 Urakawa, Urakawa-ku, Hikarise"
+   "addressEn": "2-11-7 Urakawa, Taniyama Ward, Hikarise City"
   },
   {
    "id": "r03",
@@ -86,7 +86,7 @@
    "genreEn": "Okonomiyaki & takoyaki",
    "price": "800〜1,500円",
    "walk": "徒歩1分",
-   "address": "光瀨市九里橋区九里橋3-2-15 ビル1F",
+   "address": "光瀨市白藏山区九里橋3-2-15　ビル1F",
    "hours": "11:30〜22:00（L.O. 21:30）",
    "closed": "毎週火曜",
    "dish": "豚玉お好み焼き",
@@ -95,7 +95,7 @@
    "en": "A long-established shop in the shopping district; the griddle is right at your seat and everything is cooked to order.",
    "nameEn": "Okonomiyaki Kurikichi",
    "dishEn": "Pork-and-egg okonomiyaki",
-   "addressEn": "3-2-15 Kuribashi, Kuribashi-ku, Hikarise (Bldg. 1F)"
+   "addressEn": "3-2-15 Kuribashi, Shirakurayama Ward, Hikarise City (Bldg. 1F)"
   },
   {
    "id": "r04",
@@ -107,7 +107,7 @@
    "genreEn": "Curry",
    "price": "950〜1,400円",
    "walk": "徒歩4分",
-   "address": "光瀨市東松沢区東松沢1-9-3",
+   "address": "十万浦郡松沢町東松沢1-9-3",
    "hours": "11:00〜20:30",
    "closed": "毎週木曜",
    "dish": "野菜ごろごろスープカレー",
@@ -116,7 +116,7 @@
    "en": "Soup curry packed with vegetables; choose your spice level from 0 to 5.",
    "nameEn": "Curry Kobo Hinata",
    "dishEn": "Vegetable-packed soup curry",
-   "addressEn": "1-9-3 Higashi-Matsuzawa, Higashi-Matsuzawa-ku, Hikarise"
+   "addressEn": "1-9-3 Higashi-Matsuzawa, Matsuzawa Town, Jumanmura District"
   },
   {
    "id": "r05",
@@ -137,7 +137,7 @@
    "en": "Hand-cut soba from house-made noodles, handy before or after concerts and events.",
    "nameEn": "Sobadokoro Tomiyaan",
    "dishEn": "Tempura zaru soba",
-   "addressEn": "3-1-4 Tomiya-cho, Tomiya-ku, Hikarise"
+   "addressEn": "3-1-4 Tomiya-cho, Tomiya Ward, Hikarise City"
   },
   {
    "id": "r06",
@@ -158,7 +158,7 @@
    "en": "A udon shop open from 7 a.m. — grab a bowl before the early train.",
    "nameEn": "Udon Kaido Chaya",
    "dishEn": "Beef bukkake udon",
-   "addressEn": "2-7-1 Hanakura-kaido, Hanakura-ku, Hikarise"
+   "addressEn": "2-7-1 Hanakura-kaido, Hanakura Ward, Hikarise City"
   },
   {
    "id": "r07",
@@ -170,7 +170,7 @@
    "genreEn": "Canteen-style set meals",
    "price": "600〜1,000円",
    "walk": "徒歩2分",
-   "address": "光瀨市大学区学園通り1-3-8",
+   "address": "光瀨市戸宮区学園通り1-3-8",
    "hours": "8:30〜19:00",
    "closed": "土・日曜、祝日",
    "dish": "唐揚げ定食",
@@ -179,7 +179,7 @@
    "en": "Student-cafeteria style with generous portions and friendly prices; open to everyone.",
    "nameEn": "Gakushoku Cafe Keyaki",
    "dishEn": "Fried-chicken set meal",
-   "addressEn": "1-3-8 Gakuen-dori, Daigaku-ku, Hikarise"
+   "addressEn": "1-3-8 Gakuen-dori, Tomiya Ward, Hikarise City"
   },
   {
    "id": "r08",
@@ -191,7 +191,7 @@
    "genreEn": "Conveyor-belt sushi",
    "price": "1,200〜2,000円",
    "walk": "徒歩3分",
-   "address": "光瀨市中央区みつせ町4-6-12",
+   "address": "光瀨市栗田区みつせ町4-6-12",
    "hours": "11:00〜22:00",
    "closed": "無休",
    "dish": "活あじ握り",
@@ -200,7 +200,7 @@
    "en": "Conveyor-belt sushi in the city centre, plates from ¥130, with weekday lunch specials.",
    "nameEn": "Kaiten Sushi Mitsusemaru",
    "dishEn": "Fresh horse-mackerel nigiri",
-   "addressEn": "4-6-12 Mitsuse-cho, Chuo-ku, Hikarise"
+   "addressEn": "4-6-12 Mitsuse-cho, Kurita Ward, Hikarise City"
   },
   {
    "id": "r09",
@@ -212,7 +212,7 @@
    "genreEn": "Seafood rice bowls",
    "price": "1,500〜2,000円",
    "walk": "徒歩5分",
-   "address": "光瀨市名島区名島港町1-2-9",
+   "address": "光瀨郡名島市名島港町1-2-9",
    "hours": "7:30〜15:00",
    "closed": "毎週水曜",
    "dish": "朝どれ海鮮丼",
@@ -221,7 +221,7 @@
    "en": "Seafood rice bowls straight from the fishing port; the morning catch is the freshest, and they close when it sells out.",
    "nameEn": "Minato no Kaisendon Hamakichi",
    "dishEn": "Morning-catch seafood rice bowl",
-   "addressEn": "1-2-9 Najima-minato-cho, Najima-ku, Hikarise"
+   "addressEn": "1-2-9 Najima-minato-cho, Najima City, Hikarise District"
   },
   {
    "id": "r10",
@@ -233,7 +233,7 @@
    "genreEn": "Dried-fish set meals",
    "price": "900〜1,600円",
    "walk": "徒歩4分",
-   "address": "光瀨市勝守区勝守漁港前3-3",
+   "address": "光瀨郡勝守市勝守漁港前3-3",
    "hours": "6:30〜14:00",
    "closed": "毎週木曜",
    "dish": "あじ開き定食",
@@ -242,7 +242,7 @@
    "en": "A canteen near the fishing port where fishermen stop for breakfast at dawn.",
    "nameEn": "Katsumori Shokudo",
    "dishEn": "Opened-horse-mackerel set meal",
-   "addressEn": "3-3 Katsumori-gyoko-mae, Katsumori-ku, Hikarise"
+   "addressEn": "3-3 Katsumori-gyoko-mae, Katsumori City, Hikarise District"
   },
   {
    "id": "r11",
@@ -254,7 +254,7 @@
    "genreEn": "Tonkatsu",
    "price": "1,100〜1,800円",
    "walk": "徒歩3分",
-   "address": "光瀨市平倉区東平倉1-6-10",
+   "address": "十万浦郡平倉市東平倉1-6-10",
    "hours": "11:00〜21:00（L.O. 20:30）",
    "closed": "毎週月曜",
    "dish": "ロースかつ定食",
@@ -263,7 +263,7 @@
    "en": "Thick-cut pork cutlets with free refills of cabbage and miso soup.",
    "nameEn": "Tonkatsu Heikuratei",
    "dishEn": "Pork loin cutlet set",
-   "addressEn": "1-6-10 Higashi-Heikura, Heikura-ku, Hikarise"
+   "addressEn": "1-6-10 Higashi-Heikura, Heikura City, Jumanmura District"
   },
   {
    "id": "r12",
@@ -275,7 +275,7 @@
    "genreEn": "Cafe & light meals",
    "price": "700〜1,400円",
    "walk": "徒歩2分",
-   "address": "光瀨市南九里区南九里2-4-6",
+   "address": "光瀨市白藏山区南九里2-4-6",
    "hours": "8:00〜18:00",
    "closed": "毎週火曜",
    "dish": "ナポリタンとプリン",
@@ -284,7 +284,7 @@
    "en": "A Showa-style coffee house; the Napolitan spaghetti and pudding are the signatures.",
    "nameEn": "Kissa Kurinoki",
    "dishEn": "Napolitan spaghetti and pudding",
-   "addressEn": "2-4-6 Minami-Kusato, Minami-Kusato-ku, Hikarise"
+   "addressEn": "2-4-6 Minami-Kusato, Shirakurayama Ward, Hikarise City"
   },
   {
    "id": "r13",
@@ -305,7 +305,7 @@
    "en": "Chicken skewers grilled over binchotan charcoal, paired with sake and shochu.",
    "nameEn": "Sumibi Yakitori Torimasa",
    "dishEn": "Binchotan yakitori omakase",
-   "addressEn": "2-8-1 Taniyama-cho, Taniyama-ku, Hikarise"
+   "addressEn": "2-8-1 Taniyama-cho, Taniyama Ward, Hikarise City"
   },
   {
    "id": "r14",
@@ -317,7 +317,7 @@
    "genreEn": "Shabu-shabu",
    "price": "3,800〜5,000円",
    "walk": "徒歩2分",
-   "address": "光瀨市浦川区浦川1-3-12 2F",
+   "address": "光瀨市谷山区浦川1-3-12　2F",
    "hours": "11:30〜14:30／17:00〜22:00",
    "closed": "毎週火曜",
    "dish": "国産牛しゃぶしゃぶ",
@@ -326,7 +326,7 @@
    "en": "Domestic-beef hot pot served with house sesame sauce and ponzu.",
    "nameEn": "Shabu-shabu Uranoya",
    "dishEn": "Domestic-beef shabu-shabu",
-   "addressEn": "1-3-12 Urakawa, Urakawa-ku, Hikarise (2F)"
+   "addressEn": "1-3-12 Urakawa, Taniyama Ward, Hikarise City (2F)"
   },
   {
    "id": "r15",
@@ -338,7 +338,7 @@
    "genreEn": "Yakiniku",
    "price": "3,500〜5,000円",
    "walk": "徒歩1分",
-   "address": "光瀨市九里橋区九里橋3-5-2",
+   "address": "光瀨市白藏山区九里橋3-5-2",
    "hours": "17:00〜23:00（L.O. 22:30）",
    "closed": "無休",
    "dish": "特選カルビ",
@@ -347,7 +347,7 @@
    "en": "A yakiniku restaurant in the shopping district with private rooms suited to families and groups.",
    "nameEn": "Yakiniku Kuribashien",
    "dishEn": "Premium kalbi",
-   "addressEn": "3-5-2 Kuribashi, Kuribashi-ku, Hikarise"
+   "addressEn": "3-5-2 Kuribashi, Shirakurayama Ward, Hikarise City"
   },
   {
    "id": "r16",
@@ -359,7 +359,7 @@
    "genreEn": "Italian",
    "price": "3,000〜4,800円",
    "walk": "徒歩5分",
-   "address": "光瀨市東松沢区東松沢3-2-5",
+   "address": "十万浦郡松沢町東松沢3-2-5",
    "hours": "11:30〜14:30／17:30〜21:30",
    "closed": "毎週水曜",
    "dish": "手打ちパスタのコース",
@@ -368,7 +368,7 @@
    "en": "Hand-made pasta and wood-fired pizza; lunch sets are around ¥3,000.",
    "nameEn": "Trattoria La Luce",
    "dishEn": "Hand-made pasta course",
-   "addressEn": "3-2-5 Higashi-Matsuzawa, Higashi-Matsuzawa-ku, Hikarise"
+   "addressEn": "3-2-5 Higashi-Matsuzawa, Matsuzawa Town, Jumanmura District"
   },
   {
    "id": "r17",
@@ -389,7 +389,7 @@
    "en": "Counter seating where tempura is fried and served one piece at a time; seats are available after arena events too.",
    "nameEn": "Tempura Tomiya Yoshino",
    "dishEn": "Assorted tempura",
-   "addressEn": "1-12-3 Tomiya-cho, Tomiya-ku, Hikarise"
+   "addressEn": "1-12-3 Tomiya-cho, Tomiya Ward, Hikarise City"
   },
   {
    "id": "r18",
@@ -410,7 +410,7 @@
    "en": "Kaiseki centred on hand-cut soba, with a relaxing courtyard view.",
    "nameEn": "Soba Kaiseki Hanakura",
    "dishEn": "Soba kaiseki course",
-   "addressEn": "1-14-2 Hanakura-kaido, Hanakura-ku, Hikarise"
+   "addressEn": "1-14-2 Hanakura-kaido, Hanakura Ward, Hikarise City"
   },
   {
    "id": "r19",
@@ -422,7 +422,7 @@
    "genreEn": "Sushi",
    "price": "4,000〜5,000円",
    "walk": "徒歩3分",
-   "address": "光瀨市中央区みつせ町2-3-8",
+   "address": "光瀨市栗田区みつせ町2-3-8",
    "hours": "11:30〜14:00／17:00〜21:30",
    "closed": "毎週水曜",
    "dish": "おまかせ握り十貫",
@@ -431,7 +431,7 @@
    "en": "A counter-style sushi bar; the ten-piece nigiri lunch is around ¥4,000.",
    "nameEn": "Sushi Mitsuse-zushi",
    "dishEn": "Omakase ten-piece nigiri",
-   "addressEn": "2-3-8 Mitsuse-cho, Chuo-ku, Hikarise"
+   "addressEn": "2-3-8 Mitsuse-cho, Kurita Ward, Hikarise City"
   },
   {
    "id": "r20",
@@ -443,7 +443,7 @@
    "genreEn": "Grilled seafood",
    "price": "3,000〜4,500円",
    "walk": "徒歩3分",
-   "address": "光瀨市名島区名島港町2-5-1",
+   "address": "光瀨郡名島市名島港町2-5-1",
    "hours": "11:00〜21:00",
    "closed": "毎週火曜",
    "dish": "浜焼き盛り合わせ",
@@ -452,7 +452,7 @@
    "en": "Grill seafood yourself over charcoal; the shellfish and fish are delivered the same day.",
    "nameEn": "Hamayaki Najimamaru",
    "dishEn": "Assorted hamayaki grill",
-   "addressEn": "2-5-1 Najima-minato-cho, Najima-ku, Hikarise"
+   "addressEn": "2-5-1 Najima-minato-cho, Najima City, Hikarise District"
   },
   {
    "id": "r21",
@@ -464,7 +464,7 @@
    "genreEn": "Japanese lunch",
    "price": "2,800〜4,500円",
    "walk": "徒歩4分",
-   "address": "光瀨市天鳥崎区天鳥崎参道2-1",
+   "address": "光瀨郡天鳥崎町天鳥崎参道2-1",
    "hours": "11:00〜16:00",
    "closed": "毎週木曜",
    "dish": "海の幸の御膳",
@@ -473,7 +473,7 @@
    "en": "A Japanese restaurant by the shrine approach; the seafood gozen comes with a seasonal side dish.",
    "nameEn": "Sando Saryo Amatori",
    "dishEn": "Seafood gozen",
-   "addressEn": "2-1 Amatorizaki-sando, Amatorizaki-ku, Hikarise"
+   "addressEn": "2-1 Amatorizaki-sando, Amatorizaki Town, Hikarise District"
   },
   {
    "id": "r22",
@@ -485,7 +485,7 @@
    "genreEn": "Western-style Japanese",
    "price": "2,500〜4,500円",
    "walk": "徒歩2分",
-   "address": "光瀨市紫市区紫市本町1-8-4",
+   "address": "光瀨郡紫市紫市本町1-8-4",
    "hours": "11:00〜15:00／17:00〜21:00",
    "closed": "毎週水曜",
    "dish": "デミグラスハンバーグ",
@@ -494,7 +494,7 @@
    "en": "A classic yoshoku restaurant whose signature hamburg steak is simmered in demi-glace for two days.",
    "nameEn": "Yoshoku Murasakiken",
    "dishEn": "Demi-glace hamburg steak",
-   "addressEn": "1-8-4 Murasaki-shi Honcho, Murasaki-shi-ku, Hikarise"
+   "addressEn": "1-8-4 Murasaki-shi Honcho, Murasaki City, Hikarise District"
   },
   {
    "id": "r23",
@@ -506,7 +506,7 @@
    "genreEn": "Teppanyaki",
    "price": "3,800〜5,000円",
    "walk": "徒歩4分",
-   "address": "光瀨市平倉区東平倉2-3-7 3F",
+   "address": "十万浦郡平倉市東平倉2-3-7　3F",
    "hours": "11:30〜14:30／17:30〜22:00",
    "closed": "毎週火曜",
    "dish": "国産牛鉄板ステーキ",
@@ -515,7 +515,7 @@
    "en": "The teppan is right in front of you as the chef cooks steak and seafood on the spot.",
    "nameEn": "Teppanyaki Heikura Grill",
    "dishEn": "Domestic-beef teppan steak",
-   "addressEn": "2-3-7 Higashi-Heikura, Heikura-ku, Hikarise (3F)"
+   "addressEn": "2-3-7 Higashi-Heikura, Heikura City, Jumanmura District (3F)"
   },
   {
    "id": "r24",
@@ -527,7 +527,7 @@
    "genreEn": "Chinese",
    "price": "2,800〜4,500円",
    "walk": "徒歩2分",
-   "address": "光瀨市南九里区南九里1-7-3",
+   "address": "光瀨市白藏山区南九里1-7-3",
    "hours": "11:00〜15:00／17:00〜22:00",
    "closed": "毎週月曜",
    "dish": "海老チリと小籠包",
@@ -536,7 +536,7 @@
    "en": "Stir-fried shrimp in chili sauce and xiaolongbao are the popular pair; set menus are available.",
    "nameEn": "Chuka Kuri Hanten",
    "dishEn": "Shrimp in chili sauce and xiaolongbao",
-   "addressEn": "1-7-3 Minami-Kusato, Minami-Kusato-ku, Hikarise"
+   "addressEn": "1-7-3 Minami-Kusato, Shirakurayama Ward, Hikarise City"
   },
   {
    "id": "r25",
@@ -557,7 +557,7 @@
    "en": "An eight-seat counter serving fish delivered from the fishing port according to the season.",
    "nameEn": "Sushi Taniyama Isana",
    "dishEn": "Omakase nigiri course",
-   "addressEn": "3-1-9 Taniyama-cho, Taniyama-ku, Hikarise"
+   "addressEn": "3-1-9 Taniyama-cho, Taniyama Ward, Hikarise City"
   },
   {
    "id": "r26",
@@ -569,7 +569,7 @@
    "genreEn": "Kappo",
    "price": "7,000〜10,000円",
    "walk": "徒歩2分",
-   "address": "光瀨市九里橋区九里橋2-9-1",
+   "address": "光瀨市白藏山区九里橋2-9-1",
    "hours": "17:00〜22:00（要予約）",
    "closed": "毎週日曜",
    "dish": "旬菜おまかせコース",
@@ -578,7 +578,7 @@
    "en": "A kappo restaurant deep in the shopping district with a seasonal menu.",
    "nameEn": "Kappo Kuribashi Minamo",
    "dishEn": "Seasonal vegetable omakase course",
-   "addressEn": "2-9-1 Kuribashi, Kuribashi-ku, Hikarise"
+   "addressEn": "2-9-1 Kuribashi, Shirakurayama Ward, Hikarise City"
   },
   {
    "id": "r27",
@@ -590,7 +590,7 @@
    "genreEn": "French",
    "price": "8,000〜10,000円",
    "walk": "徒歩3分",
-   "address": "光瀨市戸宮区戸宮町5-2-1 3F",
+   "address": "光瀨市戸宮区戸宮町5-2-1　3F",
    "hours": "12:00〜14:30／18:00〜21:30（要予約）",
    "closed": "毎週月曜",
    "dish": "シェフおまかせディナー",
@@ -599,7 +599,7 @@
    "en": "A French restaurant with a view of the arena at night; reservations are required for dinner.",
    "nameEn": "French Le Bois Tomiya",
    "dishEn": "Chef's omakase dinner",
-   "addressEn": "5-2-1 Tomiya-cho, Tomiya-ku, Hikarise (3F)"
+   "addressEn": "5-2-1 Tomiya-cho, Tomiya Ward, Hikarise City (3F)"
   },
   {
    "id": "r28",
@@ -620,7 +620,7 @@
    "en": "A garden-surrounded ryotei whose private rooms can host business entertaining and family gatherings.",
    "nameEn": "Ryotei Hanakuratei",
    "dishEn": "Seasonal kaiseki",
-   "addressEn": "4-1-1 Hanakura-kaido, Hanakura-ku, Hikarise"
+   "addressEn": "4-1-1 Hanakura-kaido, Hanakura Ward, Hikarise City"
   },
   {
    "id": "r29",
@@ -632,7 +632,7 @@
    "genreEn": "Steak",
    "price": "7,000〜10,000円",
    "walk": "徒歩3分",
-   "address": "光瀨市大学区学園通り2-5-3",
+   "address": "光瀨市戸宮区学園通り2-5-3",
    "hours": "11:30〜14:30／17:30〜21:30",
    "closed": "毎週水曜",
    "dish": "黒毛和牛サーロイン",
@@ -641,7 +641,7 @@
    "en": "A steakhouse using Japanese black wagyu; choose your weight of aged beef.",
    "nameEn": "Steak House Daigakumae Grill",
    "dishEn": "Japanese black wagyu sirloin",
-   "addressEn": "2-5-3 Gakuen-dori, Daigaku-ku, Hikarise"
+   "addressEn": "2-5-3 Gakuen-dori, Tomiya Ward, Hikarise City"
   },
   {
    "id": "r30",
@@ -653,7 +653,7 @@
    "genreEn": "Sky dining",
    "price": "8,000〜10,000円",
    "walk": "徒歩4分",
-   "address": "光瀨市中央区みつせ町1-1 中央公園ビル最上階",
+   "address": "光瀨市栗田区みつせ町1-1　中央公園ビル最上階",
    "hours": "12:00〜15:00／17:30〜22:00（要予約）",
    "closed": "無休",
    "dish": "ステラコース",
@@ -662,7 +662,7 @@
    "en": "A high-floor restaurant overlooking Central Park and Ryusei Tree; the night-view seats are in high demand.",
    "nameEn": "Ryusei Dining Stella",
    "dishEn": "Stella course",
-   "addressEn": "1-1 Mitsuse-cho, Chuo-ku, Hikarise (Chuo Koen Bldg., top floor)"
+   "addressEn": "1-1 Mitsuse-cho, Kurita Ward, Hikarise City (Chuo Koen Bldg., top floor)"
   },
   {
    "id": "r31",
@@ -674,7 +674,7 @@
    "genreEn": "Kaiseki",
    "price": "8,000〜10,000円",
    "walk": "徒歩4分",
-   "address": "光瀨市名島区名島港町3-1",
+   "address": "光瀨郡名島市名島港町3-1",
    "hours": "11:30〜14:00／17:00〜21:00（要予約）",
    "closed": "毎週火曜",
    "dish": "活魚の姿造り会席",
@@ -683,7 +683,7 @@
    "en": "Live-fish cuisine by the harbour, with ikizukuri prepared from the tank on the spot.",
    "nameEn": "Katsugyo Kaiseki Najimaro",
    "dishEn": "Live-fish ikizukuri kaiseki",
-   "addressEn": "3-1 Najima-minato-cho, Najima-ku, Hikarise"
+   "addressEn": "3-1 Najima-minato-cho, Najima City, Hikarise District"
   },
   {
    "id": "r32",
@@ -695,7 +695,7 @@
    "genreEn": "Crab dishes",
    "price": "8,500〜10,000円",
    "walk": "徒歩5分",
-   "address": "光瀨市勝守区勝守漁港前1-1",
+   "address": "光瀨郡勝守市勝守漁港前1-1",
    "hours": "11:30〜21:00（要予約）",
    "closed": "毎週水曜",
    "dish": "蟹づくしコース",
@@ -704,7 +704,7 @@
    "en": "Crab dishes in front of the fishing port, from raw crab all the way to crab hot pot.",
    "nameEn": "Kani Ryori Katsumori Kani Goten",
    "dishEn": "All-crab course",
-   "addressEn": "1-1 Katsumori-gyoko-mae, Katsumori-ku, Hikarise"
+   "addressEn": "1-1 Katsumori-gyoko-mae, Katsumori City, Hikarise District"
   },
   {
    "id": "r33",
@@ -716,7 +716,7 @@
    "genreEn": "Kaiseki",
    "price": "8,000〜10,000円",
    "walk": "徒歩5分",
-   "address": "光瀨市天鳥崎区天鳥崎参道7-2",
+   "address": "光瀨郡天鳥崎町天鳥崎参道7-2",
    "hours": "12:00〜14:00／17:30〜20:30（要予約）",
    "closed": "毎週木曜",
    "dish": "潮騒懐石",
@@ -725,7 +725,7 @@
    "en": "Kaiseki facing the coast; the dusk-hour seats are the most popular.",
    "nameEn": "Kaiseki Amatorizaki Shiosai",
    "dishEn": "Shiosai kaiseki",
-   "addressEn": "7-2 Amatorizaki-sando, Amatorizaki-ku, Hikarise"
+   "addressEn": "7-2 Amatorizaki-sando, Amatorizaki Town, Hikarise District"
   },
   {
    "id": "r34",
@@ -737,7 +737,7 @@
    "genreEn": "Japanese cuisine",
    "price": "7,500〜10,000円",
    "walk": "徒歩2分",
-   "address": "光瀨市紫市区紫市本町3-2-1",
+   "address": "光瀨郡紫市紫市本町3-2-1",
    "hours": "12:00〜14:00／17:30〜21:30（要予約）",
    "closed": "毎週月曜",
    "dish": "紫雲コース",
@@ -746,7 +746,7 @@
    "en": "Built around seasonal ingredients, with tableware and presentation that are worth a look.",
    "nameEn": "Nihon Ryori Shiun",
    "dishEn": "Shiun course",
-   "addressEn": "3-2-1 Murasaki-shi Honcho, Murasaki-shi-ku, Hikarise"
+   "addressEn": "3-2-1 Murasaki-shi Honcho, Murasaki City, Hikarise District"
   },
   {
    "id": "r35",
@@ -758,7 +758,7 @@
    "genreEn": "Eel",
    "price": "7,000〜9,500円",
    "walk": "徒歩3分",
-   "address": "光瀨市平倉区東平倉1-2-6",
+   "address": "十万浦郡平倉市東平倉1-2-6",
    "hours": "11:00〜14:30／17:00〜20:30",
    "closed": "毎週水曜",
    "dish": "特上うな重",
@@ -767,7 +767,7 @@
    "en": "Charcoal-grilled kabayaki eel, which takes about 40 minutes, so reserve ahead.",
    "nameEn": "Unagi Heikura Unaji",
    "dishEn": "Premium unaju (eel over rice)",
-   "addressEn": "1-2-6 Higashi-Heikura, Heikura-ku, Hikarise"
+   "addressEn": "1-2-6 Higashi-Heikura, Heikura City, Jumanmura District"
   },
   {
    "id": "r36",
@@ -779,7 +779,7 @@
    "genreEn": "Italian",
    "price": "8,000〜10,000円",
    "walk": "徒歩3分",
-   "address": "光瀨市南九里区南九里3-1-2",
+   "address": "光瀨市白藏山区南九里3-1-2",
    "hours": "12:00〜14:30／18:00〜21:30（要予約）",
    "closed": "毎週火曜",
    "dish": "シェフズコース",
@@ -788,7 +788,7 @@
    "en": "A stand-alone Italian restaurant surrounded by greenery, with wine-pairing options.",
    "nameEn": "Ristorante Minami-Kusato Verde",
    "dishEn": "Chef's course",
-   "addressEn": "3-1-2 Minami-Kusato, Minami-Kusato-ku, Hikarise"
+   "addressEn": "3-1-2 Minami-Kusato, Shirakurayama Ward, Hikarise City"
   }
  ]
 }

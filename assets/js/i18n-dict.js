@@ -814,7 +814,7 @@ window.HK_I18N_DICT = {
 ],
 "最近車站：天鳥崎中央": [
 "最寄り駅：天鳥崎中央",
-"Nearest station: Amatorizaki-Chuo"
+"Nearest station: Tentori-Chuo"
 ],
 "停靠站與時刻": [
 "停車駅と時刻",
@@ -2078,7 +2078,7 @@ window.HK_I18N_DICT = {
 ],
 "天鳥崎中央": [
 "天鳥崎中央",
-"Amatorizaki-Chuo"
+"Tentori-Chuo"
 ],
 "光瀨市立博物館": [
 "光瀨市立博物館",
@@ -2350,7 +2350,7 @@ window.HK_I18N_DICT = {
 ],
 "傍晚是這裡最迷人的時段：夕陽把海面與屋瓦染成橘紅色，社殿的剪影映在天色裡。參拜之後可以回到參拜街道，逛逛沿路的小店，再搭電車回程。從天鳥崎中央站步行即可抵達。": [
 "夕方は最も魅力的な時間帯です。夕日が海面と屋根瓦を橙赤色に染め、社殿のシルエットが空に浮かびます。参拝のあとは参道に戻って、沿道の小さな店をのぞき、電車で帰るのもよいでしょう。天鳥崎中央駅から歩いて行けます。",
-"Evening is the most enchanting time: the setting sun paints the sea and roof tiles orange-red and the shrine’s silhouette stands against the sky. After worship, return along the approach road, browse the small shops, then take the train home. It is a walk from Amatorizaki-Chuo station."
+"Evening is the most enchanting time: the setting sun paints the sea and roof tiles orange-red and the shrine’s silhouette stands against the sky. After worship, return along the approach road, browse the small shops, then take the train home. It is a walk from Tentori-Chuo station."
 ],
 "海岸與夕陽": [
 "海岸と夕日",
@@ -2366,7 +2366,7 @@ window.HK_I18N_DICT = {
 ],
 "從天鳥崎中央站步行可達": [
 "天鳥崎中央駅から徒歩で行けます",
-"Walkable from Amatorizaki-Chuo station"
+"Walkable from Tentori-Chuo station"
 ],
 "夕陽下染成橘紅色的站房與電車": [
 "夕日に橙赤色に染まる駅舎と電車",
@@ -2718,7 +2718,7 @@ window.HK_I18N_DICT = {
 ],
 "沒有活動的日子，場館會把競技場地改為冰宮（溜冰場）對外開放。白色的冰面和環繞四周的紅色看台，搭配懸掛在天花板下的大型旗幟，與活動日的熱鬧氣氛完全不同。想要在冰面上放鬆一下的話，不妨安排一個半天。從戸宮站或中央戸宮／光大前站都可以步行前往。": [
 "イベントのない日は、競技場がアイスパレス（スケート場）として一般に開放されます。白い氷面と周囲の赤い客席、天井から下がる大きな旗は、イベント日の賑わいとはまた違う雰囲気です。氷の上でのんびり過ごす半日はいかがでしょう。戸宮駅、または中央戸宮／光大前駅から歩いて行けます。",
-"On days without events the arena floor opens to the public as an ice palace (skating rink). The white ice, the red stands around it and the big banners hanging from the ceiling feel completely different from an event day. It makes a relaxing half-day outing. Walk from Tomiya Station or Chuo-Tomiya / Kodai-mae Station."
+"On days without events the arena floor opens to the public as an ice palace (skating rink). The white ice, the red stands around it and the big banners hanging from the ceiling feel completely different from an event day. It makes a relaxing half-day outing. Walk from Tomiya Station or Chuo-Tomiya Station."
 ],
 "演唱會、體育活動的室內場館": [
 "コンサート・スポーツ大会の屋内アリーナ",
@@ -2730,7 +2730,7 @@ window.HK_I18N_DICT = {
 ],
 "最近車站：戸宮、中央戸宮／光大前": [
 "最寄駅：戸宮、中央戸宮／光大前",
-"Nearest stations: Tomiya, Chuo-Tomiya / Kodai-mae"
+"Nearest stations: Tomiya, Chuo-Tomiya"
 ],
 "活動日請先確認場館公告": [
 "イベント日は事前に会場のお知らせをご確認ください",
@@ -2762,7 +2762,7 @@ window.HK_I18N_DICT = {
 ],
 "戲劇會場以木質的座席與天花板為特色，舞台上的佈景會隨演出更換，不定時會有音樂劇上演。逛完展覽再看一場演出，是適合半天到一天的行程。最近車站是曲江站。": [
 "劇場は木質の客席と天井が特徴で、舞台の背景は演目ごとに入れ替わり、不定期にミュージカルが上演されます。展示を見たあとに公演を楽しむ、半日から1日のコースにおすすめです。最寄駅は曲江駅です。",
-"The theatre is known for its wooden seats and ceiling; stage sets change with each production, and musicals are staged from time to time. Combine an exhibition with a show for a half-day or full-day outing. The nearest station is Kyokko."
+"The theatre is known for its wooden seats and ceiling; stage sets change with each production, and musicals are staged from time to time. Combine an exhibition with a show for a half-day or full-day outing. The nearest station is Magarie."
 ],
 "現代美術展館": [
 "現代美術の展示",
@@ -2774,7 +2774,7 @@ window.HK_I18N_DICT = {
 ],
 "最近車站：曲江": [
 "最寄駅：曲江",
-"Nearest station: Kyokko"
+"Nearest station: Magarie"
 ],
 "展覽與演出安排以館方公告為準": [
 "展示・公演の予定は館のお知らせをご確認ください",
@@ -2790,7 +2790,7 @@ window.HK_I18N_DICT = {
 ],
 "曲江站旁的懷永美術館外觀": [
 "曲江駅そばの懐永美術館の外観",
-"Exterior of Kaiei Museum of Art next to Kyokko Station"
+"Exterior of Kaiei Museum of Art next to Magarie Station"
 ],
 "戲劇會場的座席與舞台": [
 "劇場の客席と舞台",
@@ -3198,7 +3198,7 @@ window.HK_I18N_DICT = {
 ],
 "曲江": [
 "曲江",
-"Kyokko"
+"Magarie"
 ],
 "全日時刻表": [
 "全日時刻表",

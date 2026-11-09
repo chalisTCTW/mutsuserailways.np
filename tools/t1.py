@@ -202,7 +202,7 @@ T1 = [
 (201,"最寄り駅：勝守","Nearest station: Katsumori"),
 (202,"天鳥崎神社","Amatorizaki Shrine"),
 (203,"海岸、夕日、神社と参道。夕方に訪れるのが最も美しい。","Coast, sunset, the shrine and its approach. Most beautiful toward evening."),
-(204,"最寄り駅：天鳥崎中央","Nearest station: Amatorizaki-Chuo"),
+(204,"最寄り駅：天鳥崎中央","Nearest station: Tentori-Chuo"),
 (205,"停車駅と時刻","Stops and times"),
 (206,"主な停車駅：勝守・天鳥崎・本磯島。詳しい停車駅と時刻は、時刻表データの更新後にここに表示されます。","Main stops: Katsumori, Amatorizaki, Motoisojima. Detailed stops and times will appear here after timetable data is updated."),
 (207,"時刻表へ","Go to timetable"),
