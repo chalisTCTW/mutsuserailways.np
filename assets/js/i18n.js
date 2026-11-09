@@ -63,6 +63,11 @@
     if ((r = /^(\d+) 両編成(?:・(.+))?$/.exec(t))) return lang === 'en' ? `${r[1]}-car train${r[2] ? ' · ' + tr(r[2]) : ''}` : null;
     if ((r = /^\+(¥[\d,]+)（合計 (¥[\d,]+)）$/.exec(t))) return lang === 'en' ? `+${r[1]} (total ${r[2]})` : null;
     if ((r = /^空(\d+)(.*)$/.exec(t))) return lang === 'en' ? `Free ${r[1]}${r[2]}` : `空き ${r[1]}${r[2]}`;
+    if ((r = /^(.+?)（約[\s　]*(\d+)[\s　]*分）$/.exec(t))) { const a = tr(r[1]); return lang === 'en' ? `${a} (about ${r[2]} min)` : `${a}（約${r[2]}分）`; }
+    if (t.includes('、')) {   // 路線名・方向名・行先の「、」区切り一覧：要素ごとに訳す
+      const parts = t.split('、'), tt = parts.map(x => { const v = lookup(norm(x)); return v == null ? x : v; });
+      if (tt.some((x, i) => x !== parts[i])) return tt.join(lang === 'en' ? ', ' : '、');
+    }
     if ((r = /^(.+?) → (.+)$/.exec(t))) { const a = lookup(r[1]), b = lookup(r[2]); if (a != null || b != null) return (a != null ? a : r[1]) + ' → ' + (b != null ? b : r[2]); }
     return null;
   }
@@ -109,7 +114,7 @@
   const pretty = s => s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s\-/])([a-z])/g, (_, a, b) => a + b.toUpperCase()) : s;
   function addNames(pairs) {
     if (lang !== 'en') return;
-    for (const [zh, en] of pairs) if (zh && en && !names.has(zh)) names.set(zh, pretty(String(en).trim()));
+    for (const [zh, en] of pairs) if (zh && en && !names.has(zh)) names.set(zh, pretty(String(en).trim()).replace(/內回/g, 'Inner loop').replace(/外回/g, 'Outer loop'));
     setTimeout(() => scan(document.body), 0);
   }
   /** 語言切換鈕（放在最上方細條）。 */

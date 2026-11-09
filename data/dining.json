@@ -49,7 +49,11 @@
    "closed": "毎週月曜",
    "dish": "鶏白湯醤油ラーメン",
    "zh": "雞白湯醬油拉麵是招牌，濃郁卻不膩，午餐時段會排隊。",
-   "ja": "濃厚なのに後味すっきりの鶏白湯醤油が看板。昼は行列ができます。"
+   "ja": "濃厚なのに後味すっきりの鶏白湯醤油が看板。昼は行列ができます。",
+   "en": "Chicken-paitan soy ramen is the signature: rich but not heavy. Expect a line at lunch.",
+   "nameEn": "Mendokoro Tanikaze",
+   "dishEn": "Chicken-paitan soy ramen",
+   "addressEn": "1-5-2 Taniyama-cho, Taniyama-ku, Hikarise"
   },
   {
    "id": "r02",
@@ -66,7 +70,11 @@
    "closed": "不定休",
    "dish": "焼き魚定食",
    "zh": "每天更換的烤魚定食，附小鉢與味噌湯，白飯可以續碗。",
-   "ja": "日替わりの焼き魚定食に小鉢と味噌汁付き。ご飯はおかわり自由。"
+   "ja": "日替わりの焼き魚定食に小鉢と味噌汁付き。ご飯はおかわり自由。",
+   "en": "A daily grilled-fish set with a small side dish and miso soup; rice refills are free.",
+   "nameEn": "Teishokuya Kawasemi",
+   "dishEn": "Grilled-fish set meal",
+   "addressEn": "2-11-7 Urakawa, Urakawa-ku, Hikarise"
   },
   {
    "id": "r03",
@@ -83,7 +91,11 @@
    "closed": "毎週火曜",
    "dish": "豚玉お好み焼き",
    "zh": "商圈裡的老鋪，鐵板就在座位前，現點現煎。",
-   "ja": "商店街の老舗。目の前の鉄板で焼きたてを。"
+   "ja": "商店街の老舗。目の前の鉄板で焼きたてを。",
+   "en": "A long-established shop in the shopping district; the griddle is right at your seat and everything is cooked to order.",
+   "nameEn": "Okonomiyaki Kurikichi",
+   "dishEn": "Pork-and-egg okonomiyaki",
+   "addressEn": "3-2-15 Kuribashi, Kuribashi-ku, Hikarise (Bldg. 1F)"
   },
   {
    "id": "r04",
@@ -100,7 +112,11 @@
    "closed": "毎週木曜",
    "dish": "野菜ごろごろスープカレー",
    "zh": "蔬菜滿滿的湯咖哩，辣度可以選 0 到 5 級。",
-   "ja": "野菜たっぷりのスープカレー。辛さは0〜5辛から選べます。"
+   "ja": "野菜たっぷりのスープカレー。辛さは0〜5辛から選べます。",
+   "en": "Soup curry packed with vegetables; choose your spice level from 0 to 5.",
+   "nameEn": "Curry Kobo Hinata",
+   "dishEn": "Vegetable-packed soup curry",
+   "addressEn": "1-9-3 Higashi-Matsuzawa, Higashi-Matsuzawa-ku, Hikarise"
   },
   {
    "id": "r05",
@@ -117,7 +133,11 @@
    "closed": "毎週水曜",
    "dish": "天ぷらざるそば",
    "zh": "自家製麵的手打蕎麥，演唱會或活動前後也方便用餐。",
-   "ja": "自家製の手打ちそば。競技場のイベント前後にも便利。"
+   "ja": "自家製の手打ちそば。競技場のイベント前後にも便利。",
+   "en": "Hand-cut soba from house-made noodles, handy before or after concerts and events.",
+   "nameEn": "Sobadokoro Tomiyaan",
+   "dishEn": "Tempura zaru soba",
+   "addressEn": "3-1-4 Tomiya-cho, Tomiya-ku, Hikarise"
   },
   {
    "id": "r06",
@@ -134,7 +154,11 @@
    "closed": "毎週日曜",
    "dish": "肉ぶっかけうどん",
    "zh": "從早上 7 點營業的烏龍麵店，趕早班電車前可以吃一碗。",
-   "ja": "朝7時から営業。早い電車の前にさっと一杯。"
+   "ja": "朝7時から営業。早い電車の前にさっと一杯。",
+   "en": "A udon shop open from 7 a.m. — grab a bowl before the early train.",
+   "nameEn": "Udon Kaido Chaya",
+   "dishEn": "Beef bukkake udon",
+   "addressEn": "2-7-1 Hanakura-kaido, Hanakura-ku, Hikarise"
   },
   {
    "id": "r07",
@@ -151,7 +175,11 @@
    "closed": "土・日曜、祝日",
    "dish": "唐揚げ定食",
    "zh": "學生食堂風格，份量足、價格親切，一般客人也可入內。",
-   "ja": "学生食堂風でボリューム満点。一般のお客さまも利用できます。"
+   "ja": "学生食堂風でボリューム満点。一般のお客さまも利用できます。",
+   "en": "Student-cafeteria style with generous portions and friendly prices; open to everyone.",
+   "nameEn": "Gakushoku Cafe Keyaki",
+   "dishEn": "Fried-chicken set meal",
+   "addressEn": "1-3-8 Gakuen-dori, Daigaku-ku, Hikarise"
   },
   {
    "id": "r08",
@@ -168,7 +196,11 @@
    "closed": "無休",
    "dish": "活あじ握り",
    "zh": "市中心的迴轉壽司，一盤 130 円起，平日午餐有特價。",
-   "ja": "1皿130円から。平日ランチはお得なセットも。"
+   "ja": "1皿130円から。平日ランチはお得なセットも。",
+   "en": "Conveyor-belt sushi in the city centre, plates from ¥130, with weekday lunch specials.",
+   "nameEn": "Kaiten Sushi Mitsusemaru",
+   "dishEn": "Fresh horse-mackerel nigiri",
+   "addressEn": "4-6-12 Mitsuse-cho, Chuo-ku, Hikarise"
   },
   {
    "id": "r09",
@@ -185,7 +217,11 @@
    "closed": "毎週水曜",
    "dish": "朝どれ海鮮丼",
    "zh": "漁港直送的海鮮丼，早上的魚貨最新鮮，賣完就結束。",
-   "ja": "漁港直送の海鮮丼。朝の魚が一番新鮮、売り切れ次第終了。"
+   "ja": "漁港直送の海鮮丼。朝の魚が一番新鮮、売り切れ次第終了。",
+   "en": "Seafood rice bowls straight from the fishing port; the morning catch is the freshest, and they close when it sells out.",
+   "nameEn": "Minato no Kaisendon Hamakichi",
+   "dishEn": "Morning-catch seafood rice bowl",
+   "addressEn": "1-2-9 Najima-minato-cho, Najima-ku, Hikarise"
   },
   {
    "id": "r10",
@@ -202,7 +238,11 @@
    "closed": "毎週木曜",
    "dish": "あじ開き定食",
    "zh": "靠近漁港的食堂，一早就有漁夫來吃早餐。",
-   "ja": "漁港の目の前。朝から漁師さんで賑わいます。"
+   "ja": "漁港の目の前。朝から漁師さんで賑わいます。",
+   "en": "A canteen near the fishing port where fishermen stop for breakfast at dawn.",
+   "nameEn": "Katsumori Shokudo",
+   "dishEn": "Opened-horse-mackerel set meal",
+   "addressEn": "3-3 Katsumori-gyoko-mae, Katsumori-ku, Hikarise"
   },
   {
    "id": "r11",
@@ -219,7 +259,11 @@
    "closed": "毎週月曜",
    "dish": "ロースかつ定食",
    "zh": "厚切的炸豬排，高麗菜與味噌湯可續。",
-   "ja": "厚切りロースかつ。キャベツと味噌汁はおかわり自由。"
+   "ja": "厚切りロースかつ。キャベツと味噌汁はおかわり自由。",
+   "en": "Thick-cut pork cutlets with free refills of cabbage and miso soup.",
+   "nameEn": "Tonkatsu Heikuratei",
+   "dishEn": "Pork loin cutlet set",
+   "addressEn": "1-6-10 Higashi-Heikura, Heikura-ku, Hikarise"
   },
   {
    "id": "r12",
@@ -236,7 +280,11 @@
    "closed": "毎週火曜",
    "dish": "ナポリタンとプリン",
    "zh": "昭和風格的喫茶店，那不勒斯義大利麵與布丁是招牌。",
-   "ja": "昭和の趣の喫茶店。ナポリタンとプリンが名物。"
+   "ja": "昭和の趣の喫茶店。ナポリタンとプリンが名物。",
+   "en": "A Showa-style coffee house; the Napolitan spaghetti and pudding are the signatures.",
+   "nameEn": "Kissa Kurinoki",
+   "dishEn": "Napolitan spaghetti and pudding",
+   "addressEn": "2-4-6 Minami-Kusato, Minami-Kusato-ku, Hikarise"
   },
   {
    "id": "r13",
@@ -253,7 +301,11 @@
    "closed": "毎週日曜",
    "dish": "備長炭の焼鳥おまかせ",
    "zh": "備長炭現烤的雞肉串，有日本酒與燒酎可搭配。",
-   "ja": "備長炭で焼く焼鳥のおまかせ。日本酒と焼酎も豊富。"
+   "ja": "備長炭で焼く焼鳥のおまかせ。日本酒と焼酎も豊富。",
+   "en": "Chicken skewers grilled over binchotan charcoal, paired with sake and shochu.",
+   "nameEn": "Sumibi Yakitori Torimasa",
+   "dishEn": "Binchotan yakitori omakase",
+   "addressEn": "2-8-1 Taniyama-cho, Taniyama-ku, Hikarise"
   },
   {
    "id": "r14",
@@ -270,7 +322,11 @@
    "closed": "毎週火曜",
    "dish": "国産牛しゃぶしゃぶ",
    "zh": "國產牛火鍋，附自製芝麻醬與柚子醋。",
-   "ja": "国産牛のしゃぶしゃぶ。自家製ごまだれとポン酢で。"
+   "ja": "国産牛のしゃぶしゃぶ。自家製ごまだれとポン酢で。",
+   "en": "Domestic-beef hot pot served with house sesame sauce and ponzu.",
+   "nameEn": "Shabu-shabu Uranoya",
+   "dishEn": "Domestic-beef shabu-shabu",
+   "addressEn": "1-3-12 Urakawa, Urakawa-ku, Hikarise (2F)"
   },
   {
    "id": "r15",
@@ -287,7 +343,11 @@
    "closed": "無休",
    "dish": "特選カルビ",
    "zh": "商圈內的燒肉店，包廂適合家族與聚餐。",
-   "ja": "商店街の焼肉店。個室は家族や宴会にも。"
+   "ja": "商店街の焼肉店。個室は家族や宴会にも。",
+   "en": "A yakiniku restaurant in the shopping district with private rooms suited to families and groups.",
+   "nameEn": "Yakiniku Kuribashien",
+   "dishEn": "Premium kalbi",
+   "addressEn": "3-5-2 Kuribashi, Kuribashi-ku, Hikarise"
   },
   {
    "id": "r16",
@@ -304,7 +364,11 @@
    "closed": "毎週水曜",
    "dish": "手打ちパスタのコース",
    "zh": "手打義大利麵與窯烤披薩，午餐套餐約 3,000 円。",
-   "ja": "手打ちパスタと石窯ピッツァ。ランチコースは約3,000円。"
+   "ja": "手打ちパスタと石窯ピッツァ。ランチコースは約3,000円。",
+   "en": "Hand-made pasta and wood-fired pizza; lunch sets are around ¥3,000.",
+   "nameEn": "Trattoria La Luce",
+   "dishEn": "Hand-made pasta course",
+   "addressEn": "3-2-5 Higashi-Matsuzawa, Higashi-Matsuzawa-ku, Hikarise"
   },
   {
    "id": "r17",
@@ -321,7 +385,11 @@
    "closed": "毎週日曜",
    "dish": "天ぷら盛り合わせ",
    "zh": "吧檯座位，現炸現吃，競技場活動後也有位置。",
-   "ja": "カウンターで揚げたてを。イベント帰りにも。"
+   "ja": "カウンターで揚げたてを。イベント帰りにも。",
+   "en": "Counter seating where tempura is fried and served one piece at a time; seats are available after arena events too.",
+   "nameEn": "Tempura Tomiya Yoshino",
+   "dishEn": "Assorted tempura",
+   "addressEn": "1-12-3 Tomiya-cho, Tomiya-ku, Hikarise"
   },
   {
    "id": "r18",
@@ -338,7 +406,11 @@
    "closed": "毎週月曜",
    "dish": "そば懐石コース",
    "zh": "以手打蕎麥為主的會席料理，中庭景色悠閒。",
-   "ja": "手打ちそばを中心とした会席。中庭の眺めも楽しめます。"
+   "ja": "手打ちそばを中心とした会席。中庭の眺めも楽しめます。",
+   "en": "Kaiseki centred on hand-cut soba, with a relaxing courtyard view.",
+   "nameEn": "Soba Kaiseki Hanakura",
+   "dishEn": "Soba kaiseki course",
+   "addressEn": "1-14-2 Hanakura-kaido, Hanakura-ku, Hikarise"
   },
   {
    "id": "r19",
@@ -355,7 +427,11 @@
    "closed": "毎週水曜",
    "dish": "おまかせ握り十貫",
    "zh": "吧檯式壽司店，午餐的握壽司十貫約 4,000 円。",
-   "ja": "カウンターの寿司。ランチの握り十貫は約4,000円。"
+   "ja": "カウンターの寿司。ランチの握り十貫は約4,000円。",
+   "en": "A counter-style sushi bar; the ten-piece nigiri lunch is around ¥4,000.",
+   "nameEn": "Sushi Mitsuse-zushi",
+   "dishEn": "Omakase ten-piece nigiri",
+   "addressEn": "2-3-8 Mitsuse-cho, Chuo-ku, Hikarise"
   },
   {
    "id": "r20",
@@ -372,7 +448,11 @@
    "closed": "毎週火曜",
    "dish": "浜焼き盛り合わせ",
    "zh": "自己在炭火上烤的海鮮，貝類與魚都是當天進貨。",
-   "ja": "炭火で自分で焼く海鮮。貝も魚も当日仕入れ。"
+   "ja": "炭火で自分で焼く海鮮。貝も魚も当日仕入れ。",
+   "en": "Grill seafood yourself over charcoal; the shellfish and fish are delivered the same day.",
+   "nameEn": "Hamayaki Najimamaru",
+   "dishEn": "Assorted hamayaki grill",
+   "addressEn": "2-5-1 Najima-minato-cho, Najima-ku, Hikarise"
   },
   {
    "id": "r21",
@@ -389,7 +469,11 @@
    "closed": "毎週木曜",
    "dish": "海の幸の御膳",
    "zh": "神社參道旁的和食店，海鮮御膳附季節小鉢。",
-   "ja": "参道沿いの和食処。海の幸の御膳に季節の小鉢付き。"
+   "ja": "参道沿いの和食処。海の幸の御膳に季節の小鉢付き。",
+   "en": "A Japanese restaurant by the shrine approach; the seafood gozen comes with a seasonal side dish.",
+   "nameEn": "Sando Saryo Amatori",
+   "dishEn": "Seafood gozen",
+   "addressEn": "2-1 Amatorizaki-sando, Amatorizaki-ku, Hikarise"
   },
   {
    "id": "r22",
@@ -406,7 +490,11 @@
    "closed": "毎週水曜",
    "dish": "デミグラスハンバーグ",
    "zh": "燉煮兩天的多蜜醬，是洋食老店的招牌漢堡排。",
-   "ja": "二日間煮込んだデミグラスが自慢のハンバーグ。"
+   "ja": "二日間煮込んだデミグラスが自慢のハンバーグ。",
+   "en": "A classic yoshoku restaurant whose signature hamburg steak is simmered in demi-glace for two days.",
+   "nameEn": "Yoshoku Murasakiken",
+   "dishEn": "Demi-glace hamburg steak",
+   "addressEn": "1-8-4 Murasaki-shi Honcho, Murasaki-shi-ku, Hikarise"
   },
   {
    "id": "r23",
@@ -423,7 +511,11 @@
    "closed": "毎週火曜",
    "dish": "国産牛鉄板ステーキ",
    "zh": "鐵板就在眼前，主廚現場料理牛排與海鮮。",
-   "ja": "目の前の鉄板でステーキと海鮮を。"
+   "ja": "目の前の鉄板でステーキと海鮮を。",
+   "en": "The teppan is right in front of you as the chef cooks steak and seafood on the spot.",
+   "nameEn": "Teppanyaki Heikura Grill",
+   "dishEn": "Domestic-beef teppan steak",
+   "addressEn": "2-3-7 Higashi-Heikura, Heikura-ku, Hikarise (3F)"
   },
   {
    "id": "r24",
@@ -440,7 +532,11 @@
    "closed": "毎週月曜",
    "dish": "海老チリと小籠包",
    "zh": "蝦仁乾燒與小籠包是人氣組合，可以點套餐。",
-   "ja": "海老チリと小籠包が人気。コースも選べます。"
+   "ja": "海老チリと小籠包が人気。コースも選べます。",
+   "en": "Stir-fried shrimp in chili sauce and xiaolongbao are the popular pair; set menus are available.",
+   "nameEn": "Chuka Kuri Hanten",
+   "dishEn": "Shrimp in chili sauce and xiaolongbao",
+   "addressEn": "1-7-3 Minami-Kusato, Minami-Kusato-ku, Hikarise"
   },
   {
    "id": "r25",
@@ -457,7 +553,11 @@
    "closed": "毎週日・月曜",
    "dish": "おまかせ握りコース",
    "zh": "只有 8 席的吧檯，依季節從漁港直送的魚料理。",
-   "ja": "わずか8席のカウンター。漁港直送の旬の魚を。"
+   "ja": "わずか8席のカウンター。漁港直送の旬の魚を。",
+   "en": "An eight-seat counter serving fish delivered from the fishing port according to the season.",
+   "nameEn": "Sushi Taniyama Isana",
+   "dishEn": "Omakase nigiri course",
+   "addressEn": "3-1-9 Taniyama-cho, Taniyama-ku, Hikarise"
   },
   {
    "id": "r26",
@@ -474,7 +574,11 @@
    "closed": "毎週日曜",
    "dish": "旬菜おまかせコース",
    "zh": "在商圈深處的割烹料理，依季節更換菜單。",
-   "ja": "商店街の奥にある割烹。季節ごとに献立が変わります。"
+   "ja": "商店街の奥にある割烹。季節ごとに献立が変わります。",
+   "en": "A kappo restaurant deep in the shopping district with a seasonal menu.",
+   "nameEn": "Kappo Kuribashi Minamo",
+   "dishEn": "Seasonal vegetable omakase course",
+   "addressEn": "2-9-1 Kuribashi, Kuribashi-ku, Hikarise"
   },
   {
    "id": "r27",
@@ -491,7 +595,11 @@
    "closed": "毎週月曜",
    "dish": "シェフおまかせディナー",
    "zh": "可以看見競技場夜景的法式餐廳，晚餐需預約。",
-   "ja": "競技場の夜景を望むフレンチ。ディナーは要予約。"
+   "ja": "競技場の夜景を望むフレンチ。ディナーは要予約。",
+   "en": "A French restaurant with a view of the arena at night; reservations are required for dinner.",
+   "nameEn": "French Le Bois Tomiya",
+   "dishEn": "Chef's omakase dinner",
+   "addressEn": "5-2-1 Tomiya-cho, Tomiya-ku, Hikarise (3F)"
   },
   {
    "id": "r28",
@@ -508,7 +616,11 @@
    "closed": "毎週日曜",
    "dish": "季節の会席",
    "zh": "庭園環繞的料亭，包廂可以安排接待與家族聚會。",
-   "ja": "庭園に囲まれた料亭。個室で接待や家族の集まりにも。"
+   "ja": "庭園に囲まれた料亭。個室で接待や家族の集まりにも。",
+   "en": "A garden-surrounded ryotei whose private rooms can host business entertaining and family gatherings.",
+   "nameEn": "Ryotei Hanakuratei",
+   "dishEn": "Seasonal kaiseki",
+   "addressEn": "4-1-1 Hanakura-kaido, Hanakura-ku, Hikarise"
   },
   {
    "id": "r29",
@@ -525,7 +637,11 @@
    "closed": "毎週水曜",
    "dish": "黒毛和牛サーロイン",
    "zh": "使用黑毛和牛的牛排專門店，熟成肉可以選擇克數。",
-   "ja": "黒毛和牛のステーキ専門店。熟成肉はグラム数を選べます。"
+   "ja": "黒毛和牛のステーキ専門店。熟成肉はグラム数を選べます。",
+   "en": "A steakhouse using Japanese black wagyu; choose your weight of aged beef.",
+   "nameEn": "Steak House Daigakumae Grill",
+   "dishEn": "Japanese black wagyu sirloin",
+   "addressEn": "2-5-3 Gakuen-dori, Daigaku-ku, Hikarise"
   },
   {
    "id": "r30",
@@ -542,7 +658,11 @@
    "closed": "無休",
    "dish": "ステラコース",
    "zh": "俯瞰中央公園與流星樹的高樓層餐廳，夜景座位很搶手。",
-   "ja": "中央公園と流星樹を見下ろす最上階。夜景席は人気。"
+   "ja": "中央公園と流星樹を見下ろす最上階。夜景席は人気。",
+   "en": "A high-floor restaurant overlooking Central Park and Ryusei Tree; the night-view seats are in high demand.",
+   "nameEn": "Ryusei Dining Stella",
+   "dishEn": "Stella course",
+   "addressEn": "1-1 Mitsuse-cho, Chuo-ku, Hikarise (Chuo Koen Bldg., top floor)"
   },
   {
    "id": "r31",
@@ -559,7 +679,11 @@
    "closed": "毎週火曜",
    "dish": "活魚の姿造り会席",
    "zh": "港邊的活魚料理，從水槽現撈製作姿造。",
-   "ja": "港沿いの活魚料理。水槽から揚げた魚を姿造りに。"
+   "ja": "港沿いの活魚料理。水槽から揚げた魚を姿造りに。",
+   "en": "Live-fish cuisine by the harbour, with ikizukuri prepared from the tank on the spot.",
+   "nameEn": "Katsugyo Kaiseki Najimaro",
+   "dishEn": "Live-fish ikizukuri kaiseki",
+   "addressEn": "3-1 Najima-minato-cho, Najima-ku, Hikarise"
   },
   {
    "id": "r32",
@@ -576,7 +700,11 @@
    "closed": "毎週水曜",
    "dish": "蟹づくしコース",
    "zh": "在漁港前提供的蟹料理，從生蟹到蟹鍋一路吃到底。",
-   "ja": "漁港前の蟹料理専門店。刺身から鍋まで蟹づくし。"
+   "ja": "漁港前の蟹料理専門店。刺身から鍋まで蟹づくし。",
+   "en": "Crab dishes in front of the fishing port, from raw crab all the way to crab hot pot.",
+   "nameEn": "Kani Ryori Katsumori Kani Goten",
+   "dishEn": "All-crab course",
+   "addressEn": "1-1 Katsumori-gyoko-mae, Katsumori-ku, Hikarise"
   },
   {
    "id": "r33",
@@ -593,7 +721,11 @@
    "closed": "毎週木曜",
    "dish": "潮騒懐石",
    "zh": "面向海岸的懷石料理，黃昏的時間座位最受歡迎。",
-   "ja": "海岸に面した懐石。夕暮れの時間帯が人気。"
+   "ja": "海岸に面した懐石。夕暮れの時間帯が人気。",
+   "en": "Kaiseki facing the coast; the dusk-hour seats are the most popular.",
+   "nameEn": "Kaiseki Amatorizaki Shiosai",
+   "dishEn": "Shiosai kaiseki",
+   "addressEn": "7-2 Amatorizaki-sando, Amatorizaki-ku, Hikarise"
   },
   {
    "id": "r34",
@@ -610,7 +742,11 @@
    "closed": "毎週月曜",
    "dish": "紫雲コース",
    "zh": "以季節食材為主，餐具與擺盤也值得一看。",
-   "ja": "旬の素材を中心に。器と盛り付けも見どころ。"
+   "ja": "旬の素材を中心に。器と盛り付けも見どころ。",
+   "en": "Built around seasonal ingredients, with tableware and presentation that are worth a look.",
+   "nameEn": "Nihon Ryori Shiun",
+   "dishEn": "Shiun course",
+   "addressEn": "3-2-1 Murasaki-shi Honcho, Murasaki-shi-ku, Hikarise"
   },
   {
    "id": "r35",
@@ -627,7 +763,11 @@
    "closed": "毎週水曜",
    "dish": "特上うな重",
    "zh": "炭火蒲燒鰻魚，需要約 40 分鐘，建議先預約。",
-   "ja": "炭火の蒲焼き。40分ほどかかるので予約がおすすめ。"
+   "ja": "炭火の蒲焼き。40分ほどかかるので予約がおすすめ。",
+   "en": "Charcoal-grilled kabayaki eel, which takes about 40 minutes, so reserve ahead.",
+   "nameEn": "Unagi Heikura Unaji",
+   "dishEn": "Premium unaju (eel over rice)",
+   "addressEn": "1-2-6 Higashi-Heikura, Heikura-ku, Hikarise"
   },
   {
    "id": "r36",
@@ -644,7 +784,11 @@
    "closed": "毎週火曜",
    "dish": "シェフズコース",
    "zh": "在綠意環繞的獨棟義式餐廳，附配酒的選項。",
-   "ja": "緑に囲まれた一軒家のイタリアン。ワインペアリングもあります。"
+   "ja": "緑に囲まれた一軒家のイタリアン。ワインペアリングもあります。",
+   "en": "A stand-alone Italian restaurant surrounded by greenery, with wine-pairing options.",
+   "nameEn": "Ristorante Minami-Kusato Verde",
+   "dishEn": "Chef's course",
+   "addressEn": "3-1-2 Minami-Kusato, Minami-Kusato-ku, Hikarise"
   }
  ]
 }

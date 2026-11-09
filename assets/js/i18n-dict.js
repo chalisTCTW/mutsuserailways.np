@@ -1254,7 +1254,7 @@ window.HK_I18N_DICT = {
 ],
 "行": [
 "行き",
-"for"
+"bound"
 ],
 "關閉": [
 "閉じる",
@@ -2991,6 +2991,230 @@ window.HK_I18N_DICT = {
 "車站介紹（照片・月台・附近景點與餐廳）": [
 "駅案内（写真・ホーム・周辺のスポットとグルメ）",
 "Station guide (photos, platforms, nearby sights and dining)"
+],
+"競技場、站前商圈與住宅區之間的大型車站，多條路線在這裡交會。舉辦演唱會或體育活動時，站內會特別擁擠，建議提早出發。": [
+"アリーナ、駅前商店街、住宅地に囲まれた大きな駅で、複数の路線が交わります。コンサートやスポーツイベントの日は構内がとても混み合うので、早めの出発をおすすめします。",
+"A large station set among the arena, the shopping district and residential areas, where several lines meet. It gets especially crowded on concert and sports event days, so set out early."
+],
+"雪中的戸宮站站房與前方的廣場": [
+"雪の戸宮駅の駅舎と前の広場",
+"Tomiya Station building and the plaza in front of it, in snow"
+],
+"雪景中的站房與廣場": [
+"雪景色の駅舎と広場",
+"Station building and plaza in the snow"
+],
+"晴天的戸宮站站房與階梯廣場": [
+"晴れた日の戸宮駅の駅舎と階段広場",
+"Tomiya Station building and the stepped plaza on a clear day"
+],
+"晴天的站房與階梯": [
+"晴れた日の駅舎と階段",
+"Station building and steps on a clear day"
+],
+"臨水的車站，旁邊是高層住宅，沿著水邊走可以看到車站與列車。": [
+"水辺に面した駅で、隣には高層住宅が建っています。水辺を歩くと、駅と列車を眺められます。",
+"A waterside station next to high-rise housing; walk along the water to see the station and trains."
+],
+"紫市站的臨水站房與旁邊的高層住宅": [
+"水辺に面した紫市駅の駅舎と隣の高層住宅",
+"Murasakiichi Station building by the water, with high-rise housing beside it"
+],
+"臨水的站房與高層住宅": [
+"水辺の駅舎と高層住宅",
+"Waterside station building and high-rise housing"
+],
+"高架車站，往海的方向走就是勝守漁港。月台可以遠望港口的船隻，傍晚的天色特別好看。站房有白色格柵外牆，前方是寬敞的步道與草坪。": [
+"高架駅で、海の方へ歩くと勝守漁港です。ホームからは港の船を遠くに望め、夕暮れの空が特にきれいです。駅舎は白い格子の外壁で、前には広い歩道と芝生が広がります。",
+"An elevated station; head towards the sea to reach Katsumori Fishing Port. The platform looks out over the boats in the harbour, and the sky at dusk is especially lovely. The station building has a white lattice facade, with a wide promenade and lawn in front."
+],
+"黃昏時從高架看到的勝守站月台與港口": [
+"夕暮れの高架から見た勝守駅のホームと港",
+"Katsumori Station platform and the harbour seen from the viaduct at dusk"
+],
+"黃昏的月台與遠方的港口": [
+"夕暮れのホームと遠くの港",
+"The platform at dusk and the distant harbour"
+],
+"勝守站白色格柵外牆的站房": [
+"白い格子の外壁の勝守駅の駅舎",
+"Katsumori Station building with its white lattice facade"
+],
+"白色格柵外牆的站房": [
+"白い格子の外壁の駅舎",
+"Station building with a white lattice facade"
+],
+"光瀨都市圈的空中玄關。出站後有玻璃天橋連接航廈，從市區搭特急・特別快速可以直達。": [
+"光瀬都市圏の空の玄関口。駅を出るとガラスの連絡橋でターミナルに直結し、市内から特急・特別快速で直通できます。",
+"The air gateway of the Hikarise metropolitan area. A glass skybridge links the station to the terminal, and Limited Express and Special Rapid trains run directly from the city."
+],
+"搭乘方式與所要時間請見「機場聯外交通」。": [
+"ご利用方法と所要時間は「空港アクセス」をご覧ください。",
+"See “Airport Access” for how to get there and travel times."
+],
+"白色屋頂的機場站高架站房": [
+"白い屋根の空港駅の高架駅舎",
+"Elevated station building of the airport station with its white roof"
+],
+"機場站的高架站房": [
+"空港駅の高架駅舎",
+"Elevated station building of the airport station"
+],
+"連接航廈的玻璃天橋與道路": [
+"ターミナルへ続くガラスの連絡橋と道路",
+"The glass skybridge and road leading to the terminal"
+],
+"連接航廈的玻璃天橋": [
+"ターミナルへ続くガラスの連絡橋",
+"Glass skybridge to the terminal"
+],
+"光瀨城的最近車站，出站後沿護城河走向城門。": [
+"光瀬城の最寄駅。駅を出たら、お堀沿いに城門へ向かいます。",
+"The nearest station to Hikarise Castle; from the station, follow the moat to the castle gate."
+],
+"天鳥崎神社的最近車站，從這裡步行就能走到參拜街道。": [
+"天鳥崎神社の最寄駅。ここから参道へ歩いて行けます。",
+"The nearest station to Amatorizaki Shrine; the approach to the shrine is a short walk away."
+],
+"光瀨市立博物館的最近車站。": [
+"光瀬市立博物館の最寄駅。",
+"The nearest station to Hikarise City Museum."
+],
+"九里橋商圈的入口，出站後沿著人潮走就會到美食與商店街。": [
+"九里橋商店街の入口。駅を出て人の流れに沿って歩くと、グルメ街と商店街に着きます。",
+"The gateway to the Kurihashi shopping area; follow the crowd out of the station to reach the food and shopping streets."
+],
+"多見瀨河濱公園的最近車站。": [
+"多見瀬リバーサイドパークの最寄駅。",
+"The nearest station to Tomise Riverside Park."
+],
+"平倉市革命紀念公園的最近車站之一，公園就在鐵道旁。": [
+"平倉市革命記念公園の最寄駅のひとつ。公園は線路のすぐそばです。",
+"One of the nearest stations to Heikura Revolution Memorial Park, which lies right beside the tracks."
+],
+"平倉市革命紀念公園的最近車站之一。": [
+"平倉市革命記念公園の最寄駅のひとつ。",
+"One of the nearest stations to Heikura Revolution Memorial Park."
+],
+"戸宮武道競技場的最近車站之一，也可以步行轉乘大學前站。": [
+"戸宮武道競技場の最寄駅のひとつ。大学前駅へ歩いて乗り換えることもできます。",
+"One of the nearest stations to Tomiya Budo Arena; you can also walk to Daikaku-mae Station to transfer."
+],
+"懷永美術館的最近車站。": [
+"懐永美術館の最寄駅。",
+"The nearest station to Kaiei Museum of Art."
+],
+"光瀨市中心的車站，流星樹就在中央公園內，從這裡步行可達。": [
+"光瀬市中心部の駅。流星樹は中央公園内にあり、ここから歩いて行けます。",
+"A station in the heart of Hikarise; Ryusei Tree stands in Central Park, within walking distance."
+],
+"徒歩1分": [
+"徒歩1分",
+"1 min walk"
+],
+"徒歩2分": [
+"徒歩2分",
+"2 min walk"
+],
+"徒歩3分": [
+"徒歩3分",
+"3 min walk"
+],
+"徒歩4分": [
+"徒歩4分",
+"4 min walk"
+],
+"徒歩5分": [
+"徒歩5分",
+"5 min walk"
+],
+"毎週月曜": [
+"毎週月曜",
+"Closed Mondays"
+],
+"毎週火曜": [
+"毎週火曜",
+"Closed Tuesdays"
+],
+"毎週水曜": [
+"毎週水曜",
+"Closed Wednesdays"
+],
+"毎週木曜": [
+"毎週木曜",
+"Closed Thursdays"
+],
+"毎週日曜": [
+"毎週日曜",
+"Closed Sundays"
+],
+"毎週日・月曜": [
+"毎週日・月曜",
+"Closed Sundays and Mondays"
+],
+"無休": [
+"無休",
+"Open daily"
+],
+"不定休": [
+"不定休",
+"Irregular holidays"
+],
+"土・日曜、祝日": [
+"土・日曜、祝日",
+"Closed Saturdays, Sundays and holidays"
+],
+"內回": [
+"内回り",
+"Inner loop"
+],
+"外回": [
+"外回り",
+"Outer loop"
+],
+"花川本線": [
+"花川本線",
+"Hanakawa Main Line"
+],
+"花川本線快速": [
+"花川本線快速",
+"Hanakawa Main Line Rapid"
+],
+"花川本線特別快速": [
+"花川本線特別快速",
+"Hanakawa Main Line Special Rapid"
+],
+"特急あおさぎ": [
+"特急あおさぎ",
+"Limited Express Aosagi"
+],
+"特別快速": [
+"特別快速",
+"Special Rapid"
+],
+"環状白藏山線直通": [
+"環状白藏山線直通",
+"Loop Line (Shirakurayama through service)"
+],
+"曲江": [
+"曲江",
+"Kyokko"
+],
+"全日時刻表": [
+"全日時刻表",
+"Full-day timetable"
+],
+"倉浦市區線": [
+"倉浦市区線",
+"Kuraura Line"
+],
+"倉浦市區線各停": [
+"倉浦市区線各停",
+"Kuraura Line Local"
+],
+"あおさぎ": [
+"あおさぎ",
+"Aosagi"
 ],
 "不需轉乘": [
 "乗り換えなし",

@@ -8,6 +8,16 @@
   const pad = n => String(n).padStart(2, '0');
   const hm = t => HK.hm(t);
   const normZh = z => String(z || '').replace(/戶/g, '戸').replace(/澤/g, '沢').replace(/\s+/g, '');
+  /** 餐廳資料的語言別顯示：英文版用羅馬字店名、英譯菜名與英文地址，價格・營業時間改成英文格式。 */
+  const L = () => (window.HK_I18N && window.HK_I18N.lang) || 'ja';
+  const dn = {
+    name: r => (L() === 'en' && r.nameEn) || r.name,
+    sub: r => (L() === 'en' && r.nameEn) ? r.name : r.kana,
+    dish: r => (L() === 'en' && r.dishEn) || r.dish,
+    addr: r => (L() === 'en' && r.addressEn) || r.address,
+    price: r => L() === 'en' ? r.price.replace(/(\d[\d,]*)〜(\d[\d,]*)円/, '¥$1–$2') : r.price,
+    hours: r => L() === 'en' ? r.hours.replace(/〜/g, '–').replace(/／/g, ' / ').replace(/（要予約）/, ' (reservation required)').replace(/（L\.O\.\s*(\d+:\d+)）/, ' (last order $1)') : r.hours
+  };
   const stByName = (H, name) => H.stations.find(s => normZh(s.zh) === normZh(name)) || H.stations.find(s => normZh(s.zh).startsWith(normZh(name)));
   /* ───────── 車站介紹資料（data/stations.json） ───────── */
   let _sdP = null;
@@ -255,17 +265,17 @@
       const catalog = dining.items;
       function card(r) {
         const st = stByName(H, r.station), id = st && st.id;
-        const blurb = lang === 'zh' ? r.zh : r.ja, genre = lang === 'en' && r.genreEn ? r.genreEn : r.genre;
+        const blurb = lang === 'zh' ? r.zh : lang === 'en' && r.en ? r.en : r.ja, genre = lang === 'en' && r.genreEn ? r.genreEn : r.genre;
         return h('article', { class: 'dcard t' + r.tier },
           h('div', { class: 'dhead' }, h('span', { class: 'dtag t' + r.tier }, T[r.tier].label), h('span', { class: 'dgenre' }, genre)),
-          h('h3', null, r.name, h('small', null, r.kana)),
-          h('p', { class: 'ddish' }, h('strong', null, '推薦'), r.dish),
+          h('h3', null, dn.name(r), h('small', null, dn.sub(r))),
+          h('p', { class: 'ddish' }, h('strong', null, '推薦'), dn.dish(r)),
           h('p', { class: 'dblurb' }, blurb),
           h('dl', { class: 'dinfo' },
-            h('dt', null, '價位'), h('dd', null, r.price),
-            h('dt', null, '最近車站'), h('dd', null, id ? H.codeBadges(id) : null, r.station, '（', r.walk, '）'),
-            h('dt', null, '住址'), h('dd', null, r.address),
-            h('dt', null, '營業時間'), h('dd', null, r.hours),
+            h('dt', null, '價位'), h('dd', null, dn.price(r)),
+            h('dt', null, '最近車站'), h('dd', null, id ? H.codeBadges(id) : null, r.station, L() === 'en' ? ' (' : '（', r.walk, L() === 'en' ? ')' : '）'),
+            h('dt', null, '住址'), h('dd', null, dn.addr(r)),
+            h('dt', null, '營業時間'), h('dd', null, dn.hours(r)),
             h('dt', null, '公休'), h('dd', null, r.closed)),
           id ? h('div', { class: 'sbtns' }, h('a', { class: 'btn sm', href: 'timetable.html?s=' + encodeURIComponent(id) }, '車站時刻表'), h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=route&to=' + encodeURIComponent(id) }, '前往這裡')) : null);
       }
@@ -346,7 +356,7 @@
       if (H.zonesConfigured) fact('票價分區', st.zones && st.zones.length ? `第 ${st.zones.join('・')} 區` : null);
       fact('首班／末班', first != null ? `${H.hm(first)}／${H.hm(last)}` : null);
       const wl = H.walkLinks.filter(w => w.a === sid || w.b === sid);
-      fact('步行轉乘', wl.length ? wl.map(w => `${H.stName(w.a === sid ? w.b : w.a)}（約 ${Math.round(w.sec / 60)} 分）`).join('、') : null);
+      fact('步行轉乘', wl.length ? [...new Set(wl.map(w => `${H.stName(w.a === sid ? w.b : w.a)}（約 ${Math.round(w.sec / 60)} 分）`))].join('、') : null);
     }
     const btns = h('p', { class: 'sp-btns' }, sid ? [
       h('a', { class: 'btn', href: 'timetable.html?s=' + encodeURIComponent(sid) }, '全日時刻表'),
@@ -415,8 +425,8 @@
         kids.push(h('h3', { class: 'sp-h3' }, '附近的餐廳'));
         kids.push(h('div', { class: 'dgrid' }, rest.sort((a, b) => a.tier - b.tier).map(r => h('article', { class: 'dcard t' + r.tier },
           h('div', { class: 'dhead' }, h('span', { class: 'dtag t' + r.tier }, (T[r.tier] || {}).label || ''), h('span', { class: 'dgenre' }, lang === 'en' && r.genreEn ? r.genreEn : r.genre)),
-          h('h3', null, r.name, h('small', null, r.kana)), h('p', { class: 'ddish' }, h('strong', null, '推薦'), r.dish),
-          h('dl', { class: 'dinfo' }, h('dt', null, '價位'), h('dd', null, r.price), h('dt', null, '營業時間'), h('dd', null, r.hours), h('dt', null, '公休'), h('dd', null, r.closed), h('dt', null, '住址'), h('dd', null, r.address))))));
+          h('h3', null, dn.name(r), h('small', null, dn.sub(r))), h('p', { class: 'ddish' }, h('strong', null, '推薦'), dn.dish(r)),
+          h('dl', { class: 'dinfo' }, h('dt', null, '價位'), h('dd', null, dn.price(r)), h('dt', null, '營業時間'), h('dd', null, dn.hours(r)), h('dt', null, '公休'), h('dd', null, r.closed), h('dt', null, '住址'), h('dd', null, dn.addr(r)))))));
         kids.push(h('p', { style: 'margin:10px 0 0' }, h('a', { class: 'btn sm ghost', href: 'sights.html?station=' + encodeURIComponent(rest[0].station) + '#dining' }, '到餐廳頁依價位篩選')));
       }
       sec('車站周邊', ...kids);
