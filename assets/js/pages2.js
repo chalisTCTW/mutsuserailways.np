@@ -62,22 +62,10 @@
   };
 
   /* ───────── 路線資訊 ───────── */
-  function viewLines(H, root) {
-    const groups = groupsOf(H);
-    let cur = groups.find(g => g.name === q.get('r')) || groups[0];
-    let di = 0;
-    const chips = h('div', { class: 'lchips', role: 'group', 'aria-label': '路線' });
-    const out = h('div', { class: 'lineinfo' });
-    root.append(h('p', { class: 'lead' }, '選擇路線，查看停靠站、各站所要時間、班距與首末班。時間依目前的時刻表（含調度方案）計算。'), chips, out);
-    if (dispNote(H)) root.append(h('p', { class: 'note' }, dispNote(H)));
-
-    function drawChips() {
-      chips.replaceChildren(...groups.map(g => h('button', { type: 'button', class: 'lchipbtn', 'aria-pressed': String(g === cur), onclick: () => { cur = g; di = 0; draw(); drawChips(); try { history.replaceState(null, '', '?r=' + encodeURIComponent(g.name)); } catch (e) { } } },
-        h('i', { style: `background:${g.color}` }), g.name)));
-    }
-    function draw() {
+  /** 一個路線群組的詳細（停靠站・班距・停車一覽）。路線資訊與設備服務頁共用。 */
+  function lineBlock(H, groups, g, di, out, setDi) {
       out.replaceChildren();
-      const g = cur, sv = g.svs[Math.min(di, g.svs.length - 1)];
+      const sv = g.svs[Math.min(di, g.svs.length - 1)];
       const st = sv.stops, tt = depTimes(H, sv);
       const pax = st.filter(s => s.pax !== false);
       const total = Math.round((st[st.length - 1].arr - st[0].dep) / 60);
@@ -91,7 +79,7 @@
           h('div', null, h('dt', null, '首班／末班'), h('dd', null, tt.length ? `${hm(tt[0])}／${hm(tt[tt.length - 1])}（${H.stName(st[0].station)} 發車）` : '本日無班次')),
           h('div', null, h('dt', null, '本日班次'), h('dd', null, `${tt.length} 班`)),
           h('div', null, h('dt', null, '編組'), h('dd', null, `${cars} 両編成${ri ? '・' + ri : ''}`)))));
-      if (g.svs.length > 1) out.append(h('div', { class: 'dirs', role: 'group', 'aria-label': '方向' }, g.svs.map((v, k) => h('button', { type: 'button', 'aria-pressed': String(k === di), onclick: () => { di = k; draw(); } }, dirLabel(H, v)))));
+      if (g.svs.length > 1) out.append(h('div', { class: 'dirs', role: 'group', 'aria-label': '方向' }, g.svs.map((v, k) => h('button', { type: 'button', 'aria-pressed': String(k === di), onclick: () => setDi(k) }, dirLabel(H, v)))));
 
       // 停靠站
       const rows = [];
@@ -129,6 +117,21 @@
         out.append(h('h3', { class: 'h3' }, '停車一覽（各種別比較）'), h('div', { class: 'tscroll' }, h('table', { class: 'matrix' }, h('thead', null, hd), h('tbody', null, body))), h('p', { class: 'note' }, '●＝停車，｜＝通過，空白＝不經過。欄名可點選切換路線。'));
       }
     }
+
+  function viewLines(H, root) {
+    const groups = groupsOf(H);
+    let cur = groups.find(g => g.name === q.get('r')) || groups[0];
+    let di = 0;
+    const chips = h('div', { class: 'lchips', role: 'group', 'aria-label': '路線' });
+    const out = h('div', { class: 'lineinfo' });
+    root.append(h('p', { class: 'lead' }, '選擇路線，查看停靠站、各站所要時間、班距與首末班。時間依目前的時刻表（含調度方案）計算。'), chips, out);
+    if (dispNote(H)) root.append(h('p', { class: 'note' }, dispNote(H)));
+
+    function drawChips() {
+      chips.replaceChildren(...groups.map(g => h('button', { type: 'button', class: 'lchipbtn', 'aria-pressed': String(g === cur), onclick: () => { cur = g; di = 0; draw(); drawChips(); try { history.replaceState(null, '', '?r=' + encodeURIComponent(g.name)); } catch (e) { } } },
+        h('i', { style: `background:${g.color}` }), g.name)));
+    }
+    function draw() { lineBlock(H, groups, cur, di, out, k => { di = k; draw(); }); }
     drawChips(); draw();
   }
 
@@ -375,9 +378,8 @@
     const sec = (title, ...kids) => { const el = h('section', { class: 'sp-sec' }, h('h2', null, title), ...kids); root.append(el); return el; };
 
     if (st) {
-      /* 接下來的發車 */
-      const board = pidsBoard(H, sid, 5); sec('接下來的發車', board.el);
-      const mo = new MutationObserver(() => { if (!board.el.isConnected) { board.stop(); mo.disconnect(); } }); mo.observe(document.body, { childList: true, subtree: true });
+      /* 時刻表 */
+      sec('時刻表', HK.ttPanel(H, sid));
 
       /* 各種別的停靠狀況 */
       const byRoute = new Map();
@@ -397,10 +399,9 @@
       H.svcs.forEach(sv => sv.stops.forEach((t, i) => { if (t.station !== sid || t.pax === false || !t.platformName) return; const k = String(t.platformName); let g = byPf.get(k); if (!g) byPf.set(k, g = { pf: k, routes: new Set(), dests: new Map(), dw: new Map() }); g.routes.add(sv.routeName); const dn = H.destOf(sv, i); g.dests.set(dn, (g.dests.get(dn) || 0) + 1); const dw = Math.round(t.dep - t.arr); g.dw.set(dw, (g.dw.get(dw) || 0) + 1); }));
       if (byPf.size) {
         const rows = [...byPf.values()].sort((a, b) => a.pf.localeCompare(b.pf, 'ja', { numeric: true }));
-        const modeDw = g => [...g.dw.entries()].sort((a, b) => b[1] - a[1])[0][0];
         sec('月台', h('div', { class: 'tblwrap' }, h('table', { class: 'sp-tbl' },
-          h('thead', null, h('tr', null, h('th', null, '月台'), h('th', null, '行先'), h('th', null, '路線・種別'), h('th', null, '停車時間'))),
-          h('tbody', null, rows.map(g => h('tr', null, h('td', null, `${g.pf} 番線`), h('td', null, [...g.dests.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(d => d[0]).join('、')), h('td', null, [...g.routes].join('、')), h('td', null, `${modeDw(g)} 秒`)))))));
+          h('thead', null, h('tr', null, h('th', null, '月台'), h('th', null, '行先'), h('th', null, '路線・種別'))),
+          h('tbody', null, rows.map(g => h('tr', null, h('td', null, `${g.pf} 番線`), h('td', null, [...g.dests.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(d => d[0]).join('、')), h('td', null, [...g.routes].join('、'))))))));
       }
 
       /* 到主要車站所要時間 */
@@ -413,7 +414,7 @@
 
     /* 站內與出口補充（stations.json 的 facilities / exits，有填才顯示） */
     if (e.exits && e.exits.length) sec('出口', h('div', { class: 'sp-ex' }, e.exits.map(x => h('div', null, h('strong', null, x.name), x.note || ''))));
-    if (e.facilities && e.facilities.length) sec('站內設施', h('div', { class: 'sp-fac' }, e.facilities.map(f => h('span', null, f))));
+    if (e.facilities && e.facilities.length) sec('站內設施', h('div', { class: 'sp-fac' }, e.facilities.map(f => typeof f === 'string' ? h('span', null, f) : h('div', { class: 'sp-floor' }, h('strong', null, f.floor), h('span', null, f.items.join('、'))))));
 
     /* 車站周邊 */
     const names = new Set([normZh(name)]); const rest = dining && dining.items ? dining.items.filter(r => names.has(normZh(r.station)) || normZh(r.station).startsWith(normZh(name)) || normZh(name).startsWith(normZh(r.station))) : [];
@@ -434,5 +435,5 @@
     root.append(h('p', { style: 'margin:30px 0 0' }, h('a', { class: 'btn ghost', href: 'sights.html#stations' }, '回到車站介紹一覽')));
   }
 
-  Object.assign(HK, { viewLines, viewSights, viewStationPage, stationData, stationHref, sdEntry, stationPop, pidsBoard, depTimes, groupsOf });
+  Object.assign(HK, { lineBlock, relT, dirLabel, stLink, chipLines, dispNote, viewLines, viewSights, viewStationPage, stationData, stationHref, sdEntry, stationPop, pidsBoard, depTimes, groupsOf });
 })(window);

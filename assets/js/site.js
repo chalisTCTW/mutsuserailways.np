@@ -113,6 +113,18 @@
       const st = H.stById[sid];
       out.append(h('h2', { class: 'h2', style: 'margin-top:22px' }, H.codeBadges(sid), st.zh, st.en ? h('small', null, st.en) : null));
       if (HK.sdEntry && HK.sdEntry(st.zh)) out.append(h('p', { style: 'margin:0 0 10px' }, h('a', { class: 'btn sm', href: HK.stationHref(H, st.zh) }, '車站介紹（照片・月台・附近景點與餐廳）')));
+      out.append(HK.ttPanel(H, sid));
+    }
+    draw();
+  }
+
+  /** 車站時刻表パネル（方向の切替・全日表示つき）。車站頁と時刻表頁で共用。 */
+  function ttPanel(H, sid) {
+    let dirKey = 'all', whole = false;
+    const out = h('div');
+    function draw() {
+      const evs = H.departures(sid);
+      out.replaceChildren();
       if (!evs.length) { out.append(h('p', { class: 'lead' }, '這個車站沒有發車的班次（可能是各路線的終點站）。')); return; }
       // 分組
       const groups = new Map();
@@ -146,7 +158,9 @@
       out.append(h('p', { class: 'note' }, '時刻為各班次在本站的發車時刻。方格內有字的是各停以外的種別（字為種別略稱，例：特＝特急・特別快速、快＝快速、環＝環狀快速），沒有標示的是各站停車；右上角小字為行先。'));
     }
     draw();
+    return out;
   }
+  HK.ttPanel = ttPanel;
 
   function timetableTable(H, g, whole) {
     const nowH = Math.floor(H.nowSec() / 3600);
@@ -318,12 +332,12 @@
       else if (page === 'timetable') timetable(H);
       else if (page === 'live') live(H);
       else if (page === 'booking') HK.booking(H, app);
-      else if (page === 'routes') HK.viewLines(H, app);
+      else if (page === 'routes') HK.viewServices(H, app);
       else if (page === 'sights') await HK.viewSights(H, app);
       else if (page === 'station') await HK.viewStationPage(H, app);
       else if (page === 'guide') HK.viewGuide(H, app);
       else if (page === 'airport') HK.viewAirport(H, app);
-      else if (page === 'kobana') HK.viewKobana(H, app);
+      else if (page === 'kobana') HK.viewServices(H, app);
     } catch (e) {
       console.error(e);
       const t = h('div', { class: 'wrap' }, h('div', { class: 'soonbox' }, h('h2', null, '資料暫時無法顯示'), h('p', null, '載入時刻表資料時發生問題，請稍後再試。')));

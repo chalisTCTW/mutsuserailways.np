@@ -137,8 +137,8 @@ window.HK_I18N_DICT = {
 "Fewest stops: Limited Express Aosagi, Kobana, Airport LINER, etc."
 ],
 "全車指定席（另有立席特急券）": [
-"全車指定席（立席特急券もあり）",
-"All cars reserved (standing express tickets also available)"
+"全車指定席（立席特急券あり）",
+"All seats reserved (standing tickets also sold)"
 ],
 "指定席券 ${yen(sf)}；立席特急券 ${yen(st)}（為指定席的一半）": [
 "指定席券 {0}／立席特急券 {1}（指定席の半額）",
@@ -754,7 +754,7 @@ window.HK_I18N_DICT = {
 ],
 "座位設備": [
 "座席設備",
-"Seat equipment"
+"Seat features"
 ],
 "備有 USB 充電口": [
 "USB充電口あり",
@@ -897,8 +897,8 @@ window.HK_I18N_DICT = {
 "Take Airport LINER for the airport; Limited Express Kobana for Katsumori, Amatorizaki and Motoisojima."
 ],
 "乘車指南與常見問題": [
-"ご利用案内とよくあるご質問",
-"Rider guide and FAQ"
+"ご利用案内・FAQ",
+"Guide and FAQ"
 ],
 "單向": [
 "片道",
@@ -3215,6 +3215,222 @@ window.HK_I18N_DICT = {
 "あおさぎ": [
 "あおさぎ",
 "Aosagi"
+],
+"東出口": [
+"東口",
+"East Exit"
+],
+"西出口": [
+"西口",
+"West Exit"
+],
+"見津瀨通": [
+"見津瀬通",
+"Mitsuse-dori"
+],
+"aters百貨店方面": [
+"aters百貨店方面",
+"Toward aters Department Store"
+],
+"公車站": [
+"バス停",
+"Bus stop"
+],
+"佐山大學方面": [
+"佐山大学方面",
+"Toward Sayama University"
+],
+"光瀨大學北校區": [
+"光瀬大学北キャンパス",
+"Hikarise University North Campus"
+],
+"中央戸宮駅方面": [
+"中央戸宮駅方面",
+"Toward Chuo-Tomiya Station"
+],
+"3F 大廳層": [
+"3F コンコース階",
+"3F Concourse level"
+],
+"2F 商場": [
+"2F 商業フロア",
+"2F Shops"
+],
+"1F 商場": [
+"1F 商業フロア",
+"1F Shops"
+],
+"詢問處": [
+"案内所",
+"Information"
+],
+"購票大廳": [
+"切符売り場",
+"Ticket hall"
+],
+"候車區": [
+"待合スペース",
+"Waiting area"
+],
+"仙后座 live house": [
+"カシオペア ライブハウス",
+"Cassiopeia Live House"
+],
+"白令書店": [
+"ベーリング書店",
+"Bering Bookstore"
+],
+"服裝": [
+"アパレル",
+"Clothing"
+],
+"出入口": [
+"出入口",
+"Entrance"
+],
+"超市": [
+"スーパー",
+"Supermarket"
+],
+"美食街": [
+"グルメ街",
+"Food court"
+],
+"商場": [
+"商業施設",
+"Shops"
+],
+"設備與服務介紹": [
+"設備・サービス案内",
+"Facilities and Services"
+],
+"Facilities & Services 車型・停靠站・所要時間・全日時刻表": [
+"Facilities & Services　車両・停車駅・所要時間・終日時刻表",
+"Facilities & Services　Trains, stops, travel time and full-day timetable"
+],
+"各種別的車型、停靠站、所要時間與全日時刻表": [
+"種別ごとの車両・停車駅・所要時間・終日時刻表",
+"Trains, stops, travel time and full-day timetable for each service"
+],
+"各種別使用的車型、運行時間與全日時刻表。": [
+"各種別で使う車両、所要時間、終日時刻表です。",
+"The trains, travel times and full-day timetable for each service."
+],
+"新 8000 形 1000 番台": [
+"新8000形1000番台",
+"New 8000 Series, 1000s"
+],
+"新 8000 形 0 番台": [
+"新8000形0番台",
+"New 8000 Series, 0s"
+],
+"新 2100 形": [
+"新2100形",
+"New 2100 Series"
+],
+"10000 形": [
+"10000形",
+"10000 Series"
+],
+"新 1150 形": [
+"新1150形",
+"New 1150 Series"
+],
+"登場": [
+"登場",
+"Debut"
+],
+"傾斜方式": [
+"車体傾斜方式",
+"Tilting system"
+],
+"傾斜角度": [
+"傾斜角度",
+"Tilt angle"
+],
+"主動擺錘振子式（傾斜式）": [
+"制御付き振り子式（車体傾斜式）",
+"Active pendulum (tilting)"
+],
+"5 度": [
+"5度",
+"5°"
+],
+"2017 年": [
+"2017年",
+"2017"
+],
+"2024 年": [
+"2024年",
+"2024"
+],
+"2026 年": [
+"2026年",
+"2026"
+],
+"1999 年": [
+"1999年",
+"1999"
+],
+"2021 年": [
+"2021年",
+"2021"
+],
+"8 輛": [
+"8両",
+"8 cars"
+],
+"6 輛": [
+"6両",
+"6 cars"
+],
+"6 輛・8 輛": [
+"6両・8両",
+"6 or 8 cars"
+],
+"含松歲線直通的班次。": [
+"松歳線直通列車を含みます。",
+"Includes through services to the Matsutoshi Line."
+],
+"環狀快速白藏山線直通": [
+"環状快速白藏山線直通",
+"Loop Semi-Fast (Shirakura Line through service)"
+],
+"運行與時刻": [
+"運行と時刻",
+"Operation and timetable"
+],
+"時刻表資料中還沒有這個種別的班次，更新後會顯示在這裡。": [
+"このサービスの列車はまだ時刻表データにありません。",
+"This service is not in the timetable data yet."
+],
+"本日沒有班次。": [
+"本日の運行はありません。",
+"No trains today."
+],
+"停靠咲海研究學園都市站": [
+"咲海研究学園都市駅停車中",
+"Stopped at Sakumi Research Campus"
+],
+"行駛在山間": [
+"山間を走行中",
+"Running through the mountains"
+],
+"高架橋上的特急こばな": [
+"高架橋を走る特急こばな",
+"Limited Express Kobana on the viaduct"
+],
+"車頭": [
+"先頭車",
+"Front end"
+],
+"みつせ站附近": [
+"みつせ駅付近",
+"Near Mitsuse"
+],
+"車廂內部": [
+"車内",
+"Interior"
 ],
 "不需轉乘": [
 "乗り換えなし",

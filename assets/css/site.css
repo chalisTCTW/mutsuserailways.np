@@ -624,7 +624,7 @@ header.sh .langsw button[aria-pressed="true"] { background: #fff; color: var(--g
 .sh-menu span { top: 19px; } .sh-menu span::before { left: 0; right: 0; top: -7px; } .sh-menu span::after { left: 0; right: 0; top: 7px; }
 header.sh.open .sh-menu span { background: transparent; } header.sh.open .sh-menu span::before { top: 0; transform: rotate(45deg); } header.sh.open .sh-menu span::after { top: 0; transform: rotate(-45deg); }
 .sh-menu:focus-visible { outline: 3px solid #f2c200; outline-offset: 2px; }
-@media (max-width: 1220px) {
+@media (max-width: 1420px) {
   .sh-menu { display: block; }
   .sh-brand { margin-right: auto; }
   header.sh .gnav { position: absolute; left: 0; right: 0; top: 100%; background: var(--g0); display: none; border-top: 1px solid rgba(255, 255, 255, .2); box-shadow: 0 14px 24px rgba(0, 0, 0, .28); }
@@ -694,7 +694,7 @@ footer img { width: 40px; }
 :root { --max: 1200px; --edge: max(16px, calc((100vw - 1168px) / 2)); }
 .sh-in { max-width: 1200px; }
 header.sh .gnav ul { max-width: none; }
-@media (max-width: 1220px) { header.sh .gnav ul { max-width: 1200px; } }
+@media (max-width: 1420px) { header.sh .gnav ul { max-width: 1200px; } }
 
 /* 英語表示は文字が長いので、折りたたみを早める */
 @media (max-width: 1420px) {
@@ -711,7 +711,7 @@ header.sh .gnav ul { max-width: none; }
 }
 header.sh .gnav a { padding: 8px 8px; font-size: 13px; }
 header.sh .gnav li.admin a { padding: 6px 10px; }
-@media (max-width: 1220px) { header.sh .gnav a { padding: 14px 16px; font-size: 15px; } header.sh .gnav li.admin a { padding: 12px 16px; } }
+@media (max-width: 1420px) { header.sh .gnav a { padding: 14px 16px; font-size: 15px; } header.sh .gnav li.admin a { padding: 12px 16px; } }
 @media (max-width: 1420px) { html[lang="en"] header.sh .gnav a { padding: 14px 16px; font-size: 15px; } html[lang="en"] header.sh .gnav li.admin a { padding: 12px 16px; } }
 .livegrid > * { min-width: 0; }
 .gsec > h2 { font: 700 22px/1.4 var(--serif); border: 0; border-bottom: 1px solid var(--line); padding: 0 0 8px; margin-bottom: 16px; }
@@ -719,3 +719,24 @@ header.sh .gnav li.admin a { padding: 6px 10px; }
 .snear { border-left: 1px solid var(--line); border-top: 3px solid var(--g1); }
 .pagehead p { margin-top: 8px; }
 @media (max-width: 820px) { .pagehead h1 { font-size: 22px; } .sec > h2, .h2, .gsec > h2 { font-size: 19px; } }
+/* v9.1 車站頁 */
+.sp-ex div { border: 0; border-top: 1px solid var(--line); background: none; padding: 10px 0; }
+.sp-ex strong { font-family: var(--serif); }
+.sp-fac { display: grid; gap: 0; }
+.sp-fac .sp-floor { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 4px 14px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+.sp-fac .sp-floor strong { font-family: var(--serif); }
+.sp-fac .sp-floor span { background: none; padding: 0; font-size: inherit; }
+.sp-sec .ttable { max-width: 100%; }
+@media (max-width: 600px) { .sp-fac .sp-floor { grid-template-columns: 1fr; } }
+
+/* v9.1 設備與服務介紹 */
+.svgroup { display: grid; gap: 16px; min-width: 0; }
+.fulltt-wrap { max-height: 70vh; overflow: auto; border: 1px solid var(--line); }
+.fulltt { border-collapse: separate; border-spacing: 0; font-size: 12.5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fulltt th, .fulltt td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: center; background: #fff; }
+.fulltt thead th { position: sticky; top: 0; z-index: 2; background: var(--g3); font-size: 12px; }
+.fulltt .stk { position: sticky; left: 0; z-index: 1; text-align: left; background: #fff; border-right: 1px solid var(--line); min-width: 9em; }
+.fulltt thead .stk { z-index: 3; background: var(--g3); }
+.fulltt .hs { border-left: 2px solid var(--line); }
+.kbhero.nophoto { min-height: 0; }
+.svgroup > div, .kbcols > div { min-width: 0; max-width: 100%; overflow-x: auto; }

@@ -54,7 +54,7 @@
         h('div', { class: 'farrow', 'aria-hidden': 'true' }, '▶'),
         h('div', { class: 'fstep' }, h('b', null, '2'), h('div', null, h('strong', null, '決定要快還是省'), h('p', null, '想最快抵達：特急或特快（需要指定席券，特急可買立席特急券）。想省錢：快速、環狀快速或各停（自由席）。'))),
         h('div', { class: 'farrow', 'aria-hidden': 'true' }, '▶'),
-        h('div', { class: 'fstep' }, h('b', null, '3'), h('div', null, h('strong', null, '確認有沒有停'), h('p', null, '到「路線資訊」的「停車一覽」確認你要去的車站是否停車；再看月台的發車顯示核對種別與行先。'))))));
+        h('div', { class: 'fstep' }, h('b', null, '3'), h('div', null, h('strong', null, '確認有沒有停'), h('p', null, '到「設備與服務介紹」的「停車一覽」確認你要去的車站是否停車；再看月台的發車顯示核對種別與行先。'))))));
 
     // 4. 發車班次圖（即時計算）
     const per = { loc: new Array(24).fill(0), exp: new Array(24).fill(0), ltd: new Array(24).fill(0) };
@@ -108,7 +108,7 @@
       Q('時刻表上「特」「快」「環」是什麼意思？', h('p', null, '那是種別的略稱：不是各停、快速的列車，會以種別名稱的第一個字標示（例如特急＝「特」、特快＝「特」、環狀快速＝「環」）。各停不標示。完整的種別請看列車名稱。')),
       Q('發車顯示怎麼看？', h('p', null, '在', link('timetable.html?tab=map', '路線圖'), '點選車站，就會看到這個車站接下來的發車、種別、行先與倒數時間。')),
       Q('坐過站了怎麼辦？', h('p', null, '在下一個停靠站下車，改搭反方向的列車回去。若超過原本購買的區間，請在出站前向站務人員補票。')),
-      Q('末班車與深夜的班次怎麼查？', h('p', null, '各路線的首末班在', link('routes.html', '路線資訊'), '。深夜與離峰時段班次會減少，時刻表會依目前的時段自動顯示正在運行的班次。')),
+      Q('末班車與深夜的班次怎麼查？', h('p', null, '各路線的首末班在', link('routes.html', '設備與服務介紹'), '。深夜與離峰時段班次會減少，時刻表會依目前的時段自動顯示正在運行的班次。')),
       Q('即時列車動態的位置準嗎？', h('p', null, '列車位置是依時刻表推算，不是實際車輛位置，實際運轉狀況可能因延誤而不同，請以站內公告為準。')),
       Q('怎麼去松澤國際機場？', h('p', null, '搭乘特急或特快，一車直達，最快 11 分鐘。詳細的乘車方式與班次請見', link('airport.html', '機場聯外交通'), '。')),
       h('h3', { class: 'h3' }, '其他'),
@@ -228,13 +228,13 @@
       const rows = []; sv.stops.forEach((s, i) => { if (s.pax === false) return; rows.push(h('tr', null, h('td', null, h('a', { href: 'timetable.html?s=' + encodeURIComponent(s.station) }, H.codeBadges(s.station), H.stName(s.station))), h('td', { class: 'tm' }, i === 0 ? '起點' : `${Math.round((s.arr - sv.stops[0].arr) / 60)} 分`))); });
       dyn.append(h('div', { class: 'tscroll' }, h('table', { class: 'tbl', style: 'max-width:420px' }, h('thead', null, h('tr', null, h('th', null, '停靠站'), h('th', null, '自起點'))), h('tbody', null, rows))),
         h('p', { class: 'note' }, (all.length > 1 ? '另有反方向的班次。' : '') + dispNote(H)),
-        h('p', null, h('a', { class: 'btn ghost', href: 'routes.html?r=' + encodeURIComponent(sv.routeName) }, '路線資訊'), ' ', h('a', { class: 'btn ghost', href: 'timetable.html' }, '時刻表')));
+        h('p', null, h('a', { class: 'btn ghost', href: 'routes.html' }, '設備與服務介紹'), ' ', h('a', { class: 'btn ghost', href: 'timetable.html' }, '時刻表')));
     })();
 
     root.append(sec('乘車資訊', null,
       h('ul', { class: 'spoints' },
         h('li', null, '全車指定席。請先購買乘車券與指定席券；也有立席特急券，但不保證有座位。'),
-        h('li', null, '特急通過許多小站，請先確認目的地是否停車；停靠站請見上表或「路線資訊」。'),
+        h('li', null, '特急通過許多小站，請先確認目的地是否停車；停靠站請見上表或「設備與服務介紹」。'),
         h('li', null, '往機場請搭乘空港LINER；往勝守、天鳥崎、本磯島請搭乘特急こばな。')),
       h('p', null, h('a', { class: 'btn', href: 'booking.html' }, '線上訂票'), ' ', h('a', { class: 'btn ghost', href: 'guide.html' }, '乘車指南與常見問題'))));
   }
