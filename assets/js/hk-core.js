@@ -176,6 +176,32 @@
       return first === last ? (sv.member.dir || '環狀') : H.stName(last);
     };
 
+    /* ── 特急的「號」（1.0.3）：路線名稱含「特急」者，同一個完整路線名稱、同方向，依起點發車時刻排序；下行奇數、上行偶數；不同特急名稱各自從 1 號起算 ── */
+    const gouTable = new Map();   // 'svc.idx|一天內起點發車秒' → 例如「あおさぎ39号」
+    (function () {
+      const upOf = sv => {
+        const f = sv.stops[0].station, l = sv.stops[sv.stops.length - 1].station;
+        if (f === l) return !/逆|反/.test(String(sv.member.dir || ''));
+        const a = stById[f], b = stById[l]; if (!a || !b) return true;
+        return a.z !== b.z ? b.z > a.z : b.x < a.x;
+      };
+      const groups = new Map();
+      svcs.forEach(sv => {
+        const full = String(sv.route.displayZh || '');
+        if (full.indexOf('特急') < 0 && String(sv.member.rawName || '').indexOf('特急') < 0) return;
+        const up = upOf(sv), k = full + '|' + (up ? 1 : 0);
+        let g = groups.get(k); if (!g) groups.set(k, g = { full, up, list: [] });
+        sv.depot.departures.forEach(D => g.list.push({ tod: ((Math.round(D + sv.stops[0].dep) % DAY) + DAY) % DAY, idx: sv.idx }));
+      });
+      groups.forEach(g => {
+        g.list.sort((a, b) => a.tod - b.tod || a.idx - b.idx);
+        const nm = g.full.replace(/特急/g, '').replace(/[\s\u3000]+/g, '') || g.full.replace(/[\s\u3000]+/g, '');
+        g.list.forEach((e, i) => { const key = e.idx + '|' + e.tod; if (!gouTable.has(key)) gouTable.set(key, nm + (g.up ? 2 * (i + 1) : 2 * (i + 1) - 1) + '号'); });
+      });
+    })();
+    /** 某班（sv、base＝該日起點車庫發車時刻）的號；不是特急回傳空字串。 */
+    H.gouOf = (sv, base) => gouTable.get(sv.idx + '|' + (((Math.round(base + sv.stops[0].dep) % DAY) + DAY) % DAY)) || '';
+
     /* ── 全日班次（前後各一天，處理跨午夜）與連線 ── */
     const conns = [], trips = [], events = new Map();
     for (let day = -1; day <= 2; day++) {
@@ -251,7 +277,7 @@
         const endC = conns[inConn[st === endWalkFrom && guard === 1 ? d : st]], b = boarded.get(endC.trip), bC = conns[b.k], trip = trips[endC.trip];
         const stops = trip.sv.stops.slice(bC.i, endC.i + 2).map(s => ({ station: s.station, arr: trip.base + s.arr, dep: trip.base + s.dep, platform: s.platformName, pax: s.pax }));
         const walk = b.src !== bC.from && b.src >= 0 ? { from: stations[b.src].id, to: stations[bC.from].id, sec: ((walkMap.get(b.src) || []).find(w => w.to === bC.from) || {}).sec || 0 } : null;
-        legs.unshift({ sv: trip.sv, stops, board: bC.i, trip: endC.trip, walk });
+        legs.unshift({ sv: trip.sv, stops, board: bC.i, trip: endC.trip, walk, gou: H.gouOf(trip.sv, trip.base) });
         st = b.src;
         if (st === o || st < 0) break;
       }

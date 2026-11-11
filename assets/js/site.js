@@ -176,7 +176,7 @@
     for (let hr = lo; hr <= hi; hr++) {
       const es = (rows.get(hr) || []).sort((a, b) => a.t - b.t);
       body.append(h('tr', { class: hr === nowH ? 'now' : null }, h('th', { class: 'h', scope: 'row' }, String(hr)),
-        h('td', { class: 'm' }, es.map(e => { const mn = Math.floor((e.t % 3600) / 60); const m = typeMark(e.sv); return h('span', { class: 'dep', title: `${e.sv.routeName} ${H.destOf(e.sv, e.i)}行` }, m ? h('b', { class: 'mk ' + e.sv.tcls }, m) : null, String(mn).padStart(2, '0'), g.dests.size > 1 ? h('sup', null, mark.get(H.destOf(e.sv, e.i))) : null); }))));
+        h('td', { class: 'm' }, es.map(e => { const mn = Math.floor((e.t % 3600) / 60); const m = typeMark(e.sv); return h('span', { class: 'dep', title: `${e.sv.routeName}${H.gouOf(e.sv, e.base) ? ' ' + H.gouOf(e.sv, e.base) : ''} ${H.destOf(e.sv, e.i)}行` }, m ? h('b', { class: 'mk ' + e.sv.tcls }, m) : null, String(mn).padStart(2, '0'), g.dests.size > 1 ? h('sup', null, mark.get(H.destOf(e.sv, e.i))) : null); }))));
     }
     const dl = g.dests.size > 1 ? h('div', { class: 'tlegend' }, dests.map(dn => h('span', null, `${mark.get(dn)}＝${dn}行`))) : null;
     return h('div', { style: 'margin-bottom:18px' }, h('table', { class: 'ttable' }, h('thead', null, h('tr', null, h('th', { colspan: 2 }, g.label))), body), dl);
@@ -217,7 +217,7 @@
       const s0 = leg.stops[0], sN = leg.stops[leg.stops.length - 1], sv = leg.sv;
       lis.push(h('li', { class: li === 0 ? 'first' : '' }, h('div', { class: 'tm' }, hm(s0.dep)), h('div', { class: 'rl' }, h('i')),
         h('div', { class: 'wh' }, h('strong', null, H.codeBadges(s0.station), H.stName(s0.station)), s0.platform ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `${s0.platform} 號月台`) : null,
-          h('div', { class: 'ride' }, typeTag(sv), h('span', null, sv.routeName), h('span', null, `${H.destOf(sv, leg.board)}行`), h('span', null, `${leg.stops.length - 1} 站・${Math.max(1, Math.round((sN.arr - s0.dep) / 60))} 分`), H.reserveLabel(sv) ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null))));
+          h('div', { class: 'ride' }, typeTag(sv), h('span', null, sv.routeName, leg.gou ? h('span', { class: 'gou' }, ' ' + leg.gou) : null), h('span', null, `${H.destOf(sv, leg.board)}行`), h('span', null, `${leg.stops.length - 1} 站・${Math.max(1, Math.round((sN.arr - s0.dep) / 60))} 分`), H.reserveLabel(sv) ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null))));
       const nxt = j.legs[li + 1];
       if (nxt) {
         lis.push(h('li', { class: 'walk' }, h('div', { class: 'tm' }, hm(sN.arr), h('span', null, hm(nxt.stops[0].dep))), h('div', { class: 'rl' }, h('i')), h('div', { class: 'wh' }, h('strong', null, H.codeBadges(sN.station), H.stName(sN.station)), nxt.walk ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `徒歩 → ${H.stName(nxt.walk.to)}（約 ${Math.round(nxt.walk.sec / 60)} 分）・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`) : h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `轉乘・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`))));
@@ -303,7 +303,7 @@
           h('td', { class: 'tm' }, first ? '' : hm(base + s.arr)), h('td', { class: 'tm' }, last ? '' : hm(base + s.dep))));
       });
       return h('div', { class: 'tinfo' },
-        h('div', { class: 'ti-head' }, typeTag(sv), h('strong', null, sv.routeName), h('span', { class: 'ti-dest' }, `${dest}行`)),
+        h('div', { class: 'ti-head' }, typeTag(sv), h('strong', null, sv.routeName), H.gouOf(sv, base) ? h('span', { class: 'gou' }, ' ' + H.gouOf(sv, base)) : null, h('span', { class: 'ti-dest' }, `${dest}行`)),
         h('div', { class: 'ti-cars' }, carBar, h('span', null, `${cars} 両編成`), ri ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null),
         h('div', { class: 'ti-state' }, tr.dwelling ? `${H.stName(tr.from)} 停車中（${hm(tr.dep)} 發車）` : `${H.stName(tr.from)} → ${H.stName(tr.to)} 運行中`),
         h('table', { class: 'ti-stops' }, h('thead', null, h('tr', null, h('th'), h('th', null, '停靠站'), h('th', null, '到'), h('th', null, '發'))), h('tbody', null, rows)));
@@ -316,7 +316,7 @@
       m.setTrains(act, tr => { picked = tr.tr; show(tr); });
       act.sort((a, b) => a.sv.routeName.localeCompare(b.sv.routeName, 'ja') || a.arr - b.arr);
       list.replaceChildren(...act.slice(0, 80).map(tr => h('li', null, h('button', { type: 'button', 'aria-pressed': String(picked === tr.tr), onclick: () => { picked = tr.tr; show(tr); } },
-        typeTag(tr.sv), h('span', null, `${H.destOf(tr.sv, tr.i)}行`), h('span', { class: 'nx' }, tr.dwelling ? `${H.stName(tr.from)} 停車中` : `${H.stName(tr.from)} → ${H.stName(tr.to)}`)))));
+        typeTag(tr.sv), H.gouOf(tr.sv, tr.tr.base) ? h('span', { class: 'gou' }, H.gouOf(tr.sv, tr.tr.base)) : null, h('span', null, `${H.destOf(tr.sv, tr.i)}行`), h('span', { class: 'nx' }, tr.dwelling ? `${H.stName(tr.from)} 停車中` : `${H.stName(tr.from)} → ${H.stName(tr.to)}`)))));
       if (!act.length) list.replaceChildren(h('li', { style: 'padding:12px;color:var(--muted);font-size:13px' }, '目前沒有運行中的班次。'));
       if (picked) { const cur = act.find(a => a.tr === picked); if (cur) show(cur, true); else { pop.hidden = true; picked = null; } }
     }

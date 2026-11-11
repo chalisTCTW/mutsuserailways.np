@@ -177,7 +177,7 @@
             h('span', { class: 'tm' }, hm(e.t)),
             h('span', { class: 'ty' }, typeMark(sv) ? h('b', { class: 'mk ' + sv.tcls }, typeMark(sv)) : null, typeTag(sv)),
             h('span', { class: 'ds' }, `${H.destOf(sv, e.i)}`, h('small', null, ' 行')),
-            h('span', { class: 'rt' }, sv.routeName, pf ? h('small', null, `　${pf}`) : null, ri ? h('small', { class: 'rs' }, `　${ri}`) : null),
+            h('span', { class: 'rt' }, sv.routeName, H.gouOf(sv, e.base) ? h('small', { class: 'gou' }, ' ' + H.gouOf(sv, e.base)) : null, pf ? h('small', null, `　${pf}`) : null, ri ? h('small', { class: 'rs' }, `　${ri}`) : null),
             h('span', { class: 'r wt' }, nx));
         }));
     }

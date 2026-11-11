@@ -91,7 +91,7 @@
       list.forEach(c => ul.append(h('li', null, h('button', { type: 'button', class: 'bk-trip', style: 'display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px', onclick: () => pick(c, tf) },
         h('span', { class: 'tm' }, `${HK.hm(c.j.dep)} → ${HK.hm(c.j.arr)}`),
         h('span', { style: 'display:inline-flex;gap:4px;flex-wrap:wrap' }, ...c.legs.map(l => HK.typeTag(l.leg.sv))),
-        h('span', { class: 'nm', style: 'flex:1 1 220px' }, c.legs.map(l => l.leg.sv.routeName).join(' ＋ ')),
+        h('span', { class: 'nm', style: 'flex:1 1 220px' }, c.legs.map(l => l.leg.sv.routeName + (l.leg.gou ? ' ' + l.leg.gou : '')).join(' ＋ ')),
         h('span', { class: 'cars' }, c.legs.length > 1 ? `轉乘 ${c.legs.length - 1} 次` : '直達'),
         h('span', { class: 'yen' }, yen(tf.adult) + '〜')))));
       out.append(ul, h('p', { class: 'note' }, '價格為大人 1 位的乘車券；指定席／立席費用在下一步依各段選擇加算。'));
@@ -127,7 +127,7 @@
       S.c.legs.forEach((l, i) => {
         const st = S.legs[i], sv = l.leg.sv, s0 = l.leg.stops[0], sN = l.leg.stops[l.leg.stops.length - 1];
         if (l.leg.walk) box.append(h('div', { class: 'note', style: 'margin:6px 0' }, `徒歩連絡：${H.stName(l.leg.walk.from)} → ${H.stName(l.leg.walk.to)}（約 ${Math.round(l.leg.walk.sec / 60)} 分）`));
-        const head = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:10px' }, HK.typeTag(sv), h('strong', null, sv.routeName), h('span', null, `${HK.hm(s0.dep)} ${H.stName(s0.station)} → ${HK.hm(sN.arr)} ${H.stName(sN.station)}`), h('span', { class: 'note', style: 'margin:0' }, H.reserveLabel(sv) || '指定席なし'));
+        const head = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:10px' }, HK.typeTag(sv), h('strong', null, sv.routeName), l.leg.gou ? h('span', { class: 'gou' }, l.leg.gou) : null, h('span', null, `${HK.hm(s0.dep)} ${H.stName(s0.station)} → ${HK.hm(sN.arr)} ${H.stName(sN.station)}`), h('span', { class: 'note', style: 'margin:0' }, H.reserveLabel(sv) || '指定席なし'));
         const blk = h('section', { style: 'border:1px solid var(--line,#d6e0db);border-radius:10px;padding:10px 12px;margin-bottom:8px' }, head);
         if (!l.ri) {
           blk.append(h('p', { class: 'note' }, 'この種別は指定席がありません。乘車券のみで乘車できます。'));
@@ -147,7 +147,7 @@
       });
       const go = h('button', { class: 'btn', type: 'button', disabled: !S.c.legs.every((l, i) => !l.ri || S.legs[i].mode !== 'seat' || S.legs[i].seats.length === P.n), onclick: () => ticket() }, '確認並發行車票');
       const rows = [[`乘車券（${H.stName(fSel.value)}→${H.stName(tSel.value)}）`, `大人 ${P.a} × ${yen(tf.adult)}` + (P.c ? `／兒童 ${P.c} × ${yen(tf.child)}` : '') + (P.s ? `／優待 ${P.s} × ${yen(tf.senior)}` : ''), yen(T.base)]];
-      S.c.legs.forEach((l, i) => { if (l.ri) rows.push([`${l.leg.sv.routeName}　${modeLabel(l, S.legs[i].mode)}`, S.legs[i].mode === 'seat' ? `${yen(l.ri.fee)} × ${P.n}` : S.legs[i].mode === 'stand' ? `${yen(l.ri.standFee)} × ${P.n}` : '', yen(legFee(l, S.legs[i]))]); });
+      S.c.legs.forEach((l, i) => { if (l.ri) rows.push([`${l.leg.sv.routeName}${l.leg.gou ? ' ' + l.leg.gou : ''}　${modeLabel(l, S.legs[i].mode)}`, S.legs[i].mode === 'seat' ? `${yen(l.ri.fee)} × ${P.n}` : S.legs[i].mode === 'stand' ? `${yen(l.ri.standFee)} × ${P.n}` : '', yen(legFee(l, S.legs[i]))]); });
       box.append(h('div', { class: 'fare-box', style: 'margin-top:12px' }, h('table', { class: 'tbl' }, h('tbody', null,
         rows.map(r => h('tr', null, h('th', null, r[0], r[1] ? h('small', { style: 'display:block;font-weight:400;color:var(--muted)' }, r[1]) : null), h('td', { style: 'text-align:right' }, r[2]))),
         h('tr', { class: 'tot' }, h('th', null, '合計'), h('td', { style: 'text-align:right;font-weight:700' }, yen(T.total))))),
@@ -193,14 +193,14 @@
         const st = S.legs[i], sv = l.leg.sv, s0 = l.leg.stops[0], sN = l.leg.stops[l.leg.stops.length - 1];
         const seat = !l.ri ? '指定席なし' : st.mode === 'seat' ? st.seats.map(x => seatName(x.car, x.k)).join('、') : st.mode === 'stand' ? '立席（座位なし）' : `自由席（${l.ri.reservedCars + 1}号車以後）`;
         return h('div', { style: 'border-top:1px dashed var(--line,#ccd);padding:8px 0' },
-          h('div', { style: 'font-weight:700' }, HK.typeTag(sv), ' ', sv.routeName, '　', H.destOf(sv, l.leg.board) + '行'),
+          h('div', { style: 'font-weight:700' }, HK.typeTag(sv), ' ', sv.routeName, l.leg.gou ? ' ' + l.leg.gou : '', '　', H.destOf(sv, l.leg.board) + '行'),
           h('div', null, `${HK.hm(s0.dep)} ${H.stName(s0.station)} → ${HK.hm(sN.arr)} ${H.stName(sN.station)}`),
           h('div', null, `${modeLabel(l, st.mode)}：${seat}`));
       });
       const fareRows = [h('tr', null, h('th', null, `乘車券 大人 ${P.a} × ${yen(tf.adult)}`), h('td', null, yen(tf.adult * P.a)))];
       if (P.c) fareRows.push(h('tr', null, h('th', null, `乘車券 兒童 ${P.c} × ${yen(tf.child)}`), h('td', null, yen(tf.child * P.c))));
       if (P.s) fareRows.push(h('tr', null, h('th', null, `乘車券 優待 ${P.s} × ${yen(tf.senior)}`), h('td', null, yen(tf.senior * P.s))));
-      S.c.legs.forEach((l, i) => { if (l.ri) fareRows.push(h('tr', null, h('th', null, `${l.leg.sv.routeName} ${modeLabel(l, S.legs[i].mode)}`), h('td', null, yen(legFee(l, S.legs[i]))))); });
+      S.c.legs.forEach((l, i) => { if (l.ri) fareRows.push(h('tr', null, h('th', null, `${l.leg.sv.routeName}${l.leg.gou ? ' ' + l.leg.gou : ''} ${modeLabel(l, S.legs[i].mode)}`), h('td', null, yen(legFee(l, S.legs[i]))))); });
       const tk = h('article', { class: 'tk' },
         h('header', null, h('img', { src: 'assets/img/mark-dark.png', alt: '', width: 28, height: 28 }), h('b', null, '光瀨都市鉄道'), h('span', null, '乗車券・特急券 / TICKET')),
         h('div', { class: 'tk-main' }, h('div', { class: 'tk-st' }, h('small', null, 'FROM'), h('strong', null, H.stName(from)), h('em', null, HK.hm(S.c.j.dep) + ' 発')), h('div', { class: 'tk-arrow' }, '→'), h('div', { class: 'tk-st' }, h('small', null, 'TO'), h('strong', null, H.stName(to)), h('em', null, HK.hm(S.c.j.arr) + ' 着'))),

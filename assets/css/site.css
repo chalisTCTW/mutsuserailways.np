@@ -740,3 +740,4 @@ header.sh .gnav li.admin a { padding: 6px 10px; }
 .fulltt .hs { border-left: 2px solid var(--line); }
 .kbhero.nophoto { min-height: 0; }
 .svgroup > div, .kbcols > div { min-width: 0; max-width: 100%; overflow-x: auto; }
+.gou { font-weight: 700; font-size: .92em; margin-left: .3em; letter-spacing: .02em; }
