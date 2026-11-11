@@ -154,6 +154,7 @@
       if (owner.length !== 1) { warn(`月台 ${p.name}（座標 ${trunc(x)}, ${trunc(z)}）對應到 ${owner.length} 個車站，未納入`); continue; }
       plat.set(S(p.id), { id: S(p.id), name: p.name, station: S(owner[0].id), dwell: p.dwellTime / 1000, x, z });
     }
+    const opSet = new Set((dump.opStops || []).map(pr => S(pr[0]) + ':' + S(pr[1])));   // 1.0 運転停車（路線:月台）：不是旅客停靠站
     const stations = new Map();
     for (const s of stationsRaw) {
       const [zh, en] = splitZhEn(s.name);
@@ -173,7 +174,7 @@
       for (const rp of r.routePlatformData) {
         const p = plat.get(S(rp.platformId));
         if (!p) { warn(`路線 ${r.name} 引用了不存在的月台`); continue; }
-        stops.push({ station: p.station, platform: p.id, platformName: p.name, dest: rp.customDestination });
+        stops.push({ station: p.station, platform: p.id, platformName: p.name, dest: rp.customDestination, op: opSet.has(S(r.id) + ':' + S(rp.platformId)) });
       }
       const dps = (depotOfRoute.get(S(r.id)) || []).filter(depotHasService);
       members.push({ id: S(r.id), rawName: r.name, zh, en, dir: dirn, notes, number: r.routeNumber, color: r.color, rtype: String(r.routeType || ''), circular: r.circularState,
@@ -370,7 +371,7 @@
         r.routePlatformData.forEach((rp, j) => {
           const gi_ = g0 + j, p = plat.get(S(rp.platformId)), base = leadT + firstDwell + off;
           const aAbs = gi_ === 0 ? leadT + off : base + arr[gi_];
-          stList.push({ station: p.station, platform: p.id, platformName: p.name, arr: pyRound(aAbs, 1), dep: pyRound(base + dep[gi_], 1), dest: rp.customDestination });
+          stList.push({ station: p.station, platform: p.id, platformName: p.name, arr: pyRound(aAbs, 1), dep: pyRound(base + dep[gi_], 1), dest: rp.customDestination, op: opSet.has(S(r.id) + ':' + S(rp.platformId)) });
         });
         let cur = '';
         for (const st of stList) { if (st.dest) cur = st.dest; st.out = cur; st.pax = !cur.includes('回送'); }

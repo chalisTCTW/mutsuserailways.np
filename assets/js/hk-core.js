@@ -76,40 +76,84 @@
    *  - 時段表啟用：該班發車時刻所在時段的方案（預設／離峰＝每 2 班 1 班／深夜＝每 3 班 1 班／收車＝不運行）。
    *  - 目前方案（手動操作或時段套用）自 since 起到 until（下一個時段交界）為止有效；沒有時段表就持續到再次操作。
    *  - 名次：該車庫全部發車時刻依當地時間排序，名次 % N == 0 才運行（與模組相同）；快照裡沒有的時刻一律運行。 */
-  const N = { default: 1, offpeak: 2, night: 3 };
+  const N = { default: 1, midday: 1, offpeak: 2, night: 3 };
   function makeDispatchCore(disp) {
     if (!disp || !disp.active) return null;
     const off = disp.tzOffsetSec | 0;
+    /* 1.0.4：規則可帶星期（days＝"135" 週一三五）或指定日期（days＝"d20261111"）；沒有 days＝每天 */
     const rules = (disp.schedule ? (disp.rules || []) : []).slice().sort((a, b) => a.m - b.m);
     const rankOf = {};
     Object.keys(disp.depots || {}).forEach(id => { const m = new Map(); disp.depots[id].forEach((u, i) => m.set(u, i)); rankOf[id] = m; });
     const sinceS = disp.since ? Math.floor(disp.since / 1000) : 0;
+    const dayIdxOf = epochS => Math.floor((epochS + off) / DAY);   // 當地日序（1970-01-01＝0，是週四）
+    const appliesOn = (r, di) => {
+      const t = r.days || '';
+      if (!t) return true;
+      if (t[0] === 'd') { const d = new Date(di * DAY * 1000); return t === 'd' + String(d.getUTCFullYear()).padStart(4, '0') + String(d.getUTCMonth() + 1).padStart(2, '0') + String(d.getUTCDate()).padStart(2, '0'); }
+      return t.indexOf(String(((di + 3) % 7 + 7) % 7 + 1)) >= 0;   // 週一＝1 … 週日＝7
+    };
+    const startOf = (r, di) => di * DAY - off + r.m * 60;
+    /** epochS 這一刻生效的規則（往回找 8 天內適用且開始時刻最晚、不晚於 epochS 的那一條）→ [規則, 開始時刻]；沒有回 null。 */
+    const ruleHit = epochS => {
+      if (!rules.length) return null;
+      const d0 = dayIdxOf(epochS);
+      let best = null, bestAt = -Infinity;
+      for (let k = 0; k <= 8 && !best; k++) for (const r of rules) {
+        if (!appliesOn(r, d0 - k)) continue;
+        const t = startOf(r, d0 - k);
+        if (t <= epochS && t > bestAt) { best = r; bestAt = t; }
+      }
+      return best ? [best, bestAt] : null;
+    };
+    const ruleStarts = (a, b) => {
+      const out = [];
+      for (let di = dayIdxOf(a) - 1; di <= dayIdxOf(b) + 1; di++) for (const r of rules) if (appliesOn(r, di)) { const t = startOf(r, di); if (t >= a && t <= b) out.push(t); }
+      return out;
+    };
     let untilS = Infinity;
     if (disp.until) untilS = Math.floor(disp.until / 1000);
-    else if (sinceS && rules.length) {
-      const sl = (((sinceS + off) % DAY) + DAY) % DAY, day0 = sinceS - sl;
-      untilS = Math.min(...rules.map(r => [day0 + r.m * 60, day0 + DAY + r.m * 60]).flat().filter(t => t > sinceS));
-    }
+    else if (sinceS && rules.length) { const c = ruleStarts(sinceS + 1, sinceS + 9 * DAY).filter(t => t > sinceS); if (c.length) untilS = Math.min(...c); }
     const stateAct = disp.recall ? 'recall' : (disp.mode || 'default');
-    const ruleAt = epochS => {
-      const m = Math.floor((((epochS + off) % DAY) + DAY) % DAY / 60); let best = rules[rules.length - 1];
-      for (const r of rules) if (r.m <= m) best = r;
-      return best.act;
-    };
-    /** epochS 這一刻適用的方案（default／offpeak／night／recall）。 */
+    const ruleAt = epochS => { const h = ruleHit(epochS); return h ? h[0].act : 'default'; };
+    /** epochS 這一刻適用的方案（default／midday／offpeak／night／recall）。 */
     const actAt = epochS => {
       if (sinceS && epochS >= sinceS && epochS < untilS) return stateAct;
       return rules.length ? ruleAt(epochS) : 'default';
     };
+    /* 收車區間；首末班只看「時間最長的那一次收車」（較短的不算分界） */
+    const recallIv = (from, to) => {
+      const pts = [from, to];
+      if (sinceS > from && sinceS < to) pts.push(sinceS);
+      if (untilS > from && untilS < to) pts.push(untilS);
+      ruleStarts(from, to).forEach(t => pts.push(t));
+      pts.sort((x, y) => x - y);
+      const out = []; let cur = null;
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const a = pts[i], b = pts[i + 1]; if (b <= a) continue;
+        if (actAt(a + 1) === 'recall') { if (cur && cur[1] === a) cur[1] = b; else { cur = [a, b]; out.push(cur); } }
+      }
+      return out;
+    };
+    const mainCache = {};
+    /** 以 nowS 為中心前後 3 天內「時間最長的那一次收車」→ [[開始, 結束]…]（epoch 秒）。 */
+    const mainRecalls = nowS => {
+      const key = Math.floor(nowS / 60); if (mainCache[key]) return mainCache[key];
+      const from = nowS - 3 * DAY, to = nowS + 3 * DAY;
+      const core = recallIv(from, to).filter(iv => iv[0] > from && iv[1] < to);
+      const max = core.reduce((m, iv) => Math.max(m, iv[1] - iv[0]), 0);
+      return (mainCache[key] = core.filter(iv => iv[1] - iv[0] >= max - 60));
+    };
     return {
       has: id => !!rankOf[id],
       actAt,
+      mainRecalls,
       /** depotId：車庫；raw：UTC 一天秒數的發車時刻；epochS：這一班發車的實際時間（epoch 秒）。 */
       runs(depotId, raw, epochS) {
         const m = rankOf[depotId]; if (!m) return true;
         const a = actAt(epochS); if (a === 'recall') return false;
-        const n = N[a] || 1; if (n === 1) return true;
-        const i = m.get(raw); return i == null || i % n === 0;
+        const n = N[a] || 1; if (n === 1 && a !== 'midday') return true;
+        const i = m.get(raw); if (i == null) return true;
+        return a === 'midday' ? i % 3 !== 0 : i % n === 0;
       },
       current(nowS) { return actAt(nowS != null ? nowS : Math.floor(Date.now() / 1000)); },
     };
@@ -124,6 +168,8 @@
       /** raw：UTC 一天秒數的發車時刻；rel：這一班相對於「今天 0:00」的秒數（含跨日）。 */
       runs: (depotId, raw, rel) => core.runs(depotId, raw, midnight + rel),
       current: () => core.current(nowS),
+      /** 1.0.4：主要收車（最長那次）相對於「今天 0:00」的秒數區間，給首末班判斷用。 */
+      recallsRel: () => core.mainRecalls(nowS).map(iv => [iv[0] - midnight, iv[1] - midnight]),
     };
   }
 
@@ -131,6 +177,19 @@
     const H = { net, cfg: CFG };
     const DP = makeDispatch(disp);
     H.dispatchNow = DP ? DP.current() : 'default';
+    /** 1.0.4 首末班：不是「當天最後一班」，而是主要收車（最長那次）之前的最後一班、與收車結束後的第一班。沒有收車時維持原本的第一班／最後一班。times＝當天發車時刻（秒，已排序）。 */
+    H.firstLast = times => {
+      if (!times || !times.length) return null;
+      const iv = (DP ? DP.recallsRel() : []).sort((a, b) => a[0] - b[0]);
+      const R0 = iv.find(x => x[1] > 0);
+      if (!R0) return [times[0], times[times.length - 1]];
+      const R1 = iv.find(x => x[0] > R0[0]) || [R0[0] + DAY, R0[1] + DAY];
+      const T = [...new Set(times.concat(times.map(t => t + DAY)))].sort((a, b) => a - b);
+      let f = T.find(t => t >= R0[1]); if (f == null) f = times[0];
+      let l = null; for (const t of T) if (t >= f && t < R1[0]) l = t;
+      if (l == null) l = times[times.length - 1];
+      return [f, l];
+    };
     const minTransfer = (net.meta && net.meta.minTransferSec) || CFG.minTransferSec;
     H.minTransfer = minTransfer;
 
@@ -148,7 +207,7 @@
       if (!route || !member || route.status === 'maintenance') return;
       const nm = parseRouteName(route.displayZh);
       const col = hexColor(member.color != null ? member.color : route.color);
-      svcs.push({ idx, stops: s.stops, depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col) });
+      svcs.push({ idx, stops: s.stops.filter(x => !x.op),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col) });
     });
     H.svcs = svcs;
 

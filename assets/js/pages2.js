@@ -26,7 +26,7 @@
   const stationHref = (H, name) => { const st = stByName(H, name); return 'station.html?' + (st ? 's=' + encodeURIComponent(st.id) : 'n=' + encodeURIComponent(name)); };
   stationData();
   const TORDER = { loc: 0, exp: 1, ltd: 2 };
-  const dispNote = H => ({ offpeak: '目前採用離峰時段班次（部分列車停駛）。', night: '目前採用深夜時段班次（班次減少）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow] || '');
+  const dispNote = H => ({ midday: '目前採用日中時段班次（部分列車停駛）。', offpeak: '目前採用離峰時段班次（部分列車停駛）。', night: '目前採用深夜時段班次（班次減少）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow] || '');
   const safeGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const safeSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* 無痕模式等，忽略 */ } };
   const field = (label, el) => h('label', { class: 'f' }, h('span', null, label), el);
@@ -76,7 +76,7 @@
           h('div', null, h('dt', null, '運行區間'), h('dd', null, dirLabel(H, sv))),
           h('div', null, h('dt', null, '停靠站'), h('dd', null, `${pax.length} 站`)),
           h('div', null, h('dt', null, '全程所要時間'), h('dd', null, `約 ${total} 分`)),
-          h('div', null, h('dt', null, '首班／末班'), h('dd', null, tt.length ? `${hm(tt[0])}／${hm(tt[tt.length - 1])}（${H.stName(st[0].station)} 發車）` : '本日無班次')),
+          h('div', null, h('dt', null, '首班／末班'), h('dd', null, tt.length ? (fl => `${hm(fl[0])}／${hm(fl[1])}（${H.stName(st[0].station)} 發車）`)(H.firstLast(tt)) : '本日無班次')),
           h('div', null, h('dt', null, '本日班次'), h('dd', null, `${tt.length} 班`)),
           h('div', null, h('dt', null, '編組'), h('dd', null, `${cars} 両編成${ri ? '・' + ri : ''}`)))));
       if (g.svs.length > 1) out.append(h('div', { class: 'dirs', role: 'group', 'aria-label': '方向' }, g.svs.map((v, k) => h('button', { type: 'button', 'aria-pressed': String(k === di), onclick: () => setDi(k) }, dirLabel(H, v)))));
@@ -342,7 +342,7 @@
     const ttl = (st ? st.zh : name) + '｜光瀨都市鉄道'; document.title = ttl;
     const sid = st && st.id, sg = sightsOfStation(data, name), photos = photosOfStation(e, data);
     const tr = (st && H.events.get(sid)) || [];
-    const day = tr.filter(x => x.t >= 0 && x.t < H.DAY), first = day.length ? day[0].t : null, last = day.length ? day[day.length - 1].t : null;
+    const day = tr.filter(x => x.t >= 0 && x.t < H.DAY), fl0 = day.length ? H.firstLast(day.map(x => x.t)) : null, first = fl0 ? fl0[0] : null, last = fl0 ? fl0[1] : null;
     const lines = sid ? chipLines(H, sid, null) : [];
 
     /* 標題與照片 */
@@ -383,9 +383,9 @@
 
       /* 各種別的停靠狀況 */
       const byRoute = new Map();
-      tr.forEach(x => { if (x.t < 0 || x.t >= H.DAY) return; let g = byRoute.get(x.sv.routeName); if (!g) byRoute.set(x.sv.routeName, g = { sv: x.sv, n: 0, day: 0, dests: new Map(), first: x.t, last: x.t }); g.n++; if (x.t >= 36000 && x.t < 57600) g.day++; g.last = x.t; const dn = H.destOf(x.sv, x.i); g.dests.set(dn, (g.dests.get(dn) || 0) + 1); });
+      tr.forEach(x => { if (x.t < 0 || x.t >= H.DAY) return; let g = byRoute.get(x.sv.routeName); if (!g) byRoute.set(x.sv.routeName, g = { sv: x.sv, n: 0, day: 0, dests: new Map(), ts: [] }); g.n++; if (x.t >= 36000 && x.t < 57600) g.day++; g.ts.push(x.t); const dn = H.destOf(x.sv, x.i); g.dests.set(dn, (g.dests.get(dn) || 0) + 1); });
       if (byRoute.size) {
-        const rows = [...byRoute.values()].sort((a, b) => b.n - a.n);
+        const rows = [...byRoute.values()].sort((a, b) => b.n - a.n); rows.forEach(g => { const f = H.firstLast(g.ts.slice().sort((a, b) => a - b)); g.first = f[0]; g.last = f[1]; });
         sec('停靠的列車', h('div', { class: 'tblwrap' }, h('table', { class: 'sp-tbl' },
           h('thead', null, h('tr', null, h('th', null, '路線・種別'), h('th', null, '行先'), h('th', null, '日間每小時'), h('th', null, '一天的班數'), h('th', null, '首班／末班'))),
           h('tbody', null, rows.map(g => h('tr', null,

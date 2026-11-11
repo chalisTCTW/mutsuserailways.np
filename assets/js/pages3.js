@@ -7,7 +7,7 @@
   const yen = n => '¥' + Number(n).toLocaleString('en-US');
   const normZh = z => String(z || '').replace(/戶/g, '戸').replace(/\s+/g, '');
   const stByName = (H, name) => H.stations.find(s => normZh(s.zh) === normZh(name)) || H.stations.find(s => normZh(s.zh).startsWith(normZh(name)));
-  const dispNote = H => ({ offpeak: '目前採用離峰時段班次（部分列車停駛）。', night: '目前採用深夜時段班次（班次減少）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow] || '');
+  const dispNote = H => ({ midday: '目前採用日中時段班次（部分列車停駛）。', offpeak: '目前採用離峰時段班次（部分列車停駛）。', night: '目前採用深夜時段班次（班次減少）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow] || '');
   const sec = (title, sub, ...kids) => h('section', { class: 'gsec' }, h('h2', null, title, sub ? h('small', null, sub) : null), ...kids);
   const cfg = H => H.cfg || {};
   const seatFee = H => cfg(H).seatFee || 500, standFee = H => Math.round(seatFee(H) * (cfg(H).standRatio != null ? cfg(H).standRatio : 0.5));
@@ -223,7 +223,7 @@
         h('div', null, h('dt', null, '運行區間'), h('dd', null, `${H.stName(sv.stops[0].station)} → ${H.stName(sv.stops[sv.stops.length - 1].station)}`)),
         h('div', null, h('dt', null, '停靠站'), h('dd', null, `${pax.length} 站`)),
         h('div', null, h('dt', null, '全程所要時間'), h('dd', null, `約 ${Math.round((sv.stops[sv.stops.length - 1].arr - sv.stops[0].dep) / 60)} 分`)),
-        h('div', null, h('dt', null, '首班／末班'), h('dd', null, tt.length ? `${hm(tt[0])}／${hm(tt[tt.length - 1])}` : '本日無班次')),
+        h('div', null, h('dt', null, '首班／末班'), h('dd', null, tt.length ? (fl => `${hm(fl[0])}／${hm(fl[1])}`)(H.firstLast(tt)) : '本日無班次')),
         h('div', null, h('dt', null, '本日班次'), h('dd', null, `${tt.length} 班`))));
       const rows = []; sv.stops.forEach((s, i) => { if (s.pax === false) return; rows.push(h('tr', null, h('td', null, h('a', { href: 'timetable.html?s=' + encodeURIComponent(s.station) }, H.codeBadges(s.station), H.stName(s.station))), h('td', { class: 'tm' }, i === 0 ? '起點' : `${Math.round((s.arr - sv.stops[0].arr) / 60)} 分`))); });
       dyn.append(h('div', { class: 'tscroll' }, h('table', { class: 'tbl', style: 'max-width:420px' }, h('thead', null, h('tr', null, h('th', null, '停靠站'), h('th', null, '自起點'))), h('tbody', null, rows))),

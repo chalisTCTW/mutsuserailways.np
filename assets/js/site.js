@@ -19,7 +19,7 @@
   const field = (label, el) => h('label', { class: 'f' }, h('span', null, label), el);
   /** 調度（離峰・深夜・收車）時顯示給旅客的說明。 */
   function dispNote(H) {
-    const t = { offpeak: '目前採用離峰時段班次，部分列車停駛（約每 2 班行駛 1 班）。', night: '目前採用深夜時段班次，列車班次減少（約每 3 班行駛 1 班）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow];
+    const t = { midday: '目前採用日中時段班次，部分列車停駛（約每 3 班行駛 2 班）。', offpeak: '目前採用離峰時段班次，部分列車停駛（約每 2 班行駛 1 班）。', night: '目前採用深夜時段班次，列車班次減少（約每 3 班行駛 1 班）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow];
     return t ? ' ' + t : '';
   }
 
