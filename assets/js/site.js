@@ -90,6 +90,10 @@
     const sv = e.sv, first = sv.stops[0].station, last = sv.stops[sv.stops.length - 1].station;
     if (first === last) return { key: 'loop|' + sv.line + '|' + (sv.member.dir || ''), label: `${sv.line}　${sv.member.dir || '環狀'}` };
     const dest = last;
+    // 1.1.0：高速鉄道往東平倉方向的班次，車站時刻表固定標示「東平倉・新岩沢 方面」（地圖外的假想延伸；
+    // 前輩指定，只套用這一個方向，反方向仍用一般的終點命名）。
+    const hx = H.cfg.hsExt;
+    if (sv.isHS && hx && hx.towardLabel && H.stName(dest) === hx.afterZh) return { key: 'hsext|' + hx.afterZh, label: hx.towardLabel + '　方面' };
     // 0.21.0：方向由「這班車實際的下一個停靠站」決定（過去用到終點的最短路徑，環快這類繞行的班次會被分到相反方向）
     let nextSt = dest; for (let k = (e.i || 0) + 1; k < sv.stops.length; k++) if (sv.stops[k].pax !== false) { nextSt = sv.stops[k].station; break; }
     const p = H.shortestPath(sid, nextSt);
@@ -120,12 +124,19 @@
 
   /** 車站時刻表パネル（方向の切替・全日表示つき）。車站頁と時刻表頁で共用。 */
   function ttPanel(H, sid) {
-    let dirKey = 'all', whole = false;
+    let dirKey = 'all', whole = false, hsOnly = false;
     const out = h('div');
+    // 1.1.0：獨立的「高速鉄道」篩選欄位（票價查詢・乘車轉乘查詢也各自有一個，三頁用同一個識別色）。
+    const hasHS = H.svcs.some(sv => sv.isHS && sv.stops.some(s => s.station === sid && s.pax !== false));
+    const hsChk = h('input', { type: 'checkbox' });
+    const hsField = hasHS ? h('div', { class: 'hs-field', style: 'padding:6px 14px' }, h('label', { class: 'f', style: 'flex-direction:row;display:flex;gap:6px;align-items:center;margin:0' },
+      hsChk, h('span', null, h('span', { class: 'hs-tag' }, '高速鉄道'), '只顯示高速鉄道的班次'))) : null;
+    hsChk.addEventListener('change', () => { hsOnly = hsChk.checked; draw(); });
     function draw() {
-      const evs = H.departures(sid);
+      const evs = H.departures(sid).filter(e => !hsOnly || e.sv.isHS);
       out.replaceChildren();
-      if (!evs.length) { out.append(h('p', { class: 'lead' }, '這個車站沒有發車的班次（可能是各路線的終點站）。')); return; }
+      if (hsField) out.append(hsField);
+      if (!evs.length) { out.append(h('p', { class: 'lead' }, hsOnly ? '這個車站目前沒有高速鉄道的班次。' : '這個車站沒有發車的班次（可能是各路線的終點站）。')); return; }
       // 分組
       const groups = new Map();
       evs.forEach(e => {
@@ -190,22 +201,26 @@
     const via = q.get('via') && H.stById[q.get('via')] ? q.get('via') : '';
     const vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...H.stations.map(st => h('option', { value: st.id, selected: st.id === via }, st.zh))]);
     const noRes = h('input', { type: 'checkbox', checked: q.get('nores') === '1' });
+    const useHS = h('input', { type: 'checkbox', checked: q.get('hs') === '1' });
     const out = h('div', { style: 'margin-top:18px' });
     const swap = h('button', { class: 'btn ghost', type: 'button', onclick: () => { const a = fSel.value; fSel.value = tSel.value; tSel.value = a; go(); } }, '出發・抵達互換');
     const form = h('form', { class: 'finder v2', onsubmit: e => { e.preventDefault(); go(); } }, h('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 12px;align-items:end;padding:14px 16px' }, field('出發站', fSel), field('經由（可不選）', vSel), field('抵達站', tSel), field('出發時刻', tIn),
-      h('label', { class: 'f', style: 'flex-direction:row;display:flex;gap:6px;align-items:center' }, noRes, h('span', null, '不搭乘指定席列車（特急）')), h('button', { class: 'btn', type: 'submit' }, '查詢'), swap));
+      h('label', { class: 'f', style: 'flex-direction:row;display:flex;gap:6px;align-items:center' }, noRes, h('span', null, '不搭乘指定席列車（特急）')),
+      h('label', { class: 'f hs-field', style: 'flex-direction:row;display:flex;gap:6px;align-items:center;padding:6px 10px;margin:0' }, useHS, h('span', null, h('span', { class: 'hs-tag' }, '高速鉄道'), '可以利用高速鐵路')), h('button', { class: 'btn', type: 'submit' }, '查詢'), swap));
     root.append(h('div', { style: 'margin-top:16px' }, form), out);
     function go() {
       out.replaceChildren();
       if (fSel.value === tSel.value) { out.append(h('p', { class: 'lead' }, '請選擇不同的出發站與抵達站。')); return; }
       const [hh, mm] = (tIn.value || '00:00').split(':').map(Number), t0 = hh * 3600 + mm * 60;
-      const res = H.searchEx(fSel.value, tSel.value, t0, 4, { via: vSel.value || null, noReserved: noRes.checked });
-      const fare = H.fare(fSel.value, tSel.value);
-      out.append(h('h2', { class: 'h2' }, `${H.stName(fSel.value)} → ${H.stName(tSel.value)}`, h('small', null, `${hm(t0)} 之後的班次${vSel.value ? `　經由 ${H.stName(vSel.value)}` : ''}${noRes.checked ? '　不搭乘指定席列車' : ''}`)));
+      const res = H.searchEx(fSel.value, tSel.value, t0, 4, { via: vSel.value || null, noReserved: noRes.checked, allowHighSpeed: useHS.checked });
+      out.append(h('h2', { class: 'h2' }, `${H.stName(fSel.value)} → ${H.stName(tSel.value)}`, h('small', null, `${hm(t0)} 之後的班次${vSel.value ? `　經由 ${H.stName(vSel.value)}` : ''}${noRes.checked ? '　不搭乘指定席列車' : ''}${useHS.checked ? '　可利用高速鐵路' : ''}`)));
       if (!res.length) { out.append(h('p', { class: 'lead' }, '在這個時間之後沒有找到符合條件的班次（轉乘最多 2 次、單次等候 30 分以內）。可以改個時刻或條件再查查看。')); return; }
-      res.forEach((j, n) => out.append(journeyCard(H, j, fare, n === 0)));
-      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ' + Math.round(H.minTransfer / 60 * 10) / 10 + ' 分鐘計算（中央戸宮／光大前與大學前可步行轉乘，約 6 分鐘）。乘車券依出發站到抵達站的最短路徑計算，與搭乘的班次無關；特急為全車指定席（也有半價的立席特急券），特快的 1・2 号車為指定席、3 号車以後為自由席。'));
-      try { history.replaceState(null, '', `?tab=route&from=${fSel.value}&to=${tSel.value}&t=${tIn.value}${vSel.value ? '&via=' + vSel.value : ''}${noRes.checked ? '&nores=1' : ''}`); } catch (e) { }
+      // 1.1.0：每個行程各自算票價（可能含高速鐵路，不能共用同一個 from→to 的一般票價）
+      res.forEach((j, n) => out.append(journeyCard(H, j, H.journeyFare(j.legs), n === 0)));
+      // 1.1.0：這裡改回分開的 h() 參數（前輩用語之前就是這樣拆，中間的數字單獨一個節點），
+      // 不要再用 + 把整段接成一個字串——接成一個字串會讓既有的日文／英文翻譯對不上，整段都不會被翻譯。
+      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ', String(Math.round(H.minTransfer / 60 * 10) / 10), ' 分鐘計算（中央戸宮／光大前與大學前可步行轉乘，約 6 分鐘；幸村／新光瀨亦可步行轉乘高速鐵路）。乘車券依出發站到抵達站的最短路徑計算，與搭乘的班次無關；特急為全車指定席（也有半價的立席特急券），特快的 1・2 号車為指定席、3 号車以後為自由席；高速鐵路為全車指定席、沒有立席特急券，票價另計。'));
+      try { history.replaceState(null, '', `?tab=route&from=${fSel.value}&to=${tSel.value}&t=${tIn.value}${vSel.value ? '&via=' + vSel.value : ''}${noRes.checked ? '&nores=1' : ''}${useHS.checked ? '&hs=1' : ''}`); } catch (e) { }
     }
     if (q.get('from')) go();
   }
@@ -230,6 +245,43 @@
       h('ol', { class: 'legs' }, lis));
   }
 
+  /** 1.1.0：獨立的「高速鉄道」票價查詢欄位——萬瀨高速鉄道線専用，不跟一般票價混在一起算，
+   *  也不經過一般票價用的拓樸搜尋（高速鉄道不在 H.adj 裡）。站名清單含地圖外的假想延伸（花宮天照・豐守・新岩沢，
+   *  見 CFG.hsExt），讓玩家可以先試算之後會通到的票價；這些延伸站只會出現在這個欄位，不會出現在其他查詢或地圖上。 */
+  function hsFareBox(H) {
+    const list = H.hsQueryStations;
+    if (!list || list.length < 2) return null;
+    const opt = (zh) => h('option', { value: zh }, zh);
+    const fSel = h('select', { 'aria-label': '出發站（高速鉄道）' }, list.map(s => opt(s.zh)));
+    const tSel = h('select', { 'aria-label': '抵達站（高速鉄道）' }, list.map(s => opt(s.zh)));
+    tSel.selectedIndex = Math.min(list.length - 1, 1);
+    const out = h('div', { style: 'margin-top:10px' });
+    const form = h('form', { onsubmit: e => { e.preventDefault(); go(); } },
+      h('div', { style: 'display:grid;grid-template-columns:1fr 1fr auto;gap:10px 12px;align-items:end' },
+        field('出發站', fSel), field('抵達站', tSel), h('button', { class: 'btn', type: 'submit' }, '計算高速鉄道票價')));
+    function go() {
+      out.replaceChildren();
+      if (fSel.value === tSel.value) { out.append(h('p', { class: 'lead' }, '請選擇不同的出發站與抵達站。')); return; }
+      const f = H.hsFareExt(fSel.value, tSel.value);
+      if (!f) { out.append(h('p', { class: 'lead' }, '這兩站之間查不到高速鉄道的票價。')); return; }
+      out.append(h('div', { class: 'fare-box', style: 'margin-top:10px' },
+        h('div', { style: 'padding:14px 16px;display:flex;flex-wrap:wrap;gap:6px 24px;align-items:baseline' },
+          h('span', { style: 'font-weight:700' }, `${fSel.value} → ${tSel.value}`), h('span', { class: 'big' }, yen(f.total)), h('span', { style: 'color:var(--muted);font-size:13px' }, `跨越分區 ${f.zones}　約 ${f.km.toFixed(1)} km`)),
+        h('table', { class: 'tbl', style: 'margin:0 16px 10px;width:calc(100% - 32px)' }, h('tbody', null,
+          h('tr', null, h('th', { style: 'width:46%' }, `跨越收費區 ${f.crossed} 個 × ${yen(f.step)}`), h('td', { style: 'text-align:right' }, yen(f.zoneFee))),
+          h('tr', null, h('th', null, '乘車券合計'), h('td', { style: 'text-align:right;font-weight:700' }, yen(f.yen))),
+          h('tr', null, h('th', null, '兒童（12 歲以下）・優待（60 歲以上）'), h('td', { style: 'text-align:right' }, yen(Math.round(f.yen * H.cfg.childRatio)) + '（指定席特急券不打折）')),
+          h('tr', null, h('th', null, '指定席特急券（全車指定席，沒有立席特急券）'), h('td', { style: 'text-align:right' }, '+' + yen(f.seat) + '（合計 ' + yen(f.yen + f.seat) + '）')))),
+        h('div', { class: 'rule' }, '計算所用的路徑：' + f.path.join(' → '),
+          f.path.some(zh => list.find(s => s.zh === zh && !s.real)) ? h('span', null, '　※ 經過地圖外尚未建成的假想路段，僅供試算未來票價參考。') : null)));
+    }
+    form.addEventListener('submit', go);
+    return h('div', { class: 'sec hs-field' },
+      h('h2', null, h('span', { class: 'hs-tag' }, '高速鉄道'), '万瀨高速鉄道線　獨立票價查詢'),
+      h('p', { class: 'lead', style: 'margin-top:0' }, '万瀨高速鉄道線的票價不套用一般鐵路的分區運費制度：每跨越一個收費區加 ' + yen(H.cfg.hsFareStep) + '，指定席特急券固定 ' + yen(H.cfg.hsSeatFee) + '（不打折、沒有立席特急券）。站名含目前尚在地圖外、還沒建成的延伸路段，可以先試算之後的票價。'),
+      form, out);
+  }
+
   function viewFare(H, root) {
     const fSel = stationSelect(H, q.get('from') && H.stById[q.get('from')] ? q.get('from') : H.stations[0].id, '出發站'), tSel = stationSelect(H, q.get('to') && H.stById[q.get('to')] ? q.get('to') : H.stations[Math.min(1, H.stations.length - 1)].id, '抵達站');
     const out = h('div', { style: 'margin-top:18px' });
@@ -242,6 +294,7 @@
       h('tr', null, h('th', null, '兒童・優待'), h('td', null, '12 歲以下、60 歲以上的乘車券為大人的一半（四捨五入到整數）；指定席費用不打折。')),
       h('tr', null, h('th', null, '路徑的取法'), h('td', null, '有多條路徑時，取跨越收費區最少、其次距離最短的路徑。')))));
     root.append(h('div', { style: 'margin-top:16px' }, form), out, rule);
+    root.append(hsFareBox(H));
     function go() {
       out.replaceChildren();
       if (fSel.value === tSel.value) { out.append(h('p', { class: 'lead' }, '請選擇不同的出發站與抵達站。')); return; }

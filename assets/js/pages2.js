@@ -25,7 +25,7 @@
   const sdEntry = name => { const sd = HK._sd; if (!sd || !sd.stations || !name) return null; const n = normZh(name); return sd.stations.find(e => normZh(e.name) === n) || sd.stations.find(e => normZh(e.name).startsWith(n) || n.startsWith(normZh(e.name))) || null; };
   const stationHref = (H, name) => { const st = stByName(H, name); return 'station.html?' + (st ? 's=' + encodeURIComponent(st.id) : 'n=' + encodeURIComponent(name)); };
   stationData();
-  const TORDER = { loc: 0, exp: 1, ltd: 2 };
+  const TORDER = { loc: 0, exp: 1, ltd: 2, hs: 3 };
   const dispNote = H => ({ midday: '目前採用日中時段班次（部分列車停駛）。', offpeak: '目前採用離峰時段班次（部分列車停駛）。', night: '目前採用深夜時段班次（班次減少）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow] || '');
   const safeGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const safeSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* 無痕模式等，忽略 */ } };

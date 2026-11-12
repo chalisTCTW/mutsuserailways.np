@@ -50,12 +50,15 @@
     const tIn = h('input', { type: 'time', value: q.get('t') || '07:00' });
     const num = (label, def) => h('select', { 'aria-label': label }, [0, 1, 2, 3, 4, 5, 6].map(n => h('option', { value: n, selected: n === def }, n + ' 位')));
     const nA = num('大人', 1), nC = num('兒童（12 歲以下）', 0), nS = num('優待（60 歲以上）', 0);
+    const useHS = h('input', { type: 'checkbox', checked: q.get('hs') === '1' });
     const field = (l, el) => h('label', { class: 'f' }, h('span', null, l), el);
     const form = h('form', { class: 'finder', onsubmit: e => { e.preventDefault(); search(); } },
       h('div', { class: 'bk-form' }, field('出發站', fSel), field('經由（可不選）', vSel), field('抵達站', tSel), field('乘車日', dIn), field('出發時刻', tIn),
-        field('大人', nA), field('兒童（12 歲以下）', nC), field('優待（60 歲以上）', nS), h('button', { class: 'btn', type: 'submit' }, '查詢班次')));
+        field('大人', nA), field('兒童（12 歲以下）', nC), field('優待（60 歲以上）', nS),
+        h('label', { class: 'f', style: 'flex-direction:row;display:flex;gap:6px;align-items:center' }, useHS, h('span', null, '可以利用高速鐵路')),
+        h('button', { class: 'btn', type: 'submit' }, '查詢班次')));
     const out = h('div', { class: 'bk-out' });
-    root.append(h('p', { class: 'lead' }, '特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。'), h('div', { style: 'margin-top:12px' }, form), out);
+    root.append(h('p', { class: 'lead' }, '特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席；高速鐵路為全車指定席（沒有立席特急券，票價另計）。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。'), h('div', { style: 'margin-top:12px' }, form), out);
 
     const pax = () => ({ a: Number(nA.value), c: Number(nC.value), s: Number(nS.value), n: Number(nA.value) + Number(nC.value) + Number(nS.value) });
 
@@ -81,26 +84,27 @@
       if (from === to) { out.append(h('p', { class: 'lead' }, '請選擇不同的出發站與抵達站。')); return; }
       if (P.n < 1 || P.n > 6) { out.append(h('p', { class: 'lead' }, '旅客人數請設定為 1～6 位。')); return; }
       const [hh, mm] = (tIn.value || '00:00').split(':').map(Number), t0 = hh * 3600 + mm * 60;
-      const tf = H.ticketFares(from, to);
-      out.append(h('h2', { class: 'h2' }, `${H.stName(from)} → ${H.stName(to)}`, h('small', null, `${dIn.value}　${tIn.value} 以後${vSel.value ? `　經由 ${H.stName(vSel.value)}` : ''}`)));
-      if (!tf) { out.append(h('p', { class: 'lead' }, '查不到兩站之間的路徑。')); return; }
-      let list = H.searchEx(from, to, t0, 10, { via: vSel.value || null }).map(j => ({ j, legs: j.legs.map(l => legInfo(l, dIn.value)) }));
-      list = list.filter(x => x.j.dep < DAY + t0 && x.legs.some(l => l.ri));
-      if (!list.length) { out.append(h('p', { class: 'lead' }, '這個時間之後沒有含特急／特快（可預約）的行程。可改用「時刻表與班次」查詢一般班次。'), h('p', null, h('a', { class: 'btn ghost', href: `timetable.html?tab=route&from=${from}&to=${to}&t=${tIn.value}` }, '查詢所有班次（含轉乘）'))); return; }
+      out.append(h('h2', { class: 'h2' }, `${H.stName(from)} → ${H.stName(to)}`, h('small', null, `${dIn.value}　${tIn.value} 以後${vSel.value ? `　經由 ${H.stName(vSel.value)}` : ''}${useHS.checked ? '　可利用高速鐵路' : ''}`)));
+      // 1.1.0：票價改成每個候選行程各自算（可能含高速鐵路，票價公式不同，不能共用一個 from→to 的一般票價）
+      let list = H.searchEx(from, to, t0, 10, { via: vSel.value || null, allowHighSpeed: useHS.checked }).map(j => ({ j, legs: j.legs.map(l => legInfo(l, dIn.value)), tf: H.ticketFaresFor(j.legs) }));
+      if (!list.length) { out.append(h('p', { class: 'lead' }, '查不到兩站之間的路徑。')); return; }
+      list = list.filter(x => x.tf && x.j.dep < DAY + t0 && x.legs.some(l => l.ri));
+      if (!list.length) { out.append(h('p', { class: 'lead' }, '這個時間之後沒有含特急／特快／高速鐵路（可預約）的行程。可改用「時刻表與班次」查詢一般班次。'), h('p', null, h('a', { class: 'btn ghost', href: `timetable.html?tab=route&from=${from}&to=${to}&t=${tIn.value}` }, '查詢所有班次（含轉乘）'))); return; }
       const ul = h('ul', { class: 'bk-list' });
-      list.forEach(c => ul.append(h('li', null, h('button', { type: 'button', class: 'bk-trip', style: 'display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px', onclick: () => pick(c, tf) },
+      list.forEach(c => ul.append(h('li', null, h('button', { type: 'button', class: 'bk-trip', style: 'display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px', onclick: () => pick(c, c.tf) },
         h('span', { class: 'tm' }, `${HK.hm(c.j.dep)} → ${HK.hm(c.j.arr)}`),
         h('span', { style: 'display:inline-flex;gap:4px;flex-wrap:wrap' }, ...c.legs.map(l => HK.typeTag(l.leg.sv))),
         h('span', { class: 'nm', style: 'flex:1 1 220px' }, c.legs.map(l => l.leg.sv.routeName + (l.leg.gou ? ' ' + l.leg.gou : '')).join(' ＋ ')),
         h('span', { class: 'cars' }, c.legs.length > 1 ? `轉乘 ${c.legs.length - 1} 次` : '直達'),
-        h('span', { class: 'yen' }, yen(tf.adult) + '〜')))));
+        h('span', { class: 'yen' }, yen(c.tf.adult) + '〜')))));
       out.append(ul, h('p', { class: 'note' }, '價格為大人 1 位的乘車券；指定席／立席費用在下一步依各段選擇加算。'));
       out.append(h('div', { id: 'bk-seat' }));
     }
 
     function pick(c, tf) {
       const P = pax();
-      const S = state.sel = { c, tf, P, legs: c.legs.map(l => ({ mode: !l.ri ? 'none' : (l.free >= P.n ? 'seat' : (l.ri.mode === 'all' ? 'stand' : 'free')), seats: [], car: 0 })) };
+      // 1.1.0：高速鐵路沒有立席特急券可以當空位不足時的備案，沒位置也只能停在「指定席」（之後畫面會顯示空席不足）。
+      const S = state.sel = { c, tf, P, legs: c.legs.map(l => ({ mode: !l.ri ? 'none' : (l.free >= P.n ? 'seat' : (l.ri.noStanding ? 'seat' : l.ri.mode === 'all' ? 'stand' : 'free')), seats: [], car: 0 })) };
       draw();
       document.getElementById('bk-seat').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -137,8 +141,9 @@
         const opts = [];
         const seatDisabled = l.free < P.n;
         opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'seat' ? '' : 'ghost'), disabled: seatDisabled, onclick: choose('seat') }, `指定席 ${yen(l.ri.fee)}／位${seatDisabled ? '（空席不足）' : ''}`));
-        if (l.ri.mode === 'all') opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'stand' ? '' : 'ghost'), onclick: choose('stand') }, `立席特急券 ${yen(l.ri.standFee)}／位（座位なし）`));
-        else opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'free' ? '' : 'ghost'), onclick: choose('free') }, `自由席 ${yen(0)}（${l.ri.reservedCars + 1}号車以後・座位なし）`));
+        // 1.1.0：高速鐵路沒有立席特急券（noStanding）——只有指定席這一個選項，不能像特急那樣買站票逃過空位不足。
+        if (l.ri.mode === 'all' && !l.ri.noStanding) opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'stand' ? '' : 'ghost'), onclick: choose('stand') }, `立席特急券 ${yen(l.ri.standFee)}／位（座位なし）`));
+        else if (l.ri.mode === 'part') opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'free' ? '' : 'ghost'), onclick: choose('free') }, `自由席 ${yen(0)}（${l.ri.reservedCars + 1}号車以後・座位なし）`));
         blk.append(h('div', { style: 'display:flex;flex-wrap:wrap;gap:8px;margin:8px 0' }, ...opts));
         if (st.mode === 'stand') blk.append(h('p', { class: 'note' }, '立席特急券は座位が保証されません。座位の指定はできません。'));
         if (st.mode === 'free') blk.append(h('p', { class: 'note' }, `自由席は座位が保証されません。座位の指定はできません。（${l.ri.reservedCars + 1}～${l.ri.cars}号車）`));

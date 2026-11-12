@@ -15,10 +15,18 @@
     // 指定席政策（0.21.0）：特急＝全車指定席（另有立席特急券）；特快＝1・2 号車指定席、3 号車以後自由席。1 号車＝進行方向最前端。
     reserved: [{ re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }],
     standRatio: 0.5,               // 立席特急券＝指定席費用的比例
+    // 1.1.0：高速鐵路（routeType＝HIGH_SPEED）獨立票價制度，不套用一般的分區運費與 CFG.reserved：
+    // 票價＝hsFareStep × 跨越的收費區數（沿用一般鐵路同一套分區；至少算跨 1 區）；全車指定席、沒有立席特急券，
+    // 指定席特急券固定 hsSeatFee（不打折）；8 輛編組，1・8 号車（車頭／車尾）各只有 hsEdgeCarSeats 席，其餘每節 seatsPerCar 席。
+    hsFareStep: 800, hsSeatFee: 800, hsCars: 8, hsEdgeCarSeats: 8,
+    hsColor: '#136880',            // 1.1.0：高速鉄道在票價查詢・車站時刻表・乘車轉乘查詢三個頁面的識別色
+    hsExt: null,                   // 1.1.0：地圖外的假想延伸設定（見 site-config.js 的 hsExt；這裡預設沒有）
     childRatio: 0.5, seniorRatio: 0.5,   // 乘車券折扣：12 歲以下、60 歲以上（指定席費用不打折）
     maxTransfers: 2, maxWaitSec: 1800,   // 轉乘搜尋：最多轉乘次數、單次轉乘等待上限
     // 可步行轉乘的車站（粗估 250–350 m）。a／b 為車站中文名稱的開頭；sec＝步行加緩衝所需時間
-    walkLinks: [{ a: '中央戸宮', b: '大學前', sec: 360 }],
+    // 1.1.0：幸村／新光瀨＝万瀨高速鐵路線的站外轉乘（前輩指定的案例）。sec 先沿用既有案例的 360 秒，
+    // 實際步行距離若不同，請改這個數字（這組連線同時用在查詢規劃路線，也用在路線圖判斷「轉乘站」畫法）。
+    walkLinks: [{ a: '中央戸宮', b: '大學前', sec: 360 }, { a: '幸村', b: '新光瀨', sec: 360 }],
     minTransferSec: 120,           // 轉乘最短時間（快照有值時以快照為準）
     zoneOverride: {},              // { "車站中文名": 分區編號 }：遊戲內沒設分區時，可在這裡補
     typeMarks: {},                 // 時刻表格子裡的種別略稱；沒寫的種別用種別名稱的第一個字。例：{ '環状快速': '環' }
@@ -207,7 +215,13 @@
       if (!route || !member || route.status === 'maintenance') return;
       const nm = parseRouteName(route.displayZh);
       const col = hexColor(member.color != null ? member.color : route.color);
-      svcs.push({ idx, stops: s.stops.filter(x => !x.op),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col) });
+      // 1.1.0：高速鐵路＝routeType 是 HIGH_SPEED「而且」名稱裡有「高速鉄道」兩個條件都要成立，才算萬瀨高速鉄道線。
+      // 這是前輩明確要求的雙重判斷：現有特急あおさぎ／特急LINER以前誤設過 routeType=HIGH_SPEED（前輩已改回 NORMAL），
+      // 名稱比對是多一層安全網，萬一哪天又被誤設成 HIGH_SPEED，只要名稱裡沒有「高速鉄道」就不會被誤判。
+      const isHS = route.rtype === 'HIGH_SPEED' && /高速鉄道/.test(route.zh || route.displayZh || '');
+      // 1.1.0：高速鉄道的 tcls 固定給 'hs'（不是一般的 ltd／exp／loc），這樣共用的 .ttag／.mk 樣式才會套到專屬的識別色，
+      // 不會被誤判成各停（loc）而顯示成灰框。
+      svcs.push({ idx, stops: s.stops.filter(x => !x.op),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
     });
     H.svcs = svcs;
 
@@ -318,6 +332,8 @@
           let sk = skipTrip.get(c.trip); if (sk === undefined) skipTrip.set(c.trip, sk = svMustReserve(trips[c.trip].sv));
           if (sk) continue;
         }
+        // 1.1.0：高速鐵路預設不納入查詢結果，要玩家勾選「使用高速鐵路」（opt.allowHighSpeed）才會出現在轉乘搜尋裡。
+        if (!(opt && opt.allowHighSpeed) && trips[c.trip].sv.isHS) continue;
         let b = boarded.get(c.trip);
         if (!b && ready[c.from] <= c.dep && (ready[c.from] === t0 && readySrc[c.from] === o || c.dep - ready[c.from] <= CFG.maxWaitSec + minTransfer || c.from === o)) {
           b = { k, src: readySrc[c.from] }; boarded.set(c.trip, b);
@@ -383,11 +399,13 @@
     H.search = function (fromId, toId, t0, count) { return H.searchEx(fromId, toId, t0, count, {}); };
 
     /* ── 實體鄰接圖（用在票價與路線圖） ──
-     * 各停站的班次連出「相鄰站」；快速、特急跳站的連線如果被別的班次拆成經過中間站的路徑，就視為重複，丟掉。 */
+     * 各停站的班次連出「相鄰站」；快速、特急跳站的連線如果被別的班次拆成經過中間站的路徑，就視為重複，丟掉。
+     * 1.1.0：高速鐵路（isHS）不納入這張圖——這張圖同時餵給路線圖拓樸（hk-map.js）跟一般票價的分區路徑搜尋，
+     * 高速鐵路不該影響拓樸比例、也不該被一般分區票價的路徑搜尋誤用，它有自己獨立的票價公式（見 H.hsFare）。 */
     const pairKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
     const edges = new Map();     // key → { a, b, svcs:Set(idx), n }
     const seqs = [];
-    svcs.forEach(sv => {
+    svcs.filter(sv => !sv.isHS).forEach(sv => {
       const seq = sv.stops.filter(s => s.pax !== false).map(s => s.station);
       seqs.push({ sv, seq });
       for (let i = 0; i < seq.length - 1; i++) {
@@ -423,6 +441,66 @@
     });
     H.adj = new Map(); stations.forEach(s => H.adj.set(s.id, []));
     H.edges.forEach(e => { H.adj.get(e.a).push({ to: e.b, len: e.len }); H.adj.get(e.b).push({ to: e.a, len: e.len }); });
+
+    /* 1.1.0：高速鐵路——不進 H.edges／H.adj（不影響拓樸比例與一般票價路徑搜尋），
+     * 但路線圖要另外用虛線畫出來，並且標出「轉乘站」：高速鐵路有停、而且一般路網也有服務的車站
+     * （同一站本身有一般路線停靠，或透過 walkLinks 站外轉乘到一個有一般路線停靠的車站）。 */
+    const hsPairs = new Map(); // key → {a,b}
+    svcs.filter(sv => sv.isHS).forEach(sv => {
+      const seq = sv.stops.filter(s => s.pax !== false).map(s => s.station);
+      for (let i = 0; i < seq.length - 1; i++) { if (seq[i] === seq[i + 1]) continue; const k = pairKey(seq[i], seq[i + 1]); if (!hsPairs.has(k)) hsPairs.set(k, { a: seq[i], b: seq[i + 1] }); }
+    });
+    H.hsEdges = [...hsPairs.values()].map(e => { const a = H.stById[e.a], b = H.stById[e.b]; return a && b ? { a: e.a, b: e.b, len: Math.hypot(a.x - b.x, a.z - b.z) } : null; }).filter(Boolean);
+    const hsStationIds = new Set(); svcs.filter(sv => sv.isHS).forEach(sv => sv.stops.forEach(s => { if (s.pax !== false) hsStationIds.add(s.station); }));
+    const normalStationIds = new Set(); svcs.filter(sv => !sv.isHS).forEach(sv => sv.stops.forEach(s => { if (s.pax !== false) normalStationIds.add(s.station); }));
+    H.hsTransferIds = new Set();
+    hsStationIds.forEach(id => {
+      if (normalStationIds.has(id)) { H.hsTransferIds.add(id); return; }
+      for (const w of H.walkLinks) { if (w.a === id && normalStationIds.has(w.b)) { H.hsTransferIds.add(id); H.hsTransferIds.add(w.b); } if (w.b === id && normalStationIds.has(w.a)) { H.hsTransferIds.add(id); H.hsTransferIds.add(w.a); } }
+    });
+    /* 站外轉乘（幸村↔新光瀨這類）額外加一條虛線，讓路線圖看得出兩站是連在一起的 */
+    H.walkLinks.forEach(w => { if (H.hsTransferIds.has(w.a) && H.hsTransferIds.has(w.b) && hsStationIds.has(w.a) !== hsStationIds.has(w.b)) { const a = H.stById[w.a], b = H.stById[w.b]; if (a && b) H.hsEdges.push({ a: w.a, b: w.b, len: Math.hypot(a.x - b.x, a.z - b.z), walk: true }); } });
+
+    /* 1.1.0：万瀨高速鉄道線「地圖外」的假想延伸（CFG.hsExt，見 site-config.js）——東平倉之後還沒建進地圖的
+     * 花宮天照／豐守／新岩沢，純粹是「設定」：不是遊戲內真正存在的站，不會進地圖、不會進拓樸、也完全不影響
+     * 真正車次的判斷與運作；只用在高速鉄道自己的票價／路線查詢欄位，讓玩家可以先查到之後會通到的站、方面與票價。 */
+    H.hsExtStops = []; H.hsQueryStations = [];
+    (function () {
+      const ext = CFG.hsExt; if (!ext || !ext.stops || !ext.stops.length) return;
+      (ext.real || []).forEach(zh => { const st = stations.find(s => s.zh === zh); if (st) H.hsQueryStations.push({ id: st.id, zh, real: true }); });
+      let prevZh = ext.afterZh;
+      ext.stops.forEach(e => {
+        const entry = { id: 'hsext:' + e.zh, zh: e.zh, real: false, km: e.km || 0, min: e.min || 0, zoneBoundary: !!e.zoneBoundary, prevZh };
+        H.hsExtStops.push(entry); H.hsQueryStations.push(entry); prevZh = e.zh;
+      });
+    })();
+    /** 高速鉄道獨立查詢欄位用：兩個站名（地圖內的真實站、或地圖外的假想延伸站皆可）之間的票價。
+     *  不經過一般票價的拓樸搜尋（高速鉄道不在 H.adj 裡），而是沿著 H.hsQueryStations 這個固定順序直接算：
+     *  真實站之間沿用「有沒有共同收費區」的分區定義；碰到假想延伸站的那一段，收費區跨越與否照 CFG.hsExt
+     *  裡每一站自己的 zoneBoundary 設定（前輩指定：東平倉—豐守一區、豐守—新岩沢另一區，花宮天照與東平倉同區）。 */
+    H.hsFareExt = function (aZh, bZh) {
+      const list = H.hsQueryStations; if (!list.length) return null;
+      const ia = list.findIndex(s => s.zh === aZh), ib = list.findIndex(s => s.zh === bZh);
+      if (ia < 0 || ib < 0 || ia === ib) return null;
+      const lo = Math.min(ia, ib), hi = Math.max(ia, ib);
+      let crossed = 0, km = 0, cur = list[lo].real ? H.zoneSet(list[lo].id).slice() : [];
+      for (let i = lo + 1; i <= hi; i++) {
+        const prev = list[i - 1], node = list[i];
+        if (prev.real && node.real) {
+          const A = H.stById[prev.id], B = H.stById[node.id];
+          if (A && B) km += Math.hypot(A.x - B.x, A.z - B.z) / 1000;
+          const zt = H.zoneSet(node.id);
+          if (zt.length) { if (!cur.length) cur = zt.slice(); else { const inter = cur.filter(z => zt.includes(z)); if (inter.length) cur = inter; else { crossed++; cur = zt.slice(); } } }
+        } else {
+          km += node.km || 0;
+          if (node.zoneBoundary) crossed++;
+          cur = [];
+        }
+      }
+      crossed = Math.max(1, crossed);
+      const base = CFG.hsFareStep * crossed;
+      return { yen: base, base: 0, step: CFG.hsFareStep, crossed, zones: crossed, zoneFee: base, seat: CFG.hsSeatFee, total: base + CFG.hsSeatFee, path: list.slice(lo, hi + 1).map(s => s.zh), km, isHS: true, noStanding: true, ext: true };
+    };
 
     /** 最短（直線距離總和）路徑；回傳車站 id 陣列。 */
     H.shortestPath = function (fromId, toId) {
@@ -494,15 +572,66 @@
       const total = base + zoneFee + seat;
       return { yen: base + zoneFee, base, step: CFG.fareStep, crossed: r.crossed, zones: r.crossed, zoneFee, seat, total, path: r.path, bounds: r.bounds, km: r.km };
     };
+    /** 1.1.0：高速鐵路的乘車券票價——不走一般鐵路的分區路徑搜尋（高速鐵路已經不在 H.adj 裡），
+     *  而是沿著這一段「實際搭乘」的停靠站序列（stops，來自已經決定好的班次／行程），用同一套「有沒有共同收費區」
+     *  的分區定義去算跨越次數，乘上 hsFareStep。至少算跨 1 個區間（沒有免費搭一小段高速鐵路的情況）。
+     *  沒有立席特急券：指定席特急券固定收 hsSeatFee，不因距離而變、不打折。 */
+    H.hsFare = function (stops) {
+      if (!stops || stops.length < 2) return null;
+      let crossed = 0, cur = H.zoneSet(stops[0].station).slice(), km = 0;
+      const bounds = [];
+      for (let i = 1; i < stops.length; i++) {
+        const A = H.stById[stops[i - 1].station], Bq = H.stById[stops[i].station];
+        if (A && Bq) km += Math.hypot(A.x - Bq.x, A.z - Bq.z);
+        const zt = H.zoneSet(stops[i].station); if (!zt.length) continue;
+        if (!cur.length) { cur = zt.slice(); continue; }
+        const inter = cur.filter(z => zt.includes(z));
+        if (inter.length) cur = inter; else { bounds.push({ from: stops[i - 1].station, to: stops[i].station, fromZone: cur.slice(), toZone: zt.slice() }); cur = zt.slice(); crossed++; }
+      }
+      crossed = Math.max(1, crossed);
+      const base = CFG.hsFareStep * crossed;
+      return { yen: base, base: 0, step: CFG.hsFareStep, crossed, zones: crossed, zoneFee: base, seat: CFG.hsSeatFee, total: base + CFG.hsSeatFee, path: stops.map(s => s.station), bounds, km: km / 1000, isHS: true, noStanding: true };
+    };
+    /** 1.1.0：一段行程（searchEx 回傳的 legs）的乘車券票價——按「一般鐵路／高速鐵路」分段，
+     *  每一段各自用自己的票價公式算一次「整段的直達票價」再加總；純一般鐵路的行程（沒有任何 isHS 的 leg）
+     *  結果與原來的 H.fare(from,to) 完全一樣（因為只會有一段，起訖點相同），不影響既有的查詢／訂票流程。
+     *  回傳形狀盡量貼近 H.fare：{yen,crossed,path,bounds,km,runs}。 */
+    H.journeyFare = function (legs) {
+      if (!legs || !legs.length) return null;
+      const runs = []; let cur = null;
+      legs.forEach(leg => {
+        const isHS = !!leg.sv.isHS;
+        if (!cur || cur.isHS !== isHS) { cur = { isHS, stops: [] }; runs.push(cur); }
+        const add = leg.stops.slice(cur.stops.length ? 1 : 0);   // 避免轉乘站重複計入
+        cur.stops.push(...add);
+      });
+      let yenSum = 0, crossedSum = 0, kmSum = 0; const path = [], bounds = [];
+      for (const r of runs) {
+        const f = r.isHS ? H.hsFare(r.stops) : H.fare(r.stops[0].station, r.stops[r.stops.length - 1].station);
+        if (!f) return null;
+        yenSum += f.yen; crossedSum += f.crossed; kmSum += f.km;
+        (f.path || []).forEach(id => { if (path[path.length - 1] !== id) path.push(id); });
+        bounds.push(...(f.bounds || []));
+        r.fare = f;
+      }
+      return { yen: yenSum, crossed: crossedSum, zones: crossedSum, path, bounds, km: kmSum, runs, isMixed: runs.length > 1 };
+    };
     /** 指定席資訊；沒有指定席的種別回傳 null。
-     *  mode 'all'＝全車指定席（可買立席特急券，費用為指定席的一半）；mode 'part'＝前 reservedCars 節指定席、其餘自由席（不收指定席費）。 */
+     *  mode 'all'＝全車指定席（可買立席特急券，費用為指定席的一半）；mode 'part'＝前 reservedCars 節指定席、其餘自由席（不收指定席費）。
+     *  1.1.0：高速鐵路（isHS）是獨立的全車指定席制度——沒有立席特急券（noStanding），指定席特急券固定 hsSeatFee（不打折），
+     *  8 輛編組中 1・8 号車（車頭／車尾）各只有 hsEdgeCarSeats 席、其餘每節 seatsPerCar 席，不套用 CFG.reserved 的名稱比對。 */
     H.reserveInfo = function (sv) {
       if (sv._ri !== undefined) return sv._ri;
       let out = null;
-      for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) {
-        const rc = r.mode === 'part' ? r.reservedCars : r.cars;
-        out = { mode: r.mode || 'all', cars: r.cars, reservedCars: rc, seats: rc * CFG.seatsPerCar, fee: CFG.seatFee, standFee: r.mode === 'part' ? 0 : Math.round(CFG.seatFee * CFG.standRatio), perCar: CFG.seatsPerCar };
-        break;
+      if (sv.isHS) {
+        const cars = CFG.hsCars, edge = CFG.hsEdgeCarSeats;
+        out = { mode: 'all', cars, reservedCars: cars, seats: CFG.seatsPerCar * (cars - 2) + edge * 2, fee: CFG.hsSeatFee, standFee: 0, noStanding: true, perCar: CFG.seatsPerCar, edgeCarSeats: edge };
+      } else {
+        for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) {
+          const rc = r.mode === 'part' ? r.reservedCars : r.cars;
+          out = { mode: r.mode || 'all', cars: r.cars, reservedCars: rc, seats: rc * CFG.seatsPerCar, fee: CFG.seatFee, standFee: r.mode === 'part' ? 0 : Math.round(CFG.seatFee * CFG.standRatio), perCar: CFG.seatsPerCar };
+          break;
+        }
       }
       return (sv._ri = out);
     };
@@ -517,6 +646,12 @@
     };
     H.ticketFares = function (fromId, toId) {
       const r = H.fare(fromId, toId); if (!r) return null;
+      return { adult: r.yen, child: Math.round(r.yen * CFG.childRatio), senior: Math.round(r.yen * CFG.seniorRatio), detail: r };
+    };
+    /** 1.1.0：依「實際搭乘的行程」（legs）算乘車券票價——可能含高速鐵路，所以不能只看起訖站。
+     *  兒童／優待折扣照樣套用在合計金額上（高速鐵路的分區費用也打折；指定席特急券不管一般或高速鐵路都不打折，另外算）。 */
+    H.ticketFaresFor = function (legs) {
+      const r = H.journeyFare(legs); if (!r) return null;
       return { adult: r.yen, child: Math.round(r.yen * CFG.childRatio), senior: Math.round(r.yen * CFG.seniorRatio), detail: r };
     };
     H.zonesConfigured = stations.some(s => s.zones.length);

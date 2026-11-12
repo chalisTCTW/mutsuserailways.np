@@ -58,6 +58,21 @@ MORE={
 "• 狀態每 ${n} 秒自動更新；ATOS 每分鐘回報一次，超過 ${m} 分鐘沒有回報就視為未上線。":["• 状態は {0} 秒ごとに自動更新します。ATOSは毎分報告し、{1} 分間報告がなければオフラインとみなします。","• Status refreshes automatically every {0} s. ATOS reports every minute; if no report arrives for {1} min it is treated as offline."],
 "日本語":["日本語","日本語"],
 "中文":["中文","中文"],
+# 1.1.0：万瀨高速鉄道線——票價查詢・車站時刻表・乘車轉乘查詢三個頁面新增的「高速鉄道」欄位與獨立票價查詢。
+"高速鉄道":["高速鉄道","High-Speed Rail"],
+"高速":["高速","High-speed"],
+"只顯示高速鉄道的班次":["高速鉄道の列車のみ表示","Show high-speed rail trains only"],
+"這個車站目前沒有高速鉄道的班次。":["この駅には現在、高速鉄道の列車はありません。","There are currently no high-speed rail trains at this station."],
+"可以利用高速鐵路":["高速鉄道を利用する","Allow high-speed rail"],
+"出發站（高速鉄道）":["出発駅（高速鉄道）","Origin station (high-speed rail)"],
+"抵達站（高速鉄道）":["到着駅（高速鉄道）","Destination station (high-speed rail)"],
+"計算高速鉄道票價":["高速鉄道の運賃を計算","Calculate high-speed rail fare"],
+"這兩站之間查不到高速鉄道的票價。":["この2駅間の高速鉄道の運賃は見つかりません。","No high-speed rail fare could be found between these two stations."],
+"跨越分區 ${a}　約 ${b} km":["またぐ区 {0}　約{1}km","Zones crossed {0}　about {1} km"],
+"※ 經過地圖外尚未建成的假想路段，僅供試算未來票價參考。":["※ 地図外の未開業区間を含みます。将来の運賃の参考値です。","※ Includes a section beyond the map that is not yet built; for future-fare reference only."],
+"万瀨高速鉄道線　獨立票價查詢":["万瀨高速鉄道線　単独運賃検索","Mutsuse High-Speed Rail — Separate Fare Lookup"],
+"万瀨高速鉄道線的票價不套用一般鐵路的分區運費制度：每跨越一個收費區加 ${a}，指定席特急券固定 ${b}（不打折、沒有立席特急券）。站名含目前尚在地圖外、還沒建成的延伸路段，可以先試算之後的票價。":["万瀨高速鉄道線の運賃は一般の鉄道の分区制とは異なります：収費区を1つ越えるごとに {0} 加算、指定席特急券は {1} 固定（割引なし、立席特急券もありません）。駅名には地図外のまだ建設されていない延伸区間も含み、将来の運賃を先に試算できます。","Mutsuse High-Speed Rail fares don't follow the ordinary zone-fare system: {0} is added for each fare zone crossed, and the reserved-seat express fee is a flat {1} (no discount, no standing-ticket option). The station list includes the not-yet-built extension beyond the current map, so you can preview future fares."],
+"指定席特急券（全車指定席，沒有立席特急券）":["指定席特急券（全車両指定席、立席特急券なし）","Reserved-seat express fee (all cars reserved, no standing-ticket option)"],
 }
 for k,v in MORE.items(): out[norm(k)]=v
 for k in list(out):

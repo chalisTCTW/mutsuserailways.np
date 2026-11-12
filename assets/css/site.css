@@ -130,6 +130,15 @@ dl.news .row:target { background: var(--g3); }
 .mapbox .rmap { width: 100%; height: auto; display: block; max-height: 78vh; }
 .rmap .e-casing { fill: none; stroke: #fff; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
 .rmap .e-line { fill: none; stroke: var(--g1); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+/* 1.1.0：高速鐵路不計入拓樸，只用虛線連接轉乘站（含幸村↔新光瀨這類站外轉乘） */
+.rmap .hs-line { fill: none; stroke: #8a8f98; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 6; }
+.rmap .hs-line.hs-walk { stroke: #b0b5bd; stroke-dasharray: 1 5; }
+
+/* 1.1.0：票價查詢・車站時刻表・乘車轉乘查詢三頁共用的「高速鉄道」獨立欄位外框。 */
+.hs-field { border: 1.5px solid #136880; border-radius: 6px; padding: 10px 14px; margin: 12px 0; background: rgba(19, 104, 128, .06); }
+.hs-field .hs-tag { display: inline-block; background: #136880; color: #fff; padding: 1px 9px; border-radius: 3px; font-size: 12px; font-weight: 700; margin-right: 8px; vertical-align: 1px; }
+.hs-field label.f span { color: #136880; }
+.hs-field .btn { background: #136880; border-color: #136880; }
 .rmap .st-dot { fill: #fff; stroke: var(--g0); stroke-width: 3; }
 .rmap .xfer .st-ring { fill: #fff; stroke: var(--g0); stroke-width: 3; }
 .rmap .xfer .st-dot { fill: var(--g0); stroke: none; }
@@ -162,6 +171,8 @@ dl.news .row:target { background: var(--g3); }
 .t-ltd { background: var(--g1); color: #fff; }
 .t-exp { background: #fff; color: var(--g1); border-width: 2px; line-height: 18px; }
 .t-loc { background: #fff; color: var(--muted); border-color: #8b9792; }
+/* 1.1.0：高速鉄道專屬識別色（也用在票價查詢・車站時刻表・乘車轉乘查詢三頁的高速鉄道欄位） */
+.t-hs { background: #136880; color: #fff; border-color: #136880; }
 
 /* ── 車站時刻表 ── */
 .dirs { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 12px; }
@@ -176,6 +187,7 @@ dl.news .row:target { background: var(--g3); }
 .mk, .ttable .dep .mk { display: inline-block; font-size: 11px; font-weight: 700; width: 16px; height: 16px; line-height: 14px; text-align: center; margin-right: 3px; vertical-align: 2px; border: 1px solid var(--g1); }
 .mk.ltd, .ttable .dep .mk.ltd { background: var(--g1); color: #fff; }
 .mk.exp, .ttable .dep .mk.exp { background: #fff; color: var(--g1); border-width: 2px; line-height: 12px; }
+.mk.hs, .ttable .dep .mk.hs { background: #136880; color: #fff; border-color: #136880; }
 .ttable .dep sup { font-size: 11px; color: var(--muted); margin-left: 1px; }
 .ttable tr.now th.h, .ttable tr.now td { background: #fff7d1; }
 .tlegend { margin: 12px 0 0; padding: 10px 14px; border: 1px solid var(--line); background: var(--g4); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 20px; }

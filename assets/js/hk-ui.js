@@ -77,8 +77,14 @@
     opts = opts || {};
     const W = L.width, HT = L.height, FS = opts.fontSize || 13;
     const svg = s('svg', { viewBox: `0 0 ${W} ${HT}`, class: 'rmap', role: 'img', 'aria-label': '光瀨都市鉄道 路線圖', preserveAspectRatio: 'xMidYMid meet' });
-    const gEdge = s('g', { class: 'edges' }), gSt = s('g', { class: 'stations' }), gLab = s('g', { class: 'labels' }), gTr = s('g', { class: 'trains' });
-    svg.append(gEdge, gSt, gLab, gTr);
+    const gEdge = s('g', { class: 'edges' }), gHs = s('g', { class: 'hs-edges' }), gSt = s('g', { class: 'stations' }), gLab = s('g', { class: 'labels' }), gTr = s('g', { class: 'trains' });
+    svg.append(gEdge, gHs, gSt, gLab, gTr);
+
+    // 1.1.0：高速鐵路不計入拓樸（H.edges 已經排除），只在轉乘站之間疊一層虛線（含站外轉乘，例如幸村↔新光瀨）
+    (H.hsEdges || []).forEach(e => {
+      const a = L.pos.get(e.a), b = L.pos.get(e.b); if (!a || !b) return;
+      gHs.append(s('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: 'hs-line' + (e.walk ? ' hs-walk' : '') }));
+    });
 
     // 連結：每站經過的路線數（轉乘站畫大圓）
     const linesAt = new Map(); H.stations.forEach(st => linesAt.set(st.id, new Set()));
@@ -193,10 +199,15 @@
     return ctl;
   }
 
-  /** 種別標籤（白綠配色：特急類＝綠底白字、急行／快速類＝綠框、各停＝灰框）。 */
-  function typeTag(sv) { const st = sv.color ? `background:${sv.color};border-color:${sv.color};color:${sv.ink}` : null; return sv.type ? h('span', { class: 'ttag t-' + sv.tcls, style: st }, sv.type) : h('span', { class: 'ttag t-loc', style: st }, '各停'); }
-  /** 以最簡短的字呈現種別（時刻表格子用）。 */
-  function typeMark(sv) { return root.HK.typeMarkOf(sv.type); }
+  /** 種別標籤（白綠配色：特急類＝綠底白字、急行／快速類＝綠框、各停＝灰框）。
+   *  1.1.0：高速鉄道（isHS）固定用票價查詢・車站時刻表・乘車轉乘查詢三頁共用的識別色（CFG.hsColor），
+   *  不套用一般種別的配色與路線色，讓高速鉄道的班次在時刻表、路線資訊等各處都一眼就認得出來。 */
+  function typeTag(sv) {
+    if (sv.isHS) { const c = (HK.CFG && HK.CFG.hsColor) || '#136880'; return h('span', { class: 'ttag t-hs', style: `background:${c};border-color:${c};color:#fff` }, '高速'); }
+    const st = sv.color ? `background:${sv.color};border-color:${sv.color};color:${sv.ink}` : null; return sv.type ? h('span', { class: 'ttag t-' + sv.tcls, style: st }, sv.type) : h('span', { class: 'ttag t-loc', style: st }, '各停');
+  }
+  /** 以最簡短的字呈現種別（時刻表格子用）。高速鉄道固定用「高」。 */
+  function typeMark(sv) { if (sv.isHS) return '高'; return root.HK.typeMarkOf(sv.type); }
 
   const fmtDate = ms => { if (!ms) return ''; const d = new Date(Number(ms)); if (isNaN(d)) return ''; const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 

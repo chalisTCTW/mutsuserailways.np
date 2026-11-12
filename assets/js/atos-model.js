@@ -214,8 +214,10 @@
         directionList.push({ label, operating: dm.some(m => m.operating), members: dm.map(m => m.id) });
       }
       const operating = ms.some(m => m.operating);
+      // 1.1.0：路線種類（NORMAL／LIGHT_RAIL／HIGH_SPEED，來自 MTR 路線編輯器的「種類」選項）。
+      // mergeKey 已經把 rtype 列入合併條件，同一組 ms 的 rtype 必然相同，取第一個即可。
       routes.push({ key: 'r' + gi, zh, en, color: ms[0].color, status: operating ? 'operating' : 'maintenance', statusLabel: operating ? '' : '路線工務中',
-        notes: [...new Set(ms.flatMap(m => m.notes))].sort(), mergedFrom: ms.map(m => m.rawName), directions: directionList });
+        rtype: ms[0].rtype || 'NORMAL', notes: [...new Set(ms.flatMap(m => m.notes))].sort(), mergedFrom: ms.map(m => m.rawName), directions: directionList });
       gi++;
     }
     const zhCount = new Map();

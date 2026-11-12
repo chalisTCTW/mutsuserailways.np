@@ -54,14 +54,18 @@
       const via = r[3] ? tr(r[3]) : '';
       return lang === 'en' ? `${r[1]} ${r[2]} or later${via ? ' · via ' + via : ''}` : `${r[1]}　${r[2]} 以降${via ? '　経由 ' + via : ''}`;
     }
-    if ((r = /^(\d{1,2}:\d{2}) 之後的班次(?:　經由 (.+?))?(　不搭乘指定席列車)?$/.exec(t))) {
+    if ((r = /^(\d{1,2}:\d{2}) 之後的班次(?:　經由 (.+?))?(　不搭乘指定席列車)?(　可利用高速鐵路)?$/.exec(t))) {
       const via = r[2] ? tr(r[2]) : '', nr = r[3] ? (lang === 'en' ? 'avoiding reserved-seat trains' : '指定席列車を使わない') : '';
-      return lang === 'en' ? `Trains after ${r[1]}${via ? ' · via ' + via : ''}${nr ? ' · ' + nr : ''}` : `${r[1]} 以降の列車${via ? '　経由 ' + via : ''}${nr ? '　' + nr : ''}`;
+      // 1.1.0：可利用高速鐵路（r[4]）是前輩新增的查詢條件，照既有 via／nr 的拼接方式加進同一句。
+      const hsOk = r[4] ? (lang === 'en' ? 'high-speed rail allowed' : '高速鉄道を利用可') : '';
+      return lang === 'en' ? `Trains after ${r[1]}${via ? ' · via ' + via : ''}${nr ? ' · ' + nr : ''}${hsOk ? ' · ' + hsOk : ''}` : `${r[1]} 以降の列車${via ? '　経由 ' + via : ''}${nr ? '　' + nr : ''}${hsOk ? '　' + hsOk : ''}`;
     }
     if ((r = /^(\d+) 分　(.+)$/.exec(t)) && lookup(r[2]) != null) return lang === 'en' ? `${r[1]} min · ${tr(r[2])}` : `${r[1]} 分　${tr(r[2])}`;
     if ((r = /^(\d{1,2}:\d{2}) → (\d{1,2}:\d{2})（翌日）$/.exec(t))) return lang === 'en' ? `${r[1]} → ${r[2]} (next day)` : t;
     if ((r = /^(\d+) 両編成(?:・(.+))?$/.exec(t))) return lang === 'en' ? `${r[1]}-car train${r[2] ? ' · ' + tr(r[2]) : ''}` : null;
     if ((r = /^\+(¥[\d,]+)（合計 (¥[\d,]+)）$/.exec(t))) return lang === 'en' ? `+${r[1]} (total ${r[2]})` : null;
+    // 1.1.0：高速鉄道獨立票價查詢的兒童・優待折扣那一格（¥NNN（指定席特急券不打折））。
+    if ((r = /^(¥[\d,]+)（指定席特急券不打折）$/.exec(t))) return lang === 'en' ? `${r[1]} (reserved-seat express fee is not discounted)` : `${r[1]}（指定席特急券は割引なし）`;
     if ((r = /^空(\d+)(.*)$/.exec(t))) return lang === 'en' ? `Free ${r[1]}${r[2]}` : `空き ${r[1]}${r[2]}`;
     if ((r = /^(.+?)（約[\s　]*(\d+)[\s　]*分）$/.exec(t))) { const a = tr(r[1]); return lang === 'en' ? `${a} (about ${r[2]} min)` : `${a}（約${r[2]}分）`; }
     if (t.includes('、')) {   // 路線名・方向名・行先の「、」区切り一覧：要素ごとに訳す
