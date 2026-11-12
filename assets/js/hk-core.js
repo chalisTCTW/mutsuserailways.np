@@ -249,8 +249,13 @@
       return first === last ? (sv.member.dir || '環狀') : H.stName(last);
     };
 
-    /* ── 特急的「號」（1.0.3）：路線名稱含「特急」者，同一個完整路線名稱、同方向，依起點發車時刻排序；下行奇數、上行偶數；不同特急名稱各自從 1 號起算 ── */
-    const gouTable = new Map();   // 'svc.idx|一天內起點發車秒' → 例如「あおさぎ39号」
+    /* ── 特急的「號」（1.0.3）：路線名稱含「特急」者，同一個完整路線名稱、同方向，依起點發車時刻排序；下行奇數、上行偶數；不同特急名稱各自從 1 號起算
+     * 1.1.1：前輩確認「高速鉄道的列車都是特急」──萬瀨高速鉄道線的路線全名裡沒有「特急」字樣（只有 routeNumber／簡稱欄位是「特急とりさわ」），
+     * 所以除了原本看路線全名、member.rawName，現在也看 member.number（路線編號／簡稱欄位）有沒有含「特急」；
+     * 就算哪天連這個欄位都沒寫「特急」，isHS 為真也直接當特急看待，一律會編号。
+     * 取名規則：優先用 member.number 裡的簡稱（去掉「特急」，例如「とりさわ」），這樣才不會跟畫面上已經顯示的「万瀨高速鉄道線」路線全名重複；
+     * 沒有可用的簡稱才照舊退回用路線全名去掉「特急」。 ── */
+    const gouTable = new Map();   // 'svc.idx|一天內起點發車秒' → 例如「あおさぎ39号」／「とりさわ5号」
     (function () {
       const upOf = sv => {
         const f = sv.stops[0].station, l = sv.stops[sv.stops.length - 1].station;
@@ -261,14 +266,20 @@
       const groups = new Map();
       svcs.forEach(sv => {
         const full = String(sv.route.displayZh || '');
-        if (full.indexOf('特急') < 0 && String(sv.member.rawName || '').indexOf('特急') < 0) return;
+        const numStr = String(sv.member.number || '');
+        const isLtdGou = full.indexOf('特急') >= 0 || String(sv.member.rawName || '').indexOf('特急') >= 0 || numStr.indexOf('特急') >= 0 || sv.isHS;
+        if (!isLtdGou) return;
+        // member.number 常常只單純寫「特急」兩個字（沒有車次別名，例如一般特急あおさぎ也是這樣）；
+        // 只有在去掉「特急」之後還留下東西（例如高速鉄道的「特急とりさわ」→「とりさわ」）才當成可用的簡稱，否則維持用路線全名。
+        const numNick = numStr.replace(/特急/g, '').replace(/[\s　]+/g, '');
         const up = upOf(sv), k = full + '|' + (up ? 1 : 0);
-        let g = groups.get(k); if (!g) groups.set(k, g = { full, up, list: [] });
+        let g = groups.get(k); if (!g) groups.set(k, g = { full, up, list: [], nick: numNick ? numStr : '' });
         sv.depot.departures.forEach(D => g.list.push({ tod: ((Math.round(D + sv.stops[0].dep) % DAY) + DAY) % DAY, idx: sv.idx }));
       });
       groups.forEach(g => {
         g.list.sort((a, b) => a.tod - b.tod || a.idx - b.idx);
-        const nm = g.full.replace(/特急/g, '').replace(/[\s\u3000]+/g, '') || g.full.replace(/[\s\u3000]+/g, '');
+        const base = g.nick || g.full;
+        const nm = base.replace(/特急/g, '').replace(/[\s\u3000]+/g, '') || base.replace(/[\s\u3000]+/g, '');
         g.list.forEach((e, i) => { const key = e.idx + '|' + e.tod; if (!gouTable.has(key)) gouTable.set(key, nm + (g.up ? 2 * (i + 1) : 2 * (i + 1) - 1) + '号'); });
       });
     })();
@@ -474,6 +485,13 @@
         H.hsExtStops.push(entry); H.hsQueryStations.push(entry); prevZh = e.zh;
       });
     })();
+    /** 1.1.1：假想延伸段的「銜接站」——地圖內真正存在的那個車站（目前是東平倉），所有假想延伸站都是從這一站往地圖外接出去的。
+     *  訂票・乘車轉乘查詢要讓玩家選假想站當起訖站時，拿這一站當作實際連乘搜尋（H.searchEx）用的替身車站；
+     *  假想延伸沒設定好、或銜接站不在目前路網裡時回傳 null，UI 端要自己檢查。 */
+    H.hsExtAnchorSt = function () {
+      const ext = CFG.hsExt; if (!ext || !ext.afterZh) return null;
+      return stations.find(s => s.zh === ext.afterZh) || null;
+    };
     /** 高速鉄道獨立查詢欄位用：兩個站名（地圖內的真實站、或地圖外的假想延伸站皆可）之間的票價。
      *  不經過一般票價的拓樸搜尋（高速鉄道不在 H.adj 裡），而是沿著 H.hsQueryStations 這個固定順序直接算：
      *  真實站之間沿用「有沒有共同收費區」的分區定義；碰到假想延伸站的那一段，收費區跨越與否照 CFG.hsExt

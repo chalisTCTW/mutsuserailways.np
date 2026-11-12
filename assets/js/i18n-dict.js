@@ -1577,7 +1577,7 @@ window.HK_I18N_DICT = {
 "Ticket no."
 ],
 "本券為模擬發行，不會儲存。": [
-"この券は模擬発行で、保存されません。",
+"本券はシミュレーション発行で、保存されません。",
 "This ticket is a simulated issue and is not saved."
 ],
 "車票": [
@@ -3587,5 +3587,61 @@ window.HK_I18N_DICT = {
 "指定席特急券（全車指定席，沒有立席特急券）": [
 "指定席特急券（全車両指定席、立席特急券なし）",
 "Reserved-seat express fee (all cars reserved, no standing-ticket option)"
+],
+"可以利用高速鐵路（含假想延伸站）": [
+"高速鉄道を利用する（地図外の仮想延伸駅を含む）",
+"Allow high-speed rail (including virtual extension stations)"
+],
+"万瀨高速鉄道線的假想延伸尚未設定銜接的車站，無法查詢。": [
+"万瀨高速鉄道線の仮想延伸区間は接続駅が未設定のため、検索できません。",
+"The virtual extension of the Mutsuse High-Speed Rail Line has no connecting station set, so it can't be searched."
+],
+"万瀨高速鉄道線的假想延伸尚未設定銜接的車站，無法訂票。": [
+"万瀨高速鉄道線の仮想延伸区間は接続駅が未設定のため、予約できません。",
+"The virtual extension of the Mutsuse High-Speed Rail Line has no connecting station set, so it can't be booked."
+],
+"假想延伸路段票價試算（地圖外尚未建成，沒有實際班次）": [
+"仮想延伸区間の運賃試算（地図外・未開業、実際の列車はありません）",
+"Virtual extension fare estimate (beyond the map, not yet built — no actual train service)"
+],
+"含地圖外假想延伸路段：${a} → ${b} 約 ${c} km，分區運費已併入上方票價；指定席特急券另計 ${d}（僅供試算參考，地圖外尚未建成，沒有實際班次）。": [
+"地図外の仮想延伸区間を含みます：{0} → {1}　約{2}km、分区運賃は上の運賃に含みます；指定席特急券は別途 {3}（参考値、地図外・未開業、実際の列車はありません）。",
+"Includes a virtual extension section beyond the map: {0} → {1}, about {2} km; the zone fare is already included above. The reserved-seat express fee is an extra {3} (for reference only — not yet built, no actual train service)."
+],
+"這段是地圖外尚未建成的假想延伸路段，沒有實際班次可以訂票，以下僅供票價試算參考。": [
+"この区間は地図外のまだ建設されていない仮想延伸区間です。実際の列車はなく予約できません。以下は運賃試算の参考値です。",
+"This is a virtual extension section beyond the map that is not yet built. There is no actual train service to book; the following is for fare-estimate reference only."
+],
+"已併入地圖外假想延伸路段（${a} → ${b}）的分區運費；該段的指定席特急券另計 ${c}／位（沒有實際車次，無法選位，僅供試算）。": [
+"　地図外の仮想延伸区間（{0} → {1}）の分区運賃を含みます；この区間の指定席特急券は別途 {2}／席（実際の列車はなく座席指定不可、参考値）。",
+"　Includes the zone fare for the virtual extension section ({0} → {1}) beyond the map; the reserved-seat express fee for that section is an extra {2}/seat (no actual train, no seat selection — for reference only)."
+],
+"万瀨高速鉄道線（假想延伸）": [
+"万瀨高速鉄道線（仮想延伸）",
+"Mutsuse High-Speed Rail Line (virtual extension)"
+],
+"地圖外尚未建成的假想延伸路段，沒有實際車次、無法選位；指定席特急券固定 ${a}／位（${b} × ${c} 位，不打折、沒有立席特急券）。": [
+"地図外のまだ建設されていない仮想延伸区間です。実際の列車はなく座席指定はできません；指定席特急券は {0}／席固定（{1} × {2}席、割引なし、立席特急券もありません）。",
+"A virtual extension section beyond the map that is not yet built. There is no actual train and no seat selection; the reserved-seat express fee is a flat {0}/seat ({1} × {2} seats, no discount, no standing-ticket option)."
+],
+"万瀨高速鉄道線（假想延伸 ${a}→${b}） 指定席特急券": [
+"万瀨高速鉄道線（仮想延伸 {0}→{1}）　指定席特急券",
+"Mutsuse High-Speed Rail (virtual extension {0}→{1}) reserved-seat express fee"
+],
+"万瀨高速鉄道線（假想延伸）指定席特急券 × ${a}": [
+"万瀨高速鉄道線（仮想延伸）指定席特急券 × {0}",
+"Mutsuse High-Speed Rail (virtual extension) reserved-seat express fee × {0}"
+],
+"万瀨高速鉄道線（假想延伸，地圖外尚未建成）": [
+"万瀨高速鉄道線（仮想延伸、地図外・未開業）",
+"Mutsuse High-Speed Rail (virtual extension, beyond the map, not yet built)"
+],
+"指定席特急券：${a} × ${b}（沒有實際車次，無法選位，僅供票價試算參考）": [
+"指定席特急券：{0} × {1}（実際の列車はなく座席指定不可、運賃試算の参考値）",
+"Reserved-seat express fee: {0} × {1} (no actual train, no seat selection — fare-estimate reference only)"
+],
+"含假想延伸段部分僅供試算，不代表真的可以搭乘。": [
+"　仮想延伸区間を含む部分は試算のみで、実際に乗車できることを意味しません。",
+"　The part covering the virtual extension is for estimate purposes only and does not mean the trip can actually be made."
 ]
 };

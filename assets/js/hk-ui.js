@@ -211,5 +211,20 @@
 
   const fmtDate = ms => { if (!ms) return ''; const d = new Date(Number(ms)); if (isNaN(d)) return ''; const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 
-  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, netKey, renderMap, typeTag, typeMark, fmtDate });
+  /** 1.1.1：起訖站選單裡的「假想延伸站」選項——只在勾選「可以利用高速鉄道」時才出現在選單最後的 optgroup，
+   *  取消勾選時移除；如果移除時原本選到的剛好是假想站，就把選值退回第一個（真實）選項，避免選單留著一個不存在的值。
+   *  乘車・轉乘查詢（site.js）與訂票（booking.js）共用這個函式。 */
+  function refreshHSExtOptions(H, sel, show) {
+    let grp = sel.querySelector('optgroup[data-hsext]');
+    if (show && H.hsExtStops && H.hsExtStops.length) {
+      if (!grp) { grp = h('optgroup', { label: '万瀨高速鉄道線　假想延伸（地圖外）', 'data-hsext': '1' }); sel.append(grp); }
+      grp.replaceChildren(...H.hsExtStops.map(st => h('option', { value: st.id }, st.zh)));
+    } else if (grp) {
+      const wasVirtual = String(sel.value).indexOf('hsext:') === 0;
+      grp.remove();
+      if (wasVirtual) sel.selectedIndex = 0;
+    }
+  }
+
+  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, netKey, renderMap, typeTag, typeMark, fmtDate, refreshHSExtOptions });
 })(window);

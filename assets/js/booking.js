@@ -42,8 +42,7 @@
     const opts = H.stations.map(st => h('option', { value: st.id }, st.zh));
     const fSel = h('select', { 'aria-label': '出發站' }, opts.map(o => o.cloneNode(true))), tSel = h('select', { 'aria-label': '抵達站' }, opts.map(o => o.cloneNode(true)));
     const vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...opts.map(o => o.cloneNode(true))]);
-    if (q.get('from') && H.stById[q.get('from')]) fSel.value = q.get('from');
-    tSel.selectedIndex = Math.min(1, H.stations.length - 1); if (q.get('to') && H.stById[q.get('to')]) tSel.value = q.get('to');
+    tSel.selectedIndex = Math.min(1, H.stations.length - 1);
     if (q.get('via') && H.stById[q.get('via')]) vSel.value = q.get('via');
     const today = new Date(), pad = n => String(n).padStart(2, '0');
     const dIn = h('input', { type: 'date', value: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}` });
@@ -51,11 +50,22 @@
     const num = (label, def) => h('select', { 'aria-label': label }, [0, 1, 2, 3, 4, 5, 6].map(n => h('option', { value: n, selected: n === def }, n + ' 位')));
     const nA = num('大人', 1), nC = num('兒童（12 歲以下）', 0), nS = num('優待（60 歲以上）', 0);
     const useHS = h('input', { type: 'checkbox', checked: q.get('hs') === '1' });
+    // 1.1.1：起訖站選單依 useHS 目前狀態加上假想延伸站——要先加好選項，再把 query string 的 from／to 設回去，
+    // 不然 from／to 剛好是假想站時，選單裡還沒有那個 <option>，設值會被默默忽略（跟乘車・轉乘查詢同一個道理）。
+    HK.refreshHSExtOptions(H, fSel, useHS.checked); HK.refreshHSExtOptions(H, tSel, useHS.checked);
+    const hsInit = useHS.checked;
+    const validSt = id => !!H.stById[id] || (hsInit && H.hsQueryStations.some(s => s.id === id && !s.real));
+    if (q.get('from') && validSt(q.get('from'))) fSel.value = q.get('from');
+    if (q.get('to') && validSt(q.get('to'))) tSel.value = q.get('to');
+    useHS.addEventListener('change', () => { HK.refreshHSExtOptions(H, fSel, useHS.checked); HK.refreshHSExtOptions(H, tSel, useHS.checked); });
     const field = (l, el) => h('label', { class: 'f' }, h('span', null, l), el);
+    const isV = v => String(v).indexOf('hsext:') === 0;
+    const vInfo = v => H.hsQueryStations.find(s => s.id === v);
+    const labelOf = v => isV(v) ? ((vInfo(v) || {}).zh || v) : H.stName(v);
     const form = h('form', { class: 'finder', onsubmit: e => { e.preventDefault(); search(); } },
       h('div', { class: 'bk-form' }, field('出發站', fSel), field('經由（可不選）', vSel), field('抵達站', tSel), field('乘車日', dIn), field('出發時刻', tIn),
         field('大人', nA), field('兒童（12 歲以下）', nC), field('優待（60 歲以上）', nS),
-        h('label', { class: 'f', style: 'flex-direction:row;display:flex;gap:6px;align-items:center' }, useHS, h('span', null, '可以利用高速鐵路')),
+        h('label', { class: 'f hs-field', style: 'flex-direction:row;display:flex;gap:6px;align-items:center;padding:6px 10px' }, useHS, h('span', null, h('span', { class: 'hs-tag' }, '高速鉄道'), '可以利用高速鐵路（含假想延伸站）')),
         h('button', { class: 'btn', type: 'submit' }, '查詢班次')));
     const out = h('div', { class: 'bk-out' });
     root.append(h('p', { class: 'lead' }, '特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席；高速鐵路為全車指定席（沒有立席特急券，票價另計）。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。'), h('div', { style: 'margin-top:12px' }, form), out);
@@ -83,28 +93,49 @@
       const from = fSel.value, to = tSel.value, P = pax();
       if (from === to) { out.append(h('p', { class: 'lead' }, '請選擇不同的出發站與抵達站。')); return; }
       if (P.n < 1 || P.n > 6) { out.append(h('p', { class: 'lead' }, '旅客人數請設定為 1～6 位。')); return; }
+      const fVirtual = isV(from), tVirtual = isV(to);
+      // 1.1.1：起訖站有一端是假想延伸站——先換成實際的銜接站（東平倉）去查真正的班次，假想那一段的票價另外合併進來。
+      const anchor = (fVirtual || tVirtual) ? H.hsExtAnchorSt() : null;
+      if ((fVirtual || tVirtual) && !anchor) { out.append(h('p', { class: 'lead' }, '万瀨高速鉄道線的假想延伸尚未設定銜接的車站，無法訂票。')); return; }
+      const realFrom = fVirtual ? anchor.id : from, realTo = tVirtual ? anchor.id : to;
+      const fLabel = labelOf(from), tLabel = labelOf(to);
       const [hh, mm] = (tIn.value || '00:00').split(':').map(Number), t0 = hh * 3600 + mm * 60;
-      out.append(h('h2', { class: 'h2' }, `${H.stName(from)} → ${H.stName(to)}`, h('small', null, `${dIn.value}　${tIn.value} 以後${vSel.value ? `　經由 ${H.stName(vSel.value)}` : ''}${useHS.checked ? '　可利用高速鐵路' : ''}`)));
+      out.append(h('h2', { class: 'h2' }, `${fLabel} → ${tLabel}`, h('small', null, `${dIn.value}　${tIn.value} 以後${vSel.value ? `　經由 ${H.stName(vSel.value)}` : ''}${useHS.checked ? '　可利用高速鐵路' : ''}`)));
+      // 兩端都是假想站，或其中一端剛好就是銜接站本身：真實的那一段長度是 0，沒有實際班次可以訂——
+      // 假想延伸還沒蓋好、不是真的車，這種情況只能顯示票價試算，沒辦法走後面選位、發票那一套流程。
+      if ((fVirtual || tVirtual) && realFrom === realTo) {
+        const f = H.hsFareExt(fLabel, tLabel);
+        if (!f) { out.append(h('p', { class: 'lead' }, '這兩站之間查不到高速鉄道的票價。')); return; }
+        out.append(h('p', { class: 'lead' }, '這段是地圖外尚未建成的假想延伸路段，沒有實際班次可以訂票，以下僅供票價試算參考。'), HK.hsFareDetailBox(H, f, fLabel, tLabel));
+        return;
+      }
       // 1.1.0：票價改成每個候選行程各自算（可能含高速鐵路，票價公式不同，不能共用一個 from→to 的一般票價）
-      let list = H.searchEx(from, to, t0, 10, { via: vSel.value || null, allowHighSpeed: useHS.checked }).map(j => ({ j, legs: j.legs.map(l => legInfo(l, dIn.value)), tf: H.ticketFaresFor(j.legs) }));
+      let list = H.searchEx(realFrom, realTo, t0, 10, { via: vSel.value || null, allowHighSpeed: useHS.checked || fVirtual || tVirtual }).map(j => ({ j, legs: j.legs.map(l => legInfo(l, dIn.value)), tf: H.ticketFaresFor(j.legs) }));
       if (!list.length) { out.append(h('p', { class: 'lead' }, '查不到兩站之間的路徑。')); return; }
       list = list.filter(x => x.tf && x.j.dep < DAY + t0 && x.legs.some(l => l.ri));
-      if (!list.length) { out.append(h('p', { class: 'lead' }, '這個時間之後沒有含特急／特快／高速鐵路（可預約）的行程。可改用「時刻表與班次」查詢一般班次。'), h('p', null, h('a', { class: 'btn ghost', href: `timetable.html?tab=route&from=${from}&to=${to}&t=${tIn.value}` }, '查詢所有班次（含轉乘）'))); return; }
+      if (!list.length) { out.append(h('p', { class: 'lead' }, '這個時間之後沒有含特急／特快／高速鐵路（可預約）的行程。可改用「時刻表與班次」查詢一般班次。'), h('p', null, h('a', { class: 'btn ghost', href: `timetable.html?tab=route&from=${realFrom}&to=${realTo}&t=${tIn.value}` }, '查詢所有班次（含轉乘）'))); return; }
+      // 1.1.1：合併計算——假想延伸段的分區運費併入每個候選行程的乘車券總價（大人／兒童／優待都照比例加），
+      // 並把算好的假想段資訊（ext：銜接站→假想站的分區運費與指定席特急券）留在每個候選行程上，選位、算總價、開票都要用到。
+      const vZh = fVirtual ? fLabel : (tVirtual ? tLabel : null), anchorZh = anchor ? anchor.zh : null;
+      if (vZh) list.forEach(c => {
+        const ext = H.hsFareExt(anchorZh, vZh); c.ext = ext; c.anchorZh = anchorZh; c.vZh = vZh;
+        if (ext) c.tf = { adult: c.tf.adult + ext.zoneFee, child: c.tf.child + Math.round(ext.zoneFee * H.cfg.childRatio), senior: c.tf.senior + Math.round(ext.zoneFee * H.cfg.seniorRatio), detail: c.tf.detail };
+      });
       const ul = h('ul', { class: 'bk-list' });
       list.forEach(c => ul.append(h('li', null, h('button', { type: 'button', class: 'bk-trip', style: 'display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px', onclick: () => pick(c, c.tf) },
         h('span', { class: 'tm' }, `${HK.hm(c.j.dep)} → ${HK.hm(c.j.arr)}`),
         h('span', { style: 'display:inline-flex;gap:4px;flex-wrap:wrap' }, ...c.legs.map(l => HK.typeTag(l.leg.sv))),
-        h('span', { class: 'nm', style: 'flex:1 1 220px' }, c.legs.map(l => l.leg.sv.routeName + (l.leg.gou ? ' ' + l.leg.gou : '')).join(' ＋ ')),
+        h('span', { class: 'nm', style: 'flex:1 1 220px' }, c.legs.map(l => l.leg.sv.routeName + (l.leg.gou ? ' ' + l.leg.gou : '')).join(' ＋ ') + (c.ext ? `　＋ 假想延伸 ${c.anchorZh}→${c.vZh}` : '')),
         h('span', { class: 'cars' }, c.legs.length > 1 ? `轉乘 ${c.legs.length - 1} 次` : '直達'),
         h('span', { class: 'yen' }, yen(c.tf.adult) + '〜')))));
-      out.append(ul, h('p', { class: 'note' }, '價格為大人 1 位的乘車券；指定席／立席費用在下一步依各段選擇加算。'));
+      out.append(ul, h('p', { class: 'note' }, '價格為大人 1 位的乘車券；指定席／立席費用在下一步依各段選擇加算。', vZh ? h('span', null, `　已併入地圖外假想延伸路段（${anchorZh} → ${vZh}）的分區運費；該段的指定席特急券另計 ${yen(H.cfg.hsSeatFee)}／位（沒有實際車次，無法選位，僅供試算）。`) : null));
       out.append(h('div', { id: 'bk-seat' }));
     }
 
     function pick(c, tf) {
       const P = pax();
       // 1.1.0：高速鐵路沒有立席特急券可以當空位不足時的備案，沒位置也只能停在「指定席」（之後畫面會顯示空席不足）。
-      const S = state.sel = { c, tf, P, legs: c.legs.map(l => ({ mode: !l.ri ? 'none' : (l.free >= P.n ? 'seat' : (l.ri.noStanding ? 'seat' : l.ri.mode === 'all' ? 'stand' : 'free')), seats: [], car: 0 })) };
+      const S = state.sel = { c, tf, P, ext: c.ext || null, anchorZh: c.anchorZh, vZh: c.vZh, legs: c.legs.map(l => ({ mode: !l.ri ? 'none' : (l.free >= P.n ? 'seat' : (l.ri.noStanding ? 'seat' : l.ri.mode === 'all' ? 'stand' : 'free')), seats: [], car: 0 })) };
       draw();
       document.getElementById('bk-seat').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -121,7 +152,9 @@
       const S = state.sel, tf = S.tf;
       const base = tf.adult * S.P.a + tf.child * S.P.c + tf.senior * S.P.s;
       let seats = 0; S.c.legs.forEach((l, i) => { seats += legFee(l, S.legs[i]); });
-      return { base, seats, total: base + seats };
+      // 1.1.1：假想延伸段（地圖外、沒有實際車次）的指定席特急券——全車指定席、不打折、沒有立席特急券，照人數各算一次。
+      const extSeat = S.ext ? S.ext.seat * S.P.n : 0;
+      return { base, seats: seats + extSeat, extSeat, total: base + seats + extSeat };
     }
 
     function draw() {
@@ -150,13 +183,18 @@
         if (st.mode === 'seat') blk.append(seatPicker(l, st, P));
         box.append(blk);
       });
+      // 1.1.1：假想延伸段沒有真的車次、沒辦法選位，用一段固定的說明文字顯示在真實的乘車段下面。
+      if (S.ext) box.append(h('section', { class: 'hs-field', style: 'border:1px solid var(--line,#d6e0db);border-radius:10px;padding:10px 12px;margin-bottom:8px' },
+        h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center' }, h('span', { class: 'hs-tag' }, '高速鉄道'), h('strong', null, '万瀨高速鉄道線（假想延伸）'), h('span', null, `${S.anchorZh} → ${S.vZh}`)),
+        h('p', { class: 'note' }, `地圖外尚未建成的假想延伸路段，沒有實際車次、無法選位；指定席特急券固定 ${yen(S.ext.seat)}／位（${yen(S.ext.seat)} × ${P.n} 位，不打折、沒有立席特急券）。`)));
       const go = h('button', { class: 'btn', type: 'button', disabled: !S.c.legs.every((l, i) => !l.ri || S.legs[i].mode !== 'seat' || S.legs[i].seats.length === P.n), onclick: () => ticket() }, '確認並發行車票');
-      const rows = [[`乘車券（${H.stName(fSel.value)}→${H.stName(tSel.value)}）`, `大人 ${P.a} × ${yen(tf.adult)}` + (P.c ? `／兒童 ${P.c} × ${yen(tf.child)}` : '') + (P.s ? `／優待 ${P.s} × ${yen(tf.senior)}` : ''), yen(T.base)]];
+      const rows = [[`乘車券（${labelOf(fSel.value)}→${labelOf(tSel.value)}）`, `大人 ${P.a} × ${yen(tf.adult)}` + (P.c ? `／兒童 ${P.c} × ${yen(tf.child)}` : '') + (P.s ? `／優待 ${P.s} × ${yen(tf.senior)}` : ''), yen(T.base)]];
       S.c.legs.forEach((l, i) => { if (l.ri) rows.push([`${l.leg.sv.routeName}${l.leg.gou ? ' ' + l.leg.gou : ''}　${modeLabel(l, S.legs[i].mode)}`, S.legs[i].mode === 'seat' ? `${yen(l.ri.fee)} × ${P.n}` : S.legs[i].mode === 'stand' ? `${yen(l.ri.standFee)} × ${P.n}` : '', yen(legFee(l, S.legs[i]))]); });
+      if (S.ext) rows.push([`万瀨高速鉄道線（假想延伸 ${S.anchorZh}→${S.vZh}）　指定席特急券`, `${yen(S.ext.seat)} × ${P.n}`, yen(S.ext.seat * P.n)]);
       box.append(h('div', { class: 'fare-box', style: 'margin-top:12px' }, h('table', { class: 'tbl' }, h('tbody', null,
         rows.map(r => h('tr', null, h('th', null, r[0], r[1] ? h('small', { style: 'display:block;font-weight:400;color:var(--muted)' }, r[1]) : null), h('td', { style: 'text-align:right' }, r[2]))),
         h('tr', { class: 'tot' }, h('th', null, '合計'), h('td', { style: 'text-align:right;font-weight:700' }, yen(T.total))))),
-        h('div', { class: 'rule' }, '乘車券以出發站～抵達站全程的最短路徑計算一次：' + tf.detail.path.map(id => H.stName(id)).join(' → ') + (S.c.legs.some(l => l.leg.walk) || S.c.j.endWalk ? '（步行連絡區間不另收費）' : '')),
+        h('div', { class: 'rule' }, '乘車券以出發站～抵達站全程的最短路徑計算一次：' + tf.detail.path.map(id => H.stName(id)).join(' → ') + (S.ext ? ` → ${S.vZh}（假想延伸）` : '') + (S.c.legs.some(l => l.leg.walk) || S.c.j.endWalk ? '（步行連絡區間不另收費）' : '')),
         H.zonesConfigured ? null : h('div', { class: 'rule' }, '※ 收費區資料尚未設定，目前以未跨越任何區間計算。')),
         h('div', { style: 'margin-top:12px' }, go));
     }
@@ -206,15 +244,21 @@
       if (P.c) fareRows.push(h('tr', null, h('th', null, `乘車券 兒童 ${P.c} × ${yen(tf.child)}`), h('td', null, yen(tf.child * P.c))));
       if (P.s) fareRows.push(h('tr', null, h('th', null, `乘車券 優待 ${P.s} × ${yen(tf.senior)}`), h('td', null, yen(tf.senior * P.s))));
       S.c.legs.forEach((l, i) => { if (l.ri) fareRows.push(h('tr', null, h('th', null, `${l.leg.sv.routeName}${l.leg.gou ? ' ' + l.leg.gou : ''} ${modeLabel(l, S.legs[i].mode)}`), h('td', null, yen(legFee(l, S.legs[i]))))); });
+      if (S.ext) fareRows.push(h('tr', null, h('th', null, `万瀨高速鉄道線（假想延伸）指定席特急券 × ${P.n}`), h('td', null, yen(S.ext.seat * P.n))));
+      // 1.1.1：假想延伸段沒有實際車次，車票上明確標示這一段只是試算參考，不要讓人誤會真的能搭。
+      const extDl = S.ext ? h('div', { style: 'border-top:1px dashed var(--line,#ccd);padding:8px 0' },
+        h('div', { style: 'font-weight:700' }, h('span', { class: 'hs-tag' }, '高速鉄道'), ' 万瀨高速鉄道線（假想延伸，地圖外尚未建成）'),
+        h('div', null, `${S.anchorZh} → ${S.vZh}`),
+        h('div', null, `指定席特急券：${yen(S.ext.seat)} × ${P.n}（沒有實際車次，無法選位，僅供票價試算參考）`)) : null;
       const tk = h('article', { class: 'tk' },
         h('header', null, h('img', { src: 'assets/img/mark-dark.png', alt: '', width: 28, height: 28 }), h('b', null, '光瀨都市鉄道'), h('span', null, '乗車券・特急券 / TICKET')),
-        h('div', { class: 'tk-main' }, h('div', { class: 'tk-st' }, h('small', null, 'FROM'), h('strong', null, H.stName(from)), h('em', null, HK.hm(S.c.j.dep) + ' 発')), h('div', { class: 'tk-arrow' }, '→'), h('div', { class: 'tk-st' }, h('small', null, 'TO'), h('strong', null, H.stName(to)), h('em', null, HK.hm(S.c.j.arr) + ' 着'))),
+        h('div', { class: 'tk-main' }, h('div', { class: 'tk-st' }, h('small', null, 'FROM'), h('strong', null, labelOf(from)), h('em', null, HK.hm(S.c.j.dep) + ' 発')), h('div', { class: 'tk-arrow' }, '→'), h('div', { class: 'tk-st' }, h('small', null, 'TO'), h('strong', null, labelOf(to)), h('em', null, HK.hm(S.c.j.arr) + ' 着'))),
         h('dl', { class: 'tk-dl' },
           h('div', null, h('dt', null, '乗車日'), h('dd', null, dIn.value.replaceAll('-', '/'))),
           h('div', null, h('dt', null, '旅客'), h('dd', null, `大人 ${P.a}` + (P.c ? `／兒童 ${P.c}` : '') + (P.s ? `／優待 ${P.s}` : '')))),
-        h('div', { style: 'padding:0 16px' }, ...legDl),
+        h('div', { style: 'padding:0 16px' }, ...legDl, extDl),
         h('table', { class: 'tbl tk-fare' }, h('tbody', null, ...fareRows, h('tr', { class: 'tot' }, h('th', null, '合計'), h('td', null, yen(T.total))))),
-        h('footer', null, bar, h('span', null, '券番 ' + no.replace(/(\d{4})(\d{4})(\d{2})/, '$1-$2-$3')), h('span', null, '本券為模擬發行，不會儲存。')));
+        h('footer', null, bar, h('span', null, '券番 ' + no.replace(/(\d{4})(\d{4})(\d{2})/, '$1-$2-$3')), h('span', null, '本券為模擬發行，不會儲存。', S.ext ? h('span', null, '　含假想延伸段部分僅供試算，不代表真的可以搭乘。') : null)));
       const box = document.getElementById('bk-seat');
       box.replaceChildren(h('h2', { class: 'h2' }, '車票'), tk, h('div', { class: 'noprint', style: 'margin-top:12px;display:flex;gap:10px' },
         h('button', { class: 'btn', type: 'button', onclick: () => window.print() }, '列印'), h('button', { class: 'btn ghost', type: 'button', onclick: () => search() }, '重新查詢')));

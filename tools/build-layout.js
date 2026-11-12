@@ -5,6 +5,9 @@
  * 想手動固定某站位置：在 layout.json 的 override 寫 { "車站中文名": [格x, 格y] }（格線單位，往右 x 變大、往下 y 變大），再重新執行本程式。 */
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
+// 1.1.1：hk-core.js 的 0.26.0 車站編碼 i18n 那段直接讀全域的 window.HK_I18N（不是透過模組的 root 參數），
+// 在純 Node 環境（這個建置工具）沒有 window 會直接噴錯；這裡補一個最小的殼，不影響瀏覽器端的實際行為。
+if (typeof window === 'undefined') global.window = global;
 require(path.join(root, 'assets/js/atos-model.js'));
 const HK = require(path.join(root, 'assets/js/hk-core.js'));
 const M = require(path.join(root, 'assets/js/hk-map.js'));

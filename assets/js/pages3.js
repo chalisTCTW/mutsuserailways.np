@@ -57,8 +57,11 @@
         h('div', { class: 'fstep' }, h('b', null, '3'), h('div', null, h('strong', null, '確認有沒有停'), h('p', null, '到「設備與服務介紹」的「停車一覽」確認你要去的車站是否停車；再看月台的發車顯示核對種別與行先。'))))));
 
     // 4. 發車班次圖（即時計算）
+    // 1.1.1：這張圖只分「各停／快速類／特急・特快類」三類（沒有高速鉄道專屬的第四類）；
+    // 高速鉄道的列車（sv.tcls === 'hs'）前輩確認都算特急，所以併進 ltd 那一類，不會再因為沒有對應的 per.hs 而噴錯。
     const per = { loc: new Array(24).fill(0), exp: new Array(24).fill(0), ltd: new Array(24).fill(0) };
-    for (const tr of H.trips) { const sv = tr.sv, t = tr.base + sv.stops[0].dep; if (t < 0 || t >= DAY) continue; per[sv.tcls || 'loc'][Math.floor(t / 3600)]++; }
+    const perKey = k => k === 'hs' ? 'ltd' : (k || 'loc');
+    for (const tr of H.trips) { const sv = tr.sv, t = tr.base + sv.stops[0].dep; if (t < 0 || t >= DAY) continue; per[perKey(sv.tcls)][Math.floor(t / 3600)]++; }
     const tot = Array.from({ length: 24 }, (_, i) => per.loc[i] + per.exp[i] + per.ltd[i]), mx = Math.max(1, ...tot);
     const col = { loc: '#9db8ad', exp: '#1f6b54', ltd: '#b3392f' };
     const bars = h('div', { class: 'sbars', role: 'img', 'aria-label': '每小時各種別的發車班次數' }, tot.map((n, i) => h('div', { class: 'sb', title: `${i} 時：各停 ${per.loc[i]}／快速類 ${per.exp[i]}／特急・特快類 ${per.ltd[i]}（共 ${n} 班）` },
@@ -73,7 +76,9 @@
     // 5. 避免搭錯車
     const types = new Map();
     H.svcs.forEach(sv => { const k = sv.type || '各停'; if (!types.has(k)) types.set(k, { sv, routes: new Set() }); types.get(k).routes.add(sv.routeName); });
-    const typeTags = [...types.entries()].sort((a, b) => ({ loc: 0, exp: 1, ltd: 2 }[a[1].sv.tcls] - { loc: 0, exp: 1, ltd: 2 }[b[1].sv.tcls])).map(([k, v]) =>
+    // 1.1.1：排序表沒有 'hs' 這個鍵，高速鉄道併到跟特急（ltd）同一順位，避免排序比較時拿到 undefined。
+    const TTORD = { loc: 0, exp: 1, ltd: 2, hs: 2 };
+    const typeTags = [...types.entries()].sort((a, b) => TTORD[a[1].sv.tcls] - TTORD[b[1].sv.tcls]).map(([k, v]) =>
       h('div', { class: 'ttrow' }, typeTag(v.sv), HK.typeMark(v.sv) ? h('b', { class: 'mk ' + v.sv.tcls }, HK.typeMark(v.sv)) : h('b', { class: 'mk loc' }, '—'), h('span', null, [...v.routes].slice(0, 3).join('、') + (v.routes.size > 3 ? ' 等' : ''))));
     g.append(sec('怎麼避免搭錯車', 'Avoid the wrong train',
       h('ol', { class: 'steps' },
@@ -155,7 +160,9 @@
         }
       });
       (H.events.get(ap.id) || []).forEach(e => { const g = groups.get(e.sv.routeName); if (!g) return; g.ev++; if (e.t >= 9 * 3600 && e.t < 16 * 3600) g.day++; g.dests.add(H.destOf(e.sv, e.i)); });
-      const rows = [...groups.values()].filter(g => g.ev > 0).sort((a, b) => ({ ltd: 0, exp: 1, loc: 2 }[a.sv.tcls] - { ltd: 0, exp: 1, loc: 2 }[b.sv.tcls]) || (a.mins || 1e9) - (b.mins || 1e9));
+      // 1.1.1：同上，高速鉄道（hs）併到跟特急（ltd）同一順位，避免排序比較時拿到 undefined。
+      const APORD = { ltd: 0, hs: 0, exp: 1, loc: 2 };
+      const rows = [...groups.values()].filter(g => g.ev > 0).sort((a, b) => (APORD[a.sv.tcls] - APORD[b.sv.tcls]) || (a.mins || 1e9) - (b.mins || 1e9));
       if (!rows.length) { dyn.append(h('p', { class: 'note' }, '目前的時刻表資料中沒有從機場站發車的班次。')); return; }
       dyn.append(h('div', { class: 'tscroll' }, h('table', { class: 'tbl' },
         h('thead', null, h('tr', null, h('th', null, '列車'), h('th', null, '行先'), h('th', null, center ? `到${center.zh}` : '所要時間'), h('th', null, '日間（9–16 時）'), h('th', null, '本日班次'), h('th', null, '座席'))),
