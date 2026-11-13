@@ -71,7 +71,7 @@
       h('p', null, '下面是全線各種別一天內每小時從起點發車的班次數（依目前的調度方案；尖峰時段班次多、離峰與深夜班次較少）。班次多的時段等車時間短；班次少的時段，請先查好時刻表再出發。'),
       bars,
       h('div', { class: 'sleg' }, ['loc', 'exp', 'ltd'].map(k => h('span', null, h('i', { style: `background:${col[k]}` }), tclsName[k]))),
-      h('p', { class: 'note' }, (!tot.some(n => n) ? '目前沒有班次資料。' : (Math.max(...tot) > Math.min(...tot.filter(n => n > 0)) * 1.25 ? `班次最多的是 ${peakH} 時台（${tot[peakH]} 班），最少的是 ${quiet[1]} 時台（${quiet[0]} 班）。` : '目前各時段的班次數相近。')) + (dispNote(H) ? ' ' + dispNote(H) : ''))));
+      h('p', { class: 'note' }, (!tot.some(n => n) ? '目前沒有班次資料。' : (Math.max(...tot) > Math.min(...tot.filter(n => n > 0)) * 1.25 ? `班次最多的是 ${peakH} 時台（${tot[peakH]} 班），最少的是 ${quiet[1]} 時台（${quiet[0]} 班）。` : '目前各時段的班次數相近。')), dispNote(H) ? ' ' : null, dispNote(H) || null)));
 
     // 5. 避免搭錯車
     const types = new Map();
@@ -173,7 +173,7 @@
           h('td', null, g.day ? `${g.day} 班（約 ${Math.round(7 * 60 / g.day)} 分一班）` : '—'),
           h('td', null, `${g.ev} 班`),
           h('td', null, H.reserveLabel(g.sv) || '自由席')))))),
-        h('p', { class: 'note' }, '班次為從松沢国際空港站發車的本日班次。' + dispNote(H)));
+        h('p', { class: 'note' }, '班次為從松沢国際空港站發車的本日班次。', dispNote(H) ? ' ' : null, dispNote(H) || null));
     })();
 
     // 套票
@@ -234,7 +234,7 @@
         h('div', null, h('dt', null, '本日班次'), h('dd', null, `${tt.length} 班`))));
       const rows = []; sv.stops.forEach((s, i) => { if (s.pax === false) return; rows.push(h('tr', null, h('td', null, h('a', { href: 'timetable.html?s=' + encodeURIComponent(s.station) }, H.codeBadges(s.station), H.stName(s.station))), h('td', { class: 'tm' }, i === 0 ? '起點' : `${Math.round((s.arr - sv.stops[0].arr) / 60)} 分`))); });
       dyn.append(h('div', { class: 'tscroll' }, h('table', { class: 'tbl', style: 'max-width:420px' }, h('thead', null, h('tr', null, h('th', null, '停靠站'), h('th', null, '自起點'))), h('tbody', null, rows))),
-        h('p', { class: 'note' }, (all.length > 1 ? '另有反方向的班次。' : '') + dispNote(H)),
+        h('p', { class: 'note' }, all.length > 1 ? '另有反方向的班次。' : null, (all.length > 1 && dispNote(H)) ? ' ' : null, dispNote(H) || null),
         h('p', null, h('a', { class: 'btn ghost', href: 'routes.html' }, '設備與服務介紹'), ' ', h('a', { class: 'btn ghost', href: 'timetable.html' }, '時刻表')));
     })();
 

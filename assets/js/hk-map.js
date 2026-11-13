@@ -34,6 +34,96 @@
     return x;
   }
 
+  /** 把 A→B 畫成「沿指定方向 d＋最多一次 45° 轉折」；殘差在 2.5px 內直接畫直線。A、Bq 為 [x,y]。 */
+  function decompose(A, Bq, d) {
+    const vx = Bq[0] - A[0], vy = Bq[1] - A[1], u = DIRS8[d];
+    if (Math.abs(vx * u[1] - vy * u[0]) < 2.5 && vx * u[0] + vy * u[1] > 0) return [A, Bq];
+    const tries = [(d + 1) % 8, (d + 7) % 8, (d + 2) % 8, (d + 6) % 8];
+    let best = null;
+    for (const d2 of tries) {
+      const w = DIRS8[d2], det = u[0] * w[1] - u[1] * w[0]; if (Math.abs(det) < 1e-6) continue;
+      const a = (vx * w[1] - vy * w[0]) / det, c = (u[0] * vy - u[1] * vx) / det;
+      if (a >= -0.5 && c >= -0.5) { const cost = (cdiff(d, d2) === 1 ? 0 : 1) + (a < 4 || c < 4 ? 2 : 0); if (!best || cost < best.cost) best = { cost, a: Math.max(0, a), c: Math.max(0, c), d2 }; }
+    }
+    if (!best) return [A, Bq];
+    const mid = [A[0] + u[0] * best.a, A[1] + u[1] * best.a];
+    return [A, mid, Bq];
+  }
+
+  /* 1.1.2：高速鉄道的路線圖線形——跟一般鐵路共用「只接受 45°／90° 單位轉彎」的畫法（decompose），
+   * 但不參與一般鐵路的最小平方法位置求解：車站位置完全沿用一般鐵路排好的結果（H.edges／layoutOnce 算出的 pos），
+   * 高速鉄道只在既有站位之間，另外挑一個貼近實際方位、轉折最少的方向畫線——這樣可以保證「一般鐵路的線形優先」：
+   * 不管高速鉄道怎麼繞，都不會回頭去動一般鐵路已經排好的車站位置或線形。
+   * 做法跟 layoutOnce 的步驟 1～2 一樣（分歧站分配方向、車站鏈用 Viterbi 選轉折最少的方向），只是跳過步驟 3
+   * 的位置求解（因為站位是「借」一般鐵路的，不能動），直接用 decompose 把兩個既有站位接成折線。 */
+  function layoutHsPaths(H, pos) {
+    const all = (H.hsEdges || []).filter(e => e.a !== e.b && pos.has(e.a) && pos.has(e.b));
+    const ids = [...new Set(all.flatMap(e => [e.a, e.b]))];
+    const vidx = new Map(ids.map((id, i) => [id, i]));
+    const n = ids.length, m = all.length;
+    const adj = Array.from({ length: n }, () => []);
+    const E = all.map((e, k) => { const i = vidx.get(e.a), j = vidx.get(e.b); adj[i].push({ to: j, k }); adj[j].push({ to: i, k }); return { i, j }; });
+    if (!m) return [];
+    const geo = E.map(e => angIdx(pos.get(ids[e.j]).x - pos.get(ids[e.i]).x, pos.get(ids[e.j]).y - pos.get(ids[e.i]).y));
+    const seen = (k, v) => E[k].i === v ? geo[k] : (geo[k] + 4) % 8;
+    const dirOf = new Array(m).fill(-1);
+    const dirFrom = (k, v) => dirOf[k] < 0 ? -1 : (E[k].i === v ? dirOf[k] : (dirOf[k] + 4) % 8);
+    const setFrom = (k, v, d) => { dirOf[k] = E[k].i === v ? d : (d + 4) % 8; };
+    const B = 2.5;
+    const turnCost = t => t < 0.5 ? 0 : t < 1.5 ? B : t < 2.5 ? 2.5 * B : t < 3.5 ? 6 * B : 12 * B;
+    // 分歧站（含「高速鉄道有停＋一般路網轉乘」節點）：每條線分到不同方向，順序不變（跟 layoutOnce 步驟 1 相同）
+    const junc = [...Array(n).keys()].filter(v => adj[v].length >= 3).sort((a, b) => adj[b].length - adj[a].length);
+    for (const v of junc) {
+      const inc = adj[v].map(a => ({ k: a.k, g: seen(a.k, v), lock: dirFrom(a.k, v) })).sort((a, b) => a.g - b.g);
+      const kk = inc.length; if (kk > 8) continue;
+      let best = null;
+      const subsets = [];
+      (function pick(start, cur) { if (cur.length === kk) { subsets.push(cur.slice()); return; } for (let d = start; d < 8; d++) { cur.push(d); pick(d + 1, cur); cur.pop(); } })(0, []);
+      for (const S of subsets) for (let r = 0; r < kk; r++) {
+        let cost = 0;
+        inc.forEach((x, t) => { const d = S[(t + r) % kk]; cost += cdiff(x.g, d) ** 2 + (x.lock >= 0 && x.lock !== d ? 100 : 0); });
+        if (!best || cost < best.cost) best = { cost, S, r };
+      }
+      if (best) inc.forEach((x, t) => setFrom(x.k, v, best.S[(t + best.r) % kk]));
+    }
+    // 車站鏈：兩個分歧／終點之間，用 Viterbi 決定每段方向（跟 layoutOnce 步驟 2 相同）
+    const visited = new Array(m).fill(false), chains = [];
+    const walk = (a, first) => {
+      const nodes = [a], ks = [first.k]; visited[first.k] = true;
+      let cur = first.to; nodes.push(cur);
+      while (adj[cur].length === 2) {
+        const nx = adj[cur].find(x => !visited[x.k]); if (!nx) break;
+        visited[nx.k] = true; ks.push(nx.k); cur = nx.to; nodes.push(cur);
+      }
+      chains.push({ nodes, ks });
+    };
+    for (let v = 0; v < n; v++) if (adj[v].length !== 2) for (const a of adj[v]) if (!visited[a.k]) walk(v, a);
+    for (let k = 0; k < m; k++) if (!visited[k]) walk(E[k].i, { to: E[k].j, k });
+    for (const ch of chains) {
+      const T = ch.ks.length;
+      const g = ch.ks.map((k, t) => seen(k, ch.nodes[t]));
+      const force = ch.ks.map((k, t) => dirFrom(k, ch.nodes[t]));
+      const cost = [], from = [];
+      for (let t = 0; t < T; t++) {
+        cost.push(new Float64Array(8)); from.push(new Int8Array(8));
+        for (let d = 0; d < 8; d++) {
+          let u = cdiff(g[t], d) ** 2; if (force[t] >= 0 && force[t] !== d) u += 1e6;
+          if (t === 0) { cost[t][d] = u; continue; }
+          let bc = Infinity, bd = 0;
+          for (let p = 0; p < 8; p++) { const c = cost[t - 1][p] + turnCost(cdiff(p, d)); if (c < bc) { bc = c; bd = p; } }
+          cost[t][d] = bc + u; from[t][d] = bd;
+        }
+      }
+      let d = 0, bc = Infinity; for (let q = 0; q < 8; q++) if (cost[T - 1][q] < bc) { bc = cost[T - 1][q]; d = q; }
+      for (let t = T - 1; t >= 0; t--) { setFrom(ch.ks[t], ch.nodes[t], d); d = from[t][d]; }
+    }
+    for (let k = 0; k < m; k++) if (dirOf[k] < 0) dirOf[k] = Math.round(geo[k]) % 8;
+    return E.map((e, k) => {
+      const A = [pos.get(ids[e.i]).x, pos.get(ids[e.i]).y], Bp = [pos.get(ids[e.j]).x, pos.get(ids[e.j]).y];
+      return { a: all[k].a, b: all[k].b, pts: decompose(A, Bp, dirOf[k]), walk: !!all[k].walk };
+    });
+  }
+
   /** 一組參數的版面。 */
   function layoutOnce(H, opts, prm) {
     opts = opts || {};
@@ -140,20 +230,6 @@
     const pos0 = st.map((s, i) => [p[2 * i], p[2 * i + 1]]);
 
     // 4. 每條線畫成「沿指定方向＋最多一次 45° 轉折」；殘差在 2.5px 內直接畫直線
-    const decompose = (A, Bq, d) => {
-      const vx = Bq[0] - A[0], vy = Bq[1] - A[1], u = DIRS8[d];
-      if (Math.abs(vx * u[1] - vy * u[0]) < 2.5 && vx * u[0] + vy * u[1] > 0) return [A, Bq];
-      const tries = [(d + 1) % 8, (d + 7) % 8, (d + 2) % 8, (d + 6) % 8];
-      let best = null;
-      for (const d2 of tries) {
-        const w = DIRS8[d2], det = u[0] * w[1] - u[1] * w[0]; if (Math.abs(det) < 1e-6) continue;
-        const a = (vx * w[1] - vy * w[0]) / det, c = (u[0] * vy - u[1] * vx) / det;
-        if (a >= -0.5 && c >= -0.5) { const cost = (cdiff(d, d2) === 1 ? 0 : 1) + (a < 4 || c < 4 ? 2 : 0); if (!best || cost < best.cost) best = { cost, a: Math.max(0, a), c: Math.max(0, c), d2 }; }
-      }
-      if (!best) return [A, Bq];
-      const mid = [A[0] + u[0] * best.a, A[1] + u[1] * best.a];
-      return [A, mid, Bq];
-    };
     let gx = Infinity, gy = Infinity;
     pos0.forEach(q => { gx = Math.min(gx, q[0]); gy = Math.min(gy, q[1]); });
     const polys = E.map((e, k) => decompose(pos0[e.i], pos0[e.j], dirOf[k]));
@@ -189,7 +265,11 @@
     // 與實際方位的差（度）：越小越貼近真實地圖
     let dev = 0; E.forEach((e, k) => { const a = pos.get(st[e.i].id), c = pos.get(st[e.j].id); dev += cdiff(geo[k], angIdx(c.x - a.x, c.y - a.y)) * 45; });
     dev = m ? dev / m : 0;
-    return { pos, paths, width: maxX + PAD, height: maxY + PAD, crossings: cross, bends, offGrid, near, touch, disp: dev, dev, grid: GRID, dirs: dirOf.slice() };
+    // 1.1.2：高速鉄道線形——借用上面已經排好的一般鐵路車站位置（pos），另外挑一組只接受 45°／90° 轉彎的折線，
+    // 完全不影響一般鐵路的 pos／paths／分數（crossings、bends 等診斷值都還是只算一般鐵路），所以一般鐵路的線形永遠優先。
+    const hsPaths = layoutHsPaths(H, pos);
+    hsPaths.forEach(hp => hp.pts.forEach(q => { maxX = Math.max(maxX, q[0]); maxY = Math.max(maxY, q[1]); }));
+    return { pos, paths, hsPaths, width: maxX + PAD, height: maxY + PAD, crossings: cross, bends, offGrid, near, touch, disp: dev, dev, grid: GRID, dirs: dirOf.slice() };
   }
 
   const COMBOS = (() => {

@@ -233,7 +233,13 @@
     H.stById = {}; stations.forEach(s => H.stById[s.id] = s);
     const sIdx = new Map(stations.map((s, i) => [s.id, i]));
     H.sIdx = sIdx;
-    H.stName = id => (H.stById[id] || stById[id] || { zh: '?' }).zh;
+    /* 1.1.2：假想延伸（hsExt）站已經視為「通車」，但它們不是地圖內真正存在的車站、不在 H.stById 裡；
+     * 這裡統一處理 id 開頭是 'hsext:' 的情形，讓所有照字串呼叫 H.stName 的地方（時刻表、車票、行程卡片……）
+     * 不用各自特判就能正確顯示延伸站的站名，不會印出「?」。 */
+    H.stName = id => {
+      if (typeof id === 'string' && id.indexOf('hsext:') === 0) { const e = H.hsQueryStations && H.hsQueryStations.find(s => s.id === id); if (e) return e.zh; }
+      return (H.stById[id] || stById[id] || { zh: '?' }).zh;
+    };
     /* 車站編碼（0.26.0）：id → ['H05','KU01']；徽章用路線色。沒有編碼的車站回傳空陣列／null，畫面維持原樣。 */
     H.codes = id => ((H.stById[id] || stById[id] || {}).codes) || [];
     H.codeColor = c => { const m = String(c).match(/^[A-Z]+/); const cc = (CFG.codeColors || {}); return (m && (cc[c] || cc[m[0]])) || '#6b7280'; };
@@ -481,9 +487,12 @@
       (ext.real || []).forEach(zh => { const st = stations.find(s => s.zh === zh); if (st) H.hsQueryStations.push({ id: st.id, zh, real: true }); });
       let prevZh = ext.afterZh;
       ext.stops.forEach(e => {
-        const entry = { id: 'hsext:' + e.zh, zh: e.zh, real: false, km: e.km || 0, min: e.min || 0, zoneBoundary: !!e.zoneBoundary, prevZh };
+        const entry = { id: 'hsext:' + e.zh, zh: e.zh, en: e.en || '', real: false, km: e.km || 0, min: e.min || 0, zoneBoundary: !!e.zoneBoundary, prevZh };
         H.hsExtStops.push(entry); H.hsQueryStations.push(entry); prevZh = e.zh;
       });
+      // 1.1.2：延伸站的英文站名（site-config.js 的 en 欄位）也要登記進 i18n 的站名對照表，
+      // 不然 lang=en 時「花宮天照　*高速鉄道」這種車站選單裡的站名部分會找不到翻譯、原文中文照樣顯示。
+      if (window.HK_I18N) window.HK_I18N.names(H.hsExtStops.filter(e => e.en).map(e => [e.zh, e.en]));
     })();
     /** 1.1.1：假想延伸段的「銜接站」——地圖內真正存在的那個車站（目前是東平倉），所有假想延伸站都是從這一站往地圖外接出去的。
      *  訂票・乘車轉乘查詢要讓玩家選假想站當起訖站時，拿這一站當作實際連乘搜尋（H.searchEx）用的替身車站；
@@ -518,6 +527,44 @@
       crossed = Math.max(1, crossed);
       const base = CFG.hsFareStep * crossed;
       return { yen: base, base: 0, step: CFG.hsFareStep, crossed, zones: crossed, zoneFee: base, seat: CFG.hsSeatFee, total: base + CFG.hsSeatFee, path: list.slice(lo, hi + 1).map(s => s.zh), km, isHS: true, noStanding: true, ext: true };
+    };
+    /** 延伸段（銜接站～假想延伸站，或兩個延伸站之間）的所要時間（秒）：沿著 H.hsQueryStations 把中間每一段
+     *  設定好的 min（CFG.hsExt 裡的分鐘數）加總。兩端都是地圖內真實站時這裡不會被用到（真正班次自己的時刻表決定）。 */
+    H.hsExtDuration = function (aZh, bZh) {
+      const list = H.hsQueryStations; if (!list.length) return 0;
+      const ia = list.findIndex(s => s.zh === aZh), ib = list.findIndex(s => s.zh === bZh);
+      if (ia < 0 || ib < 0 || ia === ib) return 0;
+      const lo = Math.min(ia, ib), hi = Math.max(ia, ib);
+      let sec = 0; for (let i = lo + 1; i <= hi; i++) sec += (list[i].min || 0) * 60;
+      return sec;
+    };
+    /** 1.1.2：延伸段已經視為「通車」——合成一段跟真正班次同樣形狀的 leg（sv／stops／board／gou），
+     *  讓查詢結果、訂票流程把這段當成普通一段車程處理：一樣能顯示站名／方向／種別徽章，訂票頁一樣能選位、開票。
+     *  aZh／bZh 是 H.hsQueryStations 裡的站名（真實的銜接站或假想延伸站都可以）；depSec 是這段的出發時刻
+     *  （接在真實路段抵達銜接站之後，或起訖都在地圖外時就是玩家查詢輸入的時刻）；gou 可選，延續真正班次的「○号」。
+     *  票價另外用 H.hsFareExt(aZh,bZh) 算、合併進整段票價，不經過一般的 H.journeyFare／H.hsFare 分區加總
+     *  （延伸站不在 H.stById 裡，沒有收費區資料）。 */
+    H.hsExtLeg = function (aZh, bZh, depSec, gou) {
+      const f = H.hsFareExt(aZh, bZh); if (!f) return null;
+      const dur = H.hsExtDuration(aZh, bZh);
+      const aId = (H.hsQueryStations.find(s => s.zh === aZh) || {}).id, bId = (H.hsQueryStations.find(s => s.zh === bZh) || {}).id;
+      if (!aId || !bId) return null;
+      const stops = [{ station: aId, dep: depSec }, { station: bId, arr: depSec + dur }];
+      // sv.stops 跟 leg.stops 用同一份陣列——H.destOf／H.reserveInfo 等既有函式都是照「sv 本身也有完整停靠站序列」
+      // 的假設寫的，延伸段只有一段，直接共用不會有問題。
+      const sv = { isHS: true, routeName: (CFG.hsExt && CFG.hsExt.routeName) || '万瀨高速鉄道線', idx: -2, member: {}, stops };
+      return { sv, stops, board: 0, trip: null, walk: false, gou: gou || '', ext: true, fare: f };
+    };
+    /** 一段行程裡「真正的轉乘次數」：延伸段如果延續同一班車（跟相鄰段的「○号」相同）就不算轉乘，
+     *  只是同一班車繼續開往地圖外而已；其餘（含真的換車、延伸段沒有可沿用的号碼時）照舊算一次轉乘。 */
+    H.legsTransfers = function (legs) {
+      let n = 0;
+      for (let i = 1; i < legs.length; i++) {
+        const a = legs[i - 1], b = legs[i];
+        if (b.ext && a.gou && b.gou && a.gou === b.gou) continue;
+        n++;
+      }
+      return n;
     };
 
     /** 最短（直線距離總和）路徑；回傳車站 id 陣列。 */

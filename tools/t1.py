@@ -53,7 +53,7 @@ T1 = [
 (52,"速さか節約かを決める","Choose speed or savings"),
 (53,"最速で行くなら特急か特別快速（指定席券が必要。特急は立席特急券も可）。節約するなら快速・環状快速・各停（自由席）。","For the fastest trip, take Limited Express or Special Rapid (reserved-seat ticket required; standing express tickets for Limited Express). To save money, take Rapid, Circular Rapid or Local (non-reserved)."),
 (54,"停車するか確認","Make sure it stops"),
-(55,"「路線情報」の「停車一覧」で目的の駅に停まるか確認し、ホームの発車案内で種別と行先を照合してください。","Check the “Stop list” in Line Information to see whether your station is served, then match the type and destination on the platform display."),
+(55,"「設備・サービス案内」の「停車一覧」で目的の駅に停まるか確認し、ホームの発車案内で種別と行先を照合してください。","Check the “Stop list” in Facilities and Services to see whether your station is served, then match the type and destination on the platform display."),
 (56,"種別ごとの1時間あたり発車本数","Departures per hour by type"),
 (57,"{0} 時：各停 {1}／快速系 {2}／特急・特別快速系 {3}（計 {4} 本）","{0}:00 — Local {1} / Rapid {2} / Limited Express & Special Rapid {3} ({4} total)"),
 (58,"1日の発車本数","Daily departures"),

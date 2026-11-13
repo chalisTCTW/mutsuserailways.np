@@ -16,7 +16,7 @@
   const CJK = /[぀-ヿ㐀-鿿＀-￯]/;
   const norm = s => s.replace(/\s+/g, ' ').trim();
   const D = window.HK_I18N_DICT || {};
-  const exact = new Map(), tmpl = [];
+  const exact = new Map(), tmpl = [], weakTmpl = [];
   for (const k of Object.keys(D)) {
     const v = D[k][IDX]; if (v == null) continue;
     if (k.includes('${')) {
@@ -27,42 +27,55 @@
         else { src += k[i].replace(/[.*+?^$()|[\]\\{}]/g, '\\$&'); lit++; cur += k[i]; i++; }
       }
       lits.push(cur);
-      if (lit >= 1) tmpl.push({ re: new RegExp('^' + src + '$'), to: v, lit, lits });
+      // 1.1.2：固定文字只有 1 個字的樣板（例如兩個欄位中間只隔一個全形／半形空格）太容易誤比對到不相干的字串
+      // （例如「${cars} 両編成」被「${sv.line} ${sv.member.dir}」這種樣板搶先命中，變成「8　両編成・全車指定席」這種
+      // 半吊子的結果）。這類弱樣板改放到 special() 之後才試，讓 special() 裡寫得比較精確的規則優先命中。
+      if (lit >= 2) tmpl.push({ re: new RegExp('^' + src + '$'), to: v, lit, lits });
+      else if (lit >= 1) weakTmpl.push({ re: new RegExp('^' + src + '$'), to: v, lit, lits });
     } else exact.set(k, v);
   }
   tmpl.sort((a, b) => b.lit - a.lit);
   const OUT = new Set();             // 自己產生的譯文：不再拿去查表（避免譯文又被當成原文比對）
   const names = new Map();           // 站名・路線名（中文原文 → 目前語言）
 
-  /** 單一字串（已去除前後空白）的翻譯；找不到回傳 null。 */
-  function lookup(t) {
-    if (exact.has(t)) return exact.get(t);
-    if (names.has(t)) return names.get(t);
-    for (const m of tmpl) {
+  const tryTmpl = (t, list) => {
+    for (const m of list) {
       let pos = 0, ok = true;   // 先確認固定文字依序出現（避免昂貴的正規表示式比對）
       for (const L of m.lits) { if (!L) continue; const p = t.indexOf(L, pos); if (p < 0) { ok = false; break; } pos = p + L.length; }
       if (!ok) continue;
       const r = m.re.exec(t); if (!r) continue;
       return m.to.replace(/\{(\d+)\}/g, (_, n) => { const c = r[+n + 1]; if (c == null) return ''; const x = lookup(norm(c)); return x == null ? c : x; });
     }
-    return special(t);
+    return undefined;
+  };
+  /** 單一字串（已去除前後空白）的翻譯；找不到回傳 null。 */
+  function lookup(t) {
+    if (exact.has(t)) return exact.get(t);
+    if (names.has(t)) return names.get(t);
+    let v = tryTmpl(t, tmpl); if (v !== undefined) return v;
+    const sp = special(t); if (sp != null) return sp;
+    v = tryTmpl(t, weakTmpl); if (v !== undefined) return v;
+    return null;
   }
   /** 程式裡用巢狀條件拼出來的幾種句型。 */
   function special(t) {
     let r;
-    if ((r = /^(.+?) ?(\d{1,2}:\d{2}) 以後(?:　?經由 (.+))?$/.exec(t))) {
+    // 注意：t 已經 norm() 過（全形空格也會被收成半形），下面幾條規則比對用的都是半形空格，不是原始碼裡寫的全形空格。
+    if ((r = /^(.+?) ?(\d{1,2}:\d{2}) 以後(?: ?經由 (.+))?$/.exec(t))) {
       const via = r[3] ? tr(r[3]) : '';
       return lang === 'en' ? `${r[1]} ${r[2]} or later${via ? ' · via ' + via : ''}` : `${r[1]}　${r[2]} 以降${via ? '　経由 ' + via : ''}`;
     }
-    if ((r = /^(\d{1,2}:\d{2}) 之後的班次(?:　經由 (.+?))?(　不搭乘指定席列車)?(　可利用高速鐵路)?$/.exec(t))) {
+    if ((r = /^(\d{1,2}:\d{2}) 之後的班次(?: ?經由 (.+?))?( ?不搭乘指定席列車)?( ?可利用高速鐵路)?$/.exec(t))) {
       const via = r[2] ? tr(r[2]) : '', nr = r[3] ? (lang === 'en' ? 'avoiding reserved-seat trains' : '指定席列車を使わない') : '';
       // 1.1.0：可利用高速鐵路（r[4]）是前輩新增的查詢條件，照既有 via／nr 的拼接方式加進同一句。
       const hsOk = r[4] ? (lang === 'en' ? 'high-speed rail allowed' : '高速鉄道を利用可') : '';
       return lang === 'en' ? `Trains after ${r[1]}${via ? ' · via ' + via : ''}${nr ? ' · ' + nr : ''}${hsOk ? ' · ' + hsOk : ''}` : `${r[1]} 以降の列車${via ? '　経由 ' + via : ''}${nr ? '　' + nr : ''}${hsOk ? '　' + hsOk : ''}`;
     }
-    if ((r = /^(\d+) 分　(.+)$/.exec(t)) && lookup(r[2]) != null) return lang === 'en' ? `${r[1]} min · ${tr(r[2])}` : `${r[1]} 分　${tr(r[2])}`;
+    if ((r = /^(\d+) 分 (.+)$/.exec(t)) && lookup(r[2]) != null) return lang === 'en' ? `${r[1]} min · ${tr(r[2])}` : `${r[1]} 分　${tr(r[2])}`;
     if ((r = /^(\d{1,2}:\d{2}) → (\d{1,2}:\d{2})（翌日）$/.exec(t))) return lang === 'en' ? `${r[1]} → ${r[2]} (next day)` : t;
     if ((r = /^(\d+) 両編成(?:・(.+))?$/.exec(t))) return lang === 'en' ? `${r[1]}-car train${r[2] ? ' · ' + tr(r[2]) : ''}` : null;
+    // 1.1.2：路線資訊頁「一天的發車班次」表格的小時刻度（0時、17時……），單獨一個數字＋時，跟「N 時台」不同。
+    if ((r = /^(\d{1,2})時$/.exec(t))) return lang === 'en' ? `${r[1]}:00` : null;
     if ((r = /^\+(¥[\d,]+)（合計 (¥[\d,]+)）$/.exec(t))) return lang === 'en' ? `+${r[1]} (total ${r[2]})` : null;
     // 1.1.0：高速鉄道獨立票價查詢的兒童・優待折扣那一格（¥NNN（指定席特急券不打折））。
     if ((r = /^(¥[\d,]+)（指定席特急券不打折）$/.exec(t))) return lang === 'en' ? `${r[1]} (reserved-seat express fee is not discounted)` : `${r[1]}（指定席特急券は割引なし）`;
@@ -73,6 +86,9 @@
       if (tt.some((x, i) => x !== parts[i])) return tt.join(lang === 'en' ? ', ' : '、');
     }
     if ((r = /^(.+?) → (.+)$/.exec(t))) { const a = lookup(r[1]), b = lookup(r[2]); if (a != null || b != null) return (a != null ? a : r[1]) + ' → ' + (b != null ? b : r[2]); }
+    // 1.1.2：起訖站選單裡「站名　*高速鉄道」這個標記——站名部分跟其他地方一樣用站名對照表翻，標記本身固定後綴。
+    // 注意：這裡的 t 是已經 norm() 過的字串，原本的全形空格已經被 norm() 收成半形空格，所以這裡要比對半形空格。
+    if ((r = /^(.+?) \*高速鉄道$/.exec(t))) { const a = lookup(r[1]); const tag = lang === 'en' ? '*High-Speed Rail' : '*高速鉄道'; return (a != null ? a : r[1]) + '　' + tag; }
     return null;
   }
   const tr = s => { const v = lookup(norm(s)); return v == null ? s : v; };
@@ -85,7 +101,7 @@
     const lead = /^\s*/.exec(raw)[0], trail = /\s*$/.exec(raw)[0];
     const nv = lead + v + trail; if (nv !== raw) n.nodeValue = nv;
   }
-  const ATTRS = ['title', 'alt', 'aria-label', 'placeholder', 'aria-roledescription'];
+  const ATTRS = ['title', 'alt', 'aria-label', 'placeholder', 'aria-roledescription', 'label'];
   function fixAttrs(el) {
     for (const a of ATTRS) {
       const raw = el.getAttribute && el.getAttribute(a); if (!raw || !CJK.test(raw)) continue;

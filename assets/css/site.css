@@ -130,9 +130,11 @@ dl.news .row:target { background: var(--g3); }
 .mapbox .rmap { width: 100%; height: auto; display: block; max-height: 78vh; }
 .rmap .e-casing { fill: none; stroke: #fff; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
 .rmap .e-line { fill: none; stroke: var(--g1); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
-/* 1.1.0：高速鐵路不計入拓樸，只用虛線連接轉乘站（含幸村↔新光瀨這類站外轉乘） */
-.rmap .hs-line { fill: none; stroke: #8a8f98; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 6; }
-.rmap .hs-line.hs-walk { stroke: #b0b5bd; stroke-dasharray: 1 5; }
+/* 1.1.0：高速鐵路不計入拓樸，只用虛線連接轉乘站（含幸村↔新光瀨這類站外轉乘）。
+ * 1.1.2：改用自己的識別色（--hs-color，由 JS 設成 CFG.hsColor，跟票價查詢・車站時刻表・乘車轉乘查詢三頁一致），
+ *        跟一般鐵路（var(--g1)，綠色）明顯區分；--hs-color 沒設定時退回跟 hk-core.js CFG.hsColor 相同的預設值。 */
+.rmap .hs-line { fill: none; stroke: var(--hs-color, #136880); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2 6; }
+.rmap .hs-line.hs-walk { stroke: var(--hs-color, #136880); opacity: .55; stroke-dasharray: 1 5; }
 
 /* 1.1.0：票價查詢・車站時刻表・乘車轉乘查詢三頁共用的「高速鉄道」獨立欄位外框。 */
 .hs-field { border: 1.5px solid #136880; border-radius: 6px; padding: 10px 14px; margin: 12px 0; background: rgba(19, 104, 128, .06); }

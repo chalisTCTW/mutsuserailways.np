@@ -138,7 +138,7 @@
   /* ───────── 車站發車看板（點選路線圖上的車站時顯示的小視窗；0.7 起不再有獨立的「發車顯示」頁） ───────── */
   function dirKeyOf(H, sid, e) {
     const sv = e.sv, first = sv.stops[0].station, last = sv.stops[sv.stops.length - 1].station;
-    if (first === last) return { key: 'loop|' + sv.line + '|' + (sv.member.dir || ''), label: `${sv.line} ${sv.member.dir || '環狀'}` };
+    if (first === last) return { key: 'loop|' + sv.line + '|' + (sv.member.dir || ''), label: `${sv.line}　${sv.member.dir || '環狀'}` };
     let nextSt = last; for (let k = (e.i || 0) + 1; k < sv.stops.length; k++) if (sv.stops[k].pax !== false) { nextSt = sv.stops[k].station; break; }
     const p = H.shortestPath(sid, nextSt), nb = p && p.length > 1 ? p[1] : nextSt;
     return { key: 'nb|' + nb, label: null, nb };

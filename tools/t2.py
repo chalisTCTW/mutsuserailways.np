@@ -122,7 +122,6 @@ T2 = [
 (368,"特急は全車指定席（半額の立席特急券もあります）。特別快速は1・2号車が指定席、3号車以降が自由席です。行程の中に予約できる区間が1つでもあれば、乗り換えを含む全行程を表示します。","Limited Express is all reserved (half-price standing express tickets are also available). On Special Rapid, cars 1–2 are reserved and car 3 and beyond are non-reserved. If any leg of the trip can be reserved, the whole itinerary including transfers is shown."),
 (369,"出発駅と到着駅は別の駅を選んでください。","Please choose different origin and destination stations."),
 (370,"人数は1～6名に設定してください。","Please set the number of passengers between 1 and 6."),
-(371,"{0}　{1} 以降","{0}　after {1}"),
 (372,"2駅間の経路が見つかりません。","No route found between the two stations."),
 (373,"この時刻以降、特急・特別快速（予約可能）を含む行程はありません。「時刻表・運賃」から一般の列車を検索してください。","No itineraries including Limited Express / Special Rapid (reservable) after this time. Use Timetable and Fares to search regular trains."),
 (374,"すべての列車を検索（乗り換え含む）","Search all trains (with transfers)"),

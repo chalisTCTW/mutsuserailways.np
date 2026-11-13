@@ -69,26 +69,39 @@ MORE={
 "計算高速鉄道票價":["高速鉄道の運賃を計算","Calculate high-speed rail fare"],
 "這兩站之間查不到高速鉄道的票價。":["この2駅間の高速鉄道の運賃は見つかりません。","No high-speed rail fare could be found between these two stations."],
 "跨越分區 ${a}　約 ${b} km":["またぐ区 {0}　約{1}km","Zones crossed {0}　about {1} km"],
-"※ 經過地圖外尚未建成的假想路段，僅供試算未來票價參考。":["※ 地図外の未開業区間を含みます。将来の運賃の参考値です。","※ Includes a section beyond the map that is not yet built; for future-fare reference only."],
 "万瀨高速鉄道線　獨立票價查詢":["万瀨高速鉄道線　単独運賃検索","Mutsuse High-Speed Rail — Separate Fare Lookup"],
-"万瀨高速鉄道線的票價不套用一般鐵路的分區運費制度：每跨越一個收費區加 ${a}，指定席特急券固定 ${b}（不打折、沒有立席特急券）。站名含目前尚在地圖外、還沒建成的延伸路段，可以先試算之後的票價。":["万瀨高速鉄道線の運賃は一般の鉄道の分区制とは異なります：収費区を1つ越えるごとに {0} 加算、指定席特急券は {1} 固定（割引なし、立席特急券もありません）。駅名には地図外のまだ建設されていない延伸区間も含み、将来の運賃を先に試算できます。","Mutsuse High-Speed Rail fares don't follow the ordinary zone-fare system: {0} is added for each fare zone crossed, and the reserved-seat express fee is a flat {1} (no discount, no standing-ticket option). The station list includes the not-yet-built extension beyond the current map, so you can preview future fares."],
+"万瀨高速鉄道線的票價不套用一般鐵路的分區運費制度：每跨越一個收費區加 ${a}，指定席特急券固定 ${b}（不打折、沒有立席特急券）。站名含地圖外的延伸路段（標示「*高速鉄道」），一樣可以在這裡查票價。":["万瀨高速鉄道線の運賃は一般の鉄道の分区制とは異なります：収費区を1つ越えるごとに {0} 加算、指定席特急券は {1} 固定（割引なし、立席特急券もありません）。駅名には地図外の延伸区間（「*高速鉄道」の表示）も含み、こちらで運賃を調べられます。","Mutsuse High-Speed Rail fares don't follow the ordinary zone-fare system: {0} is added for each fare zone crossed, and the reserved-seat express fee is a flat {1} (no discount, no standing-ticket option). The station list includes the extension beyond the current map (marked \"*High-Speed Rail\"), which you can look up here too."],
 "指定席特急券（全車指定席，沒有立席特急券）":["指定席特急券（全車両指定席、立席特急券なし）","Reserved-seat express fee (all cars reserved, no standing-ticket option)"],
-# 1.1.1：合併計算（乘車・轉乘查詢／訂票頁的假想延伸站選項與試算說明）。
-"可以利用高速鐵路（含假想延伸站）":["高速鉄道を利用する（地図外の仮想延伸駅を含む）","Allow high-speed rail (including virtual extension stations)"],
-"万瀨高速鉄道線的假想延伸尚未設定銜接的車站，無法查詢。":["万瀨高速鉄道線の仮想延伸区間は接続駅が未設定のため、検索できません。","The virtual extension of the Mutsuse High-Speed Rail Line has no connecting station set, so it can't be searched."],
-"万瀨高速鉄道線的假想延伸尚未設定銜接的車站，無法訂票。":["万瀨高速鉄道線の仮想延伸区間は接続駅が未設定のため、予約できません。","The virtual extension of the Mutsuse High-Speed Rail Line has no connecting station set, so it can't be booked."],
-"假想延伸路段票價試算（地圖外尚未建成，沒有實際班次）":["仮想延伸区間の運賃試算（地図外・未開業、実際の列車はありません）","Virtual extension fare estimate (beyond the map, not yet built — no actual train service)"],
-"含地圖外假想延伸路段：${a} → ${b}　約 ${c} km，分區運費已併入上方票價；指定席特急券另計 ${d}（僅供試算參考，地圖外尚未建成，沒有實際班次）。":["地図外の仮想延伸区間を含みます：{0} → {1}　約{2}km、分区運賃は上の運賃に含みます；指定席特急券は別途 {3}（参考値、地図外・未開業、実際の列車はありません）。","Includes a virtual extension section beyond the map: {0} → {1}, about {2} km; the zone fare is already included above. The reserved-seat express fee is an extra {3} (for reference only — not yet built, no actual train service)."],
-"這段是地圖外尚未建成的假想延伸路段，沒有實際班次可以訂票，以下僅供票價試算參考。":["この区間は地図外のまだ建設されていない仮想延伸区間です。実際の列車はなく予約できません。以下は運賃試算の参考値です。","This is a virtual extension section beyond the map that is not yet built. There is no actual train service to book; the following is for fare-estimate reference only."],
-"　已併入地圖外假想延伸路段（${a} → ${b}）的分區運費；該段的指定席特急券另計 ${c}／位（沒有實際車次，無法選位，僅供試算）。":["　地図外の仮想延伸区間（{0} → {1}）の分区運賃を含みます；この区間の指定席特急券は別途 {2}／席（実際の列車はなく座席指定不可、参考値）。","　Includes the zone fare for the virtual extension section ({0} → {1}) beyond the map; the reserved-seat express fee for that section is an extra {2}/seat (no actual train, no seat selection — for reference only)."],
-"万瀨高速鉄道線（假想延伸）":["万瀨高速鉄道線（仮想延伸）","Mutsuse High-Speed Rail Line (virtual extension)"],
-"地圖外尚未建成的假想延伸路段，沒有實際車次、無法選位；指定席特急券固定 ${a}／位（${b} × ${c} 位，不打折、沒有立席特急券）。":["地図外のまだ建設されていない仮想延伸区間です。実際の列車はなく座席指定はできません；指定席特急券は {0}／席固定（{1} × {2} 席、割引なし、立席特急券もありません）。","A virtual extension section beyond the map that is not yet built. There is no actual train and no seat selection; the reserved-seat express fee is a flat {0}/seat ({1} × {2} seats, no discount, no standing-ticket option)."],
-"万瀨高速鉄道線（假想延伸 ${a}→${b}）　指定席特急券":["万瀨高速鉄道線（仮想延伸 {0}→{1}）　指定席特急券","Mutsuse High-Speed Rail (virtual extension {0}→{1}) reserved-seat express fee"],
-"万瀨高速鉄道線（假想延伸）指定席特急券 × ${a}":["万瀨高速鉄道線（仮想延伸）指定席特急券 × {0}","Mutsuse High-Speed Rail (virtual extension) reserved-seat express fee × {0}"],
-"万瀨高速鉄道線（假想延伸，地圖外尚未建成）":["万瀨高速鉄道線（仮想延伸、地図外・未開業）","Mutsuse High-Speed Rail (virtual extension, beyond the map, not yet built)"],
-"指定席特急券：${a} × ${b}（沒有實際車次，無法選位，僅供票價試算參考）":["指定席特急券：{0} × {1}（実際の列車はなく座席指定不可、運賃試算の参考値）","Reserved-seat express fee: {0} × {1} (no actual train, no seat selection — fare-estimate reference only)"],
+# 1.1.2：延伸段已經通車，站選單只用「*高速鉄道」標記，不再用「假想／未開業」這類字眼。
+"可以利用高速鐵路（含延伸路段）":["高速鉄道を利用する（延伸区間を含む）","Allow high-speed rail (including the extension)"],
+"万瀨高速鉄道線延伸段":["万瀨高速鉄道線　延伸区間","Mutsuse High-Speed Rail — Extension"],
+"万瀨高速鉄道線的延伸段尚未設定銜接的車站，無法查詢。":["万瀨高速鉄道線の延伸区間は接続駅が未設定のため、検索できません。","The Mutsuse High-Speed Rail Line's extension has no connecting station set, so it can't be searched."],
+"万瀨高速鉄道線的延伸段尚未設定銜接的車站，無法訂票。":["万瀨高速鉄道線の延伸区間は接続駅が未設定のため、予約できません。","The Mutsuse High-Speed Rail Line's extension has no connecting station set, so it can't be booked."],
+"這兩站之間查不到可以合併計算的高速鉄道延伸段票價。":["この2駅間の高速鉄道延伸区間の運賃は見つかりません。","No combined high-speed rail extension fare could be found between these two stations."],
+"這兩站之間查不到高速鉄道的班次。":["この2駅間の高速鉄道の列車は見つかりません。","No high-speed rail service could be found between these two stations."],
 "本券為模擬發行，不會儲存。":["本券はシミュレーション発行で、保存されません。","This ticket is a simulated issue and is not saved."],
-"　含假想延伸段部分僅供試算，不代表真的可以搭乘。":["　仮想延伸区間を含む部分は試算のみで、実際に乗車できることを意味しません。","　The part covering the virtual extension is for estimate purposes only and does not mean the trip can actually be made."],
+# 1.1.2：全站翻譯補完（前輩反映「整個網站許多地方的翻譯沒有完善」）——這批是實際走過 ja／en 兩種語言、
+# 逐頁掃出畫面上還留著原文中文（或日文假名以外漢字）殘留的地方，依頁面分類列在下面。
+# 調度狀態（運行情報）：site.js 是含「約每 N 班行駛 N 班」比例的長版，pages2.js／pages3.js 是不含比例的短版；
+# 兩種版本各自都有 4 種狀態（日中／離峰／深夜／收車），離峰・深夜・收車都已有翻譯，獨缺「日中」這個最常見的狀態。
+"目前採用日中時段班次，部分列車停駛（約每 3 班行駛 2 班）。":["現在、日中時間帯のダイヤで運転しており、一部の列車は運休です（約3本に2本が運転）。","The midday timetable is in effect and some trains are not running (about two in three runs)."],
+"目前採用日中時段班次（部分列車停駛）。":["現在、日中時間帯のダイヤで運転しています（一部列車は運休）。","Midday timetable in effect (some trains are not running)."],
+# 列車・路線的展示名稱：遊戲內匯出的資料本身沒有填英文名稱（net.routes 的 name 欄位 en 區段是空的），
+# 這個網站一直以來是用這份字典手動補英文名稱（可比對既有的「特急あおさぎ」「特急こばな」「花川本線特別快速」），
+# 這幾個目前還沒人補過。
+"特急スーパーこばな":["特急スーパーこばな","Limited Express Super Kobana"],
+"花川本線特別快速松歲線直通":["花川本線特別快速松歲線直通","Hanakawa Main Line Special Rapid — through service to the Matsutoshi Line"],
+"花川本線松歲線直通":["花川本線松歲線直通","Hanakawa Main Line — through service to the Matsutoshi Line"],
+# 訂票頁（booking.html）的兩段說明文字，之前完全沒有翻譯項目。
+"特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席；高速鐵路為全車指定席（沒有立席特急券，票價另計）。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。":["特急は全車指定席（半額の立席特急券もあります）。特別快速は1・2号車が指定席、3号車以降は自由席です。高速鉄道は全車指定席（立席特急券はなく、運賃は別計算）です。行程の中に予約できる区間が1つでもあれば、乗り換えを含む全行程を表示します。","Limited Express is all reserved (half-price standing express tickets also available); on Special Rapid cars 1–2 are reserved and car 3 and beyond are non-reserved; high-speed rail is all reserved (no standing-ticket option, fare calculated separately). If any leg of the trip can be reserved, the whole itinerary including transfers is shown."],
+"這個時間之後沒有含特急／特快／高速鐵路（可預約）的行程。可改用「時刻表與班次」查詢一般班次。":["この時刻以降、特急／特別快速／高速鉄道（予約可）を含む行程はありません。「時刻表と運行」で通常の運行を検索できます。","There are no itineraries after this time that include Limited Express / Special Rapid / high-speed rail (reservable). Use “Timetable and Service” to look up regular services instead."],
+# 車輛介紹頁（routes.html）的照片說明。
+"停在月台的新8000形1000番台特急あおさぎ":["停在月台的新8000形1000番台特急あおさぎ","The new 8000 series 1000 subseries Limited Express Aosagi, stopped at the platform"],
+"行駛在山間的新8000形1000番台":["行駛在山間的新8000形1000番台","The new 8000 series 1000 subseries, running through the mountains"],
+# 車站時刻表／路線頁的全日時刻表說明（第一段是路線方向，動態內容；第二段是固定說明文字）。
+"${HK.dirLabel(H, sv)}。各站的發車時刻（終點站為到達時刻），一欄是一班車。":["{0}。各駅の発車時刻（終点駅は到着時刻）。1列は1本の列車です。","{0}. Departure times at each station (arrival time at the terminus); each column is one train."],
+# 每頁共用頁首（tools/make_v90.py 產生）手機版漢堡選單按鈕的 aria-label；「主要選單」是巢狀 nav 本身的，這個是按鈕的，兩個不一樣。
+"選單":["メニュー","Menu"],
 }
 for k,v in MORE.items(): out[norm(k)]=v
 for k in list(out):

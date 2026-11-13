@@ -81,9 +81,14 @@
     svg.append(gEdge, gHs, gSt, gLab, gTr);
 
     // 1.1.0：高速鐵路不計入拓樸（H.edges 已經排除），只在轉乘站之間疊一層虛線（含站外轉乘，例如幸村↔新光瀨）
-    (H.hsEdges || []).forEach(e => {
+    // 1.1.2：改用 L.hsPaths（只接受 45°／90° 轉彎的折線，車站位置完全沿用一般鐵路排好的結果）；
+    //        顏色用 CFG.hsColor——跟票價查詢・車站時刻表・乘車轉乘查詢三頁共用的高速鉄道識別色一致，且跟一般鐵路（var(--g1)）明顯不同。
+    gHs.style.setProperty('--hs-color', (HK.CFG && HK.CFG.hsColor) || '#136880');
+    (L.hsPaths || H.hsEdges || []).forEach(e => {
+      const cls = 'hs-line' + (e.walk ? ' hs-walk' : '');
+      if (e.pts) { gHs.append(s('path', { d: 'M' + e.pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L'), class: cls })); return; }
       const a = L.pos.get(e.a), b = L.pos.get(e.b); if (!a || !b) return;
-      gHs.append(s('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: 'hs-line' + (e.walk ? ' hs-walk' : '') }));
+      gHs.append(s('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: cls }));
     });
 
     // 連結：每站經過的路線數（轉乘站畫大圓）
@@ -211,14 +216,15 @@
 
   const fmtDate = ms => { if (!ms) return ''; const d = new Date(Number(ms)); if (isNaN(d)) return ''; const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 
-  /** 1.1.1：起訖站選單裡的「假想延伸站」選項——只在勾選「可以利用高速鉄道」時才出現在選單最後的 optgroup，
-   *  取消勾選時移除；如果移除時原本選到的剛好是假想站，就把選值退回第一個（真實）選項，避免選單留著一個不存在的值。
+  /** 1.1.2：起訖站選單裡的万瀨高速鉄道線延伸段車站——只在勾選「可以利用高速鉄道」時才出現在選單最後的 optgroup，
+   *  取消勾選時移除；如果移除時原本選到的剛好是延伸段車站，就把選值退回第一個（一般）選項，避免選單留著一個不存在的值。
+   *  已經視為通車，不再用「假想／地圖外」這類字眼，每個選項後面統一標「*高速鉄道」，讓玩家知道只能搭高速鉄道抵達。
    *  乘車・轉乘查詢（site.js）與訂票（booking.js）共用這個函式。 */
   function refreshHSExtOptions(H, sel, show) {
     let grp = sel.querySelector('optgroup[data-hsext]');
     if (show && H.hsExtStops && H.hsExtStops.length) {
-      if (!grp) { grp = h('optgroup', { label: '万瀨高速鉄道線　假想延伸（地圖外）', 'data-hsext': '1' }); sel.append(grp); }
-      grp.replaceChildren(...H.hsExtStops.map(st => h('option', { value: st.id }, st.zh)));
+      if (!grp) { grp = h('optgroup', { label: '万瀨高速鉄道線延伸段', 'data-hsext': '1' }); sel.append(grp); }
+      grp.replaceChildren(...H.hsExtStops.map(st => h('option', { value: st.id }, st.zh + '　*高速鉄道')));
     } else if (grp) {
       const wasVirtual = String(sel.value).indexOf('hsext:') === 0;
       grp.remove();

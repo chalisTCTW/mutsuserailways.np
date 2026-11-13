@@ -298,7 +298,9 @@ EXTRA += [
 ("8 輛","8両","8 cars"),("6 輛","6両","6 cars"),("6 輛・8 輛","6両・8両","6 or 8 cars"),
 ("全車指定席（另有立席特急券）","全車指定席（立席特急券あり）","All seats reserved (standing tickets also sold)"),("座位設備","座席設備","Seat features"),("備有 USB 充電口","USB充電口あり","USB charging ports"),
 ("座席","座席","Seats"),("含松歲線直通的班次。","松歳線直通列車を含みます。","Includes through services to the Matsutoshi Line."),
-("環狀快速白藏山線直通","環状快速白藏山線直通","Loop Semi-Fast (Shirakura Line through service)"),
+("環状快速白藏山線直通","環状快速白藏山線直通","Circular Rapid — through service to the Shirakura Line"),
+# 1.1.2：pages4.js 的頁面標題用的是繁體「狀」（跟 hk-core.js 從遊戲資料動態組出來的「状」是不同的字），兩個字都要各放一份才會都翻到。
+("環狀快速白藏山線直通","環状快速白藏山線直通","Circular Rapid — through service to the Shirakura Line"),
 ("運行與時刻","運行と時刻","Operation and timetable"),("時刻表資料中還沒有這個種別的班次，更新後會顯示在這裡。","このサービスの列車はまだ時刻表データにありません。","This service is not in the timetable data yet."),
 ("本日沒有班次。","本日の運行はありません。","No trains today."),("乘車指南與常見問題","ご利用案内・FAQ","Guide and FAQ"),("車站","駅","Station"),
 ("停靠咲海研究學園都市站","咲海研究学園都市駅停車中","Stopped at Sakumi Research Campus"),("行駛在山間","山間を走行中","Running through the mountains"),
