@@ -95,6 +95,7 @@
 
   function fixText(n) {
     const raw = n.nodeValue; if (!raw || !CJK.test(raw)) return;
+    if (n.parentElement && n.parentElement.closest('[data-i18n-off]')) return;   /* 1.2.5：車票等自帶日英雙語的區塊，不再被語言切換改寫 */
     const t = norm(raw); if (!t || OUT.has(t)) return;
     const v = lookup(t); if (v == null || v === t) return;
     OUT.add(norm(v));
@@ -105,6 +106,7 @@
   function fixAttrs(el) {
     for (const a of ATTRS) {
       const raw = el.getAttribute && el.getAttribute(a); if (!raw || !CJK.test(raw)) continue;
+      if (el.closest && el.closest('[data-i18n-off]')) continue;
       const t = norm(raw); if (OUT.has(t)) continue; const v = lookup(t); if (v != null && v !== raw) { OUT.add(norm(v)); el.setAttribute(a, v); }
     }
   }

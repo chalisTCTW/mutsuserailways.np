@@ -755,3 +755,65 @@ header.sh .gnav li.admin a { padding: 6px 10px; }
 .kbhero.nophoto { min-height: 0; }
 .svgroup > div, .kbcols > div { min-width: 0; max-width: 100%; overflow-x: auto; }
 .gou { font-weight: 700; font-size: .92em; margin-left: .3em; letter-spacing: .02em; }
+
+/* ───────── 1.2.4：高速鉄道欄位を主システム（v9.0「写真と1色」）の見た目に統一 ─────────
+ * 角丸・淡い青緑の面・青緑の枠をやめ、他の入力欄と同じ「直角・細い罫線・白地・深緑の文字」に。
+ * 高速鉄道の識別色（#136880）は小さなタグ・路線図の破線・時刻表の記号だけに残す。 */
+.hs-field { border: 1px solid var(--line); border-radius: 0; background: var(--white); }
+.hs-field .hs-tag { border-radius: 0; padding: 0 7px; line-height: 20px; border: 1px solid #136880; }
+.hs-field label.f span { color: var(--g0); }
+.hs-field label.f span .hs-tag { color: #fff; }
+.hs-field .btn { background: var(--g1); border-color: var(--g1); }
+.hs-field h2 { font-family: var(--serif); }
+
+/* 1.2.4：車票（乗車券＋特急券）。site-config.js の ticketStyle で A／B／C を切り替え。 */
+.tk-set { display: flex; gap: 14px; }
+.tk-set-a, .tk-set-b { flex-direction: column; }
+.tk-set-c { flex-wrap: wrap; align-items: flex-start; }
+.tk.tkB { border-radius: 0; box-shadow: none; border-width: 1px; }
+.tk.tkB > header b { font-family: var(--serif); letter-spacing: .08em; }
+.tk.tkB .tk-st strong { font-family: var(--serif); font-weight: 700; }
+.tk-seat { padding: 0 16px 6px; font-weight: 700; }
+/* A：硬券・指定券風 */
+/* 1.2.5：A 方案定案——票面固定 寬 10.5 : 高 5.7，日文＋英文同時印出；文字以容器寬度（cqw）等比縮放，比例不會因內容而變 */
+.tk-set-a { overflow-x: auto; }
+.tk.tkA { --tk: var(--g1); container-type: inline-size; width: min(100%, 600px); min-width: 440px; flex: 0 0 auto; aspect-ratio: 10.5 / 5.7; box-sizing: border-box; overflow: hidden; display: grid; grid-template-columns: 15% minmax(0, 1fr); border: 1px solid var(--tk); border-radius: 0; background: #f3f7f4; box-shadow: 0 2px 6px rgba(18, 63, 49, .16); margin: 0; }
+.tkA-side { background: var(--tk); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6cqw; padding: 2cqw 1cqw; min-height: 0; overflow: hidden; }
+.tkA-side b { font: 900 5.2cqw/1 var(--serif); letter-spacing: .06em; writing-mode: vertical-rl; white-space: nowrap; }
+.tkA-side em { font: 700 1.5cqw/1 var(--sans, sans-serif); font-style: normal; letter-spacing: .08em; writing-mode: vertical-rl; white-space: nowrap; opacity: .9; }
+.tkA-side small { font-size: 1.7cqw; line-height: 1.2; text-align: center; }
+.tkA-body { padding: 2cqw 2.6cqw; display: flex; flex-direction: column; justify-content: space-between; gap: 1cqw; border-left: 2px dashed #fff; min-width: 0; min-height: 0; overflow: hidden; }
+.tkA-top { display: flex; justify-content: space-between; gap: 2cqw; font-size: 1.9cqw; line-height: 1.25; color: var(--muted); }
+.tkA-top .r { text-align: right; }
+.tkA-top i, .tkA-route i, .tkA-via span + span { font-style: normal; font-size: .86em; opacity: .85; }
+.tkA-route { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 1.5cqw; }
+.tkA-route .st { display: flex; flex-direction: column; min-width: 0; }
+.tkA-route .st b { font: 700 4.4cqw/1.2 var(--serif); color: var(--g0); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tkA-route .st i { font-size: 2cqw; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tkA-route .st em { font: normal 2.1cqw/1.3 var(--sans, sans-serif); color: var(--tk); }
+.tkA-route .ar { font-size: 4cqw; color: var(--tk); }
+.tkA-via { display: flex; flex-direction: column; font-size: 1.9cqw; line-height: 1.3; color: var(--muted); min-width: 0; }
+.tkA-via span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tkA-seat { border-top: 1px solid var(--line); padding-top: 1cqw; color: var(--tk); }
+.tkA-seat .bi { display: flex; flex-direction: column; }
+.tkA-seat .ja { font: 900 4.6cqw/1.15 var(--serif); }
+.tkA-seat .en { font: 700 2.2cqw/1.2 var(--sans, sans-serif); }
+.tkA-foot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 2cqw; line-height: 1.25; color: var(--muted); }
+.tkA-foot .bi { display: flex; flex-direction: column; }
+.tkA-foot b { font: 900 5.4cqw/1 var(--serif); color: var(--tk); }
+.tkA-no { display: flex; align-items: center; gap: 1.6cqw; border-top: 1px dashed var(--tk); padding-top: 1cqw; font-size: 1.5cqw; color: var(--muted); white-space: nowrap; }
+.tkA-no .tk-bar { height: 4.4cqw; margin: 0; gap: .25cqw; max-width: 26cqw; overflow: hidden; flex: 0 0 auto; transform-origin: left; }
+.tkA-no .n { line-height: 1.3; }
+.tk.tkC { width: 190px; max-width: 100%; border: 1px solid var(--line); border-radius: 0; background: #fbfaf5; box-shadow: 0 2px 6px rgba(0, 0, 0, .12); font-family: "DotGothic16", "MS Gothic", "Noto Sans JP", monospace; padding-bottom: 12px; }
+.tk.tkC > header { display: block; text-align: center; padding: 7px 0; font-size: 14px; letter-spacing: .2em; color: #fff; margin: 0; }
+.tkC-in { padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; font-size: 13px; }
+.tkC-sub { font-size: 10px; color: var(--muted); text-align: center; }
+.tkC-st { font-size: 17px; line-height: 1.3; text-align: center; }
+.tkC-ar { text-align: center; }
+.tkC-in hr { border: 0; border-top: 1px dotted var(--ink); margin: 2px 0; }
+.tkC-row { display: flex; justify-content: space-between; gap: 6px; }
+.tkC-seat { text-align: center; font-size: 20px; border: 1px solid; padding: 4px 0; }
+.tkC-yen { display: flex; justify-content: space-between; font-size: 20px; border-top: 1px dotted var(--ink); padding-top: 6px; }
+.tkC-no { font-size: 9px; color: var(--muted); text-align: center; }
+.tk.tkC .tk-bar { margin: 4px 0 0; }
+@media print { .tk-set { break-inside: avoid; } }

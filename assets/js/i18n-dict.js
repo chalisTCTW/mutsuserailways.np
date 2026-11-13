@@ -3647,5 +3647,29 @@ window.HK_I18N_DICT = {
 "選單": [
 "メニュー",
 "Menu"
+],
+"乗車券 / TICKET": [
+"乗車券 / TICKET",
+"Fare Ticket / TICKET"
+],
+"特急券 / EXPRESS TICKET": [
+"特急券 / EXPRESS TICKET",
+"Express Ticket / EXPRESS TICKET"
+],
+"乗車券": [
+"乗車券",
+"Fare Ticket"
+],
+"特急券": [
+"特急券",
+"Express Ticket"
+],
+"以後": [
+"以降",
+"onward"
+],
+"可利用高速鐵路": [
+"高速鉄道の利用可",
+"High-speed rail allowed"
 ]
 };

@@ -238,7 +238,7 @@
         const extLeg = H.hsExtLeg(fLabel, tLabel, t0);
         if (!extLeg) { out.append(h('p', { class: 'lead' }, '這兩站之間查不到高速鉄道的班次。')); return; }
         out.append(h('h2', { class: 'h2' }, `${fLabel} → ${tLabel}`, h('small', null, `${hm(t0)} 之後的班次`)));
-        out.append(journeyCard(H, { dep: extLeg.stops[0].dep, arr: extLeg.stops[1].arr, legs: [extLeg] }, { yen: extLeg.fare.zoneFee }, true));
+        out.append(journeyCard(H, { dep: extLeg.stops[0].dep, arr: extLeg.stops[extLeg.stops.length - 1].arr, legs: [extLeg] }, { yen: extLeg.fare.zoneFee }, true));
         return;
       }
       const res = H.searchEx(realFrom, realTo, t0, 4, { via: vSel.value || null, noReserved: noRes.checked, allowHighSpeed: useHS.checked || fVirtual || tVirtual });
@@ -253,13 +253,15 @@
           // 1.1.2：延伸段已經通車——合成一段跟真正班次同樣形狀的 leg，接在真實路段之後（或之前）一起顯示在
           // 行程卡片的時刻表裡，不是另外用一行文字說明；票價一樣是「真實路段＋延伸段的分區運費」合併計算。
           let extLeg;
-          if (tVirtual) { const last = j.legs[j.legs.length - 1]; extLeg = H.hsExtLeg(anchorZh, vZh, j.arr, last.sv.isHS ? last.gou : ''); }
-          else { const first = j.legs[0]; extLeg = H.hsExtLeg(vZh, anchorZh, j.dep - H.hsExtDuration(vZh, anchorZh), first.sv.isHS ? first.gou : ''); }
+          if (tVirtual) { const last = j.legs[j.legs.length - 1]; extLeg = H.hsExtLeg(anchorZh, vZh, j.arr + (last.sv.isHS && !last.walk ? 0 : H.minTransfer), last.sv.isHS ? last.gou : ''); }
+          else { const first = j.legs[0]; extLeg = H.hsExtLeg(vZh, anchorZh, j.dep - H.hsExtDuration(vZh, anchorZh) - (first.sv.isHS && !first.walk ? 0 : H.minTransfer), first.sv.isHS ? first.gou : ''); }
           if (extLeg) {
             fare = { yen: (real ? real.yen : 0) + extLeg.fare.zoneFee };
-            legs = tVirtual ? [...j.legs, extLeg] : [extLeg, ...j.legs];
-            dep = tVirtual ? j.dep : extLeg.stops[0].dep;
-            arr = tVirtual ? extLeg.stops[1].arr : j.arr;
+            // 1.2.4：延伸段與相鄰的高速鉄道班次併成同一班車（H.attachExtLeg）；相鄰那段不是高速鉄道時才保留成獨立一段。
+            const at = H.attachExtLeg(j.legs, extLeg, tVirtual);
+            legs = at.legs;
+            dep = tVirtual ? j.dep : legs[0].stops[0].dep;
+            arr = tVirtual ? legs[legs.length - 1].stops[legs[legs.length - 1].stops.length - 1].arr : j.arr;
           }
         }
         out.append(journeyCard(H, { dep, arr, legs }, fare, n === 0));

@@ -102,6 +102,13 @@ MORE={
 "${HK.dirLabel(H, sv)}。各站的發車時刻（終點站為到達時刻），一欄是一班車。":["{0}。各駅の発車時刻（終点駅は到着時刻）。1列は1本の列車です。","{0}. Departure times at each station (arrival time at the terminus); each column is one train."],
 # 每頁共用頁首（tools/make_v90.py 產生）手機版漢堡選單按鈕的 aria-label；「主要選單」是巢狀 nav 本身的，這個是按鈕的，兩個不一樣。
 "選單":["メニュー","Menu"],
+# 1.2.4：車票（乗車券＋特急券）、訂票頁標題的新文字。
+"乗車券 / TICKET":["乗車券 / TICKET","Fare Ticket / TICKET"],
+"特急券 / EXPRESS TICKET":["特急券 / EXPRESS TICKET","Express Ticket / EXPRESS TICKET"],
+"乗車券":["乗車券","Fare Ticket"],
+"特急券":["特急券","Express Ticket"],
+"以後":["以降","onward"],
+"可利用高速鐵路":["高速鉄道の利用可","High-speed rail allowed"],
 }
 for k,v in MORE.items(): out[norm(k)]=v
 for k in list(out):

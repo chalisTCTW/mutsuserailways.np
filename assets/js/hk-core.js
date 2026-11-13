@@ -401,17 +401,51 @@
     /** fromId → toId，t0 之後最早的 count 個選項。opt：{ via: 車站id, noReserved: true } */
     H.searchEx = function (fromId, toId, t0, count, opt) {
       opt = opt || {};
-      const o = sIdx.get(fromId), d = sIdx.get(toId), v = opt.via && opt.via !== fromId && opt.via !== toId ? sIdx.get(opt.via) : null, out = []; count = count || 4;
-      if (o == null || d == null || o === d) return out;
+      const o = sIdx.get(fromId), d = sIdx.get(toId), v = opt.via && opt.via !== fromId && opt.via !== toId ? sIdx.get(opt.via) : null;
+      count = count || 4;
+      if (o == null || d == null || o === d) return [];
+      // 1.1.3：先比 count 多蒐集一些候選（底下 (4)(5) 兩條 post-filter／排序要從裡面挑，剔除繞路方案後才不會湊不滿 count 筆）。
+      const wantRaw = count * 3, raw = [];
       let t = t0;
-      for (let i = 0, tries = 0; out.length < count && tries < count * 4; tries++) {
+      for (let tries = 0; raw.length < wantRaw && tries < wantRaw * 4; tries++) {
         const j = v != null ? viaJourney(o, v, d, t, opt) : bestFrom(o, d, t, opt);
         if (!j) break;
         t = j.dep + 1;
         if (!okJourney(j)) continue;
-        if (!out.length || j.dep > out[out.length - 1].dep) out.push(j);
+        if (!raw.length || j.dep > raw[raw.length - 1].dep) raw.push(j);
       }
-      return out;
+      if (!opt.allowHighSpeed) return raw.slice(0, count);   // 沒勾選高速鐵路時，searchOnce 早就把所有 HS 班次濾掉了，(4)(5) 不會有候選可挑
+      // (4) 盡量不要建議「高速鐵路→一般鐵路→高速鐵路」來回的路徑：先把這種來回模式的候選剔除；
+      //     剔除後若一個方案都不剩，還是把原本的候選還回去，不要讓玩家完全查不到路線。
+      const hsRailHsBack = legs => {
+        let sawHS = false, leftHS = false;
+        for (const lg of legs) { const isHS = !!lg.sv.isHS; if (isHS) { if (leftHS) return true; sawHS = true; } else if (sawHS) leftHS = true; }
+        return false;
+      };
+      let pool = raw.filter(j => !hsRailHsBack(j.legs));
+      if (!pool.length) pool = raw;
+      // (5) 不可避免要在高速鐵路／一般鐵路之間轉乘（這段行程同時含 HS 與非 HS 的 leg）時，到達時間跟目前最早的
+      //     方案相近的候選裡，優先選「一般鐵路時間最短、高速鐵路時間最長」的方案。
+      //     「到達時間相近」原始需求沒有明確定義容忍窗口，這裡自行取 ±5 分鐘（300 秒）：日本鐵路時刻表級距以分計，
+      //     5 分鐘大致是乘客觀感上「還算差不多時間到」的範圍，而且是固定秒數，不會因路線長短而忽寬忽窄，
+      //     比起用總行程時間的百分比更容易預期、也比較穩定。只用來挑要留下的 count 筆，不改變最終回傳的排序。
+      // 1.2.4：原指令是以「總路徑長度」比較——利用一般鐵路最短、高速鐵路最長的方案優先（1.2.3 誤用了時間，已改回路徑長度）。
+      //        路徑長度＝每一段 leg 相鄰停靠站之間直線距離（地圖座標 x／z）的總和，一般鐵路與高速鐵路分開累加。
+      //        只在「到達時間相近」的混合方案之間比較，避免挑到晚很多才到的方案；容忍秒數是 CFG.hsPreferTolSec（預設 900＝15 分鐘）。
+      const TOL = (CFG.hsPreferTolSec != null ? CFG.hsPreferTolSec : 900);
+      const legLen = lg => { let d = 0; for (let i = 1; i < lg.stops.length; i++) { const A = H.stById[lg.stops[i - 1].station], B = H.stById[lg.stops[i].station]; if (A && B) d += Math.hypot(A.x - B.x, A.z - B.z); } return d; };
+      const railSec = j => j.legs.reduce((s, lg) => s + (lg.sv.isHS ? 0 : legLen(lg)), 0);
+      const hsSec = j => j.legs.reduce((s, lg) => s + (lg.sv.isHS ? legLen(lg) : 0), 0);
+      const isMixed = j => { let hs = false, nr = false; j.legs.forEach(lg => { if (lg.sv.isHS) hs = true; else nr = true; }); return hs && nr; };
+      const minArr = pool.length ? Math.min(...pool.map(j => j.arr)) : 0;
+      const rank = pool.map(j => ({ j, closeToBest: isMixed(j) && (j.arr - minArr) <= TOL, rail: railSec(j), hs: hsSec(j) }));
+      rank.sort((a, b) => {
+        if (a.closeToBest && b.closeToBest) { const r = a.rail - b.rail; if (r) return r; const hd = b.hs - a.hs; if (hd) return hd; }
+        return a.j.arr - b.j.arr || a.j.dep - b.j.dep;
+      });
+      const chosen = rank.slice(0, count).map(r => r.j);
+      chosen.sort((a, b) => a.dep - b.dep);   // 回傳順序仍照「依出發時間先後」，跟原本的顯示習慣一致
+      return chosen;
     };
     H.search = function (fromId, toId, t0, count) { return H.searchEx(fromId, toId, t0, count, {}); };
 
@@ -546,22 +580,57 @@
      *  （延伸站不在 H.stById 裡，沒有收費區資料）。 */
     H.hsExtLeg = function (aZh, bZh, depSec, gou) {
       const f = H.hsFareExt(aZh, bZh); if (!f) return null;
-      const dur = H.hsExtDuration(aZh, bZh);
-      const aId = (H.hsQueryStations.find(s => s.zh === aZh) || {}).id, bId = (H.hsQueryStations.find(s => s.zh === bZh) || {}).id;
-      if (!aId || !bId) return null;
-      const stops = [{ station: aId, dep: depSec }, { station: bId, arr: depSec + dur }];
+      const list = H.hsQueryStations;
+      const ia = list.findIndex(s => s.zh === aZh), ib = list.findIndex(s => s.zh === bZh);
+      if (ia < 0 || ib < 0 || ia === ib) return null;
+      // 1.1.3：延伸段的中間站也要在停靠順序內（例如新岩沢—新勝守之間還有別的延伸站），不能只放頭尾兩站。
+      // 走法跟 H.hsFareExt／H.hsExtDuration 一樣沿 lo→hi 累加每一段的時間；aZh 在 bZh 後面（index 較大）
+      // 時整段反過來（rev），但每段的秒數本來就是跟方向無關的物理站間時間，反過來排列即可。
+      const rev = ia > ib, lo = Math.min(ia, ib), hi = Math.max(ia, ib);
+      let seq = list.slice(lo, hi + 1);
+      let segSec = []; for (let i = lo + 1; i <= hi; i++) segSec.push((list[i].min || 0) * 60);
+      if (rev) { seq = seq.slice().reverse(); segSec = segSec.slice().reverse(); }
+      let t = depSec;
+      const stops = [{ station: seq[0].id, dep: t }];
+      for (let i = 1; i < seq.length; i++) {
+        t += segSec[i - 1];
+        stops.push(i === seq.length - 1 ? { station: seq[i].id, arr: t } : { station: seq[i].id, arr: t, dep: t });
+      }
       // sv.stops 跟 leg.stops 用同一份陣列——H.destOf／H.reserveInfo 等既有函式都是照「sv 本身也有完整停靠站序列」
-      // 的假設寫的，延伸段只有一段，直接共用不會有問題。
+      // 的假設寫的，現在停靠站序列是完整的 lo→hi 範圍，一樣直接共用不會有問題。
       const sv = { isHS: true, routeName: (CFG.hsExt && CFG.hsExt.routeName) || '万瀨高速鉄道線', idx: -2, member: {}, stops };
       return { sv, stops, board: 0, trip: null, walk: false, gou: gou || '', ext: true, fare: f };
     };
-    /** 一段行程裡「真正的轉乘次數」：延伸段如果延續同一班車（跟相鄰段的「○号」相同）就不算轉乘，
-     *  只是同一班車繼續開往地圖外而已；其餘（含真的換車、延伸段沒有可沿用的号碼時）照舊算一次轉乘。 */
+    /** 1.1.3：把 H.hsExtLeg 產生的延伸段，合併進相鄰「真正那一班車」的 leg 裡，顯示成同一班車直接開到地圖外，
+     *  不會在銜接站（東平倉）出現「轉乘」。只回傳給畫面顯示用的複本：不改動 H.svcs 共用的 sv 物件、不影響
+     *  booking.js 另外用 extLegInfo() 處理的訂位／選位資料結構，純粹是查詢結果呈現上的合併。
+     *  atEnd＝true：延伸段接在這段的尾端（往地圖外去）；false：接在這段的開頭（從地圖外進來）。 */
+    H.mergeExtLeg = function (leg, extLeg, atEnd) {
+      if (!leg || !extLeg) return leg;
+      // 去掉重複的那一筆錨點站（atEnd 時是 extLeg 的第一筆；反過來時是 extLeg 的最後一筆）
+      const stops = atEnd ? leg.stops.concat(extLeg.stops.slice(1)) : extLeg.stops.slice(0, -1).concat(leg.stops);
+      const sv = { ...leg.sv, stops };   // 複本：sv.stops 跟著延伸，但不动到 H.svcs 共用的原始物件
+      const board = atEnd ? leg.board : leg.board + (extLeg.stops.length - 1);
+      return { ...leg, sv, stops, board };
+    };
+    /** 1.2.4：把延伸段接進一串 legs。相鄰那一段本身是高速鉄道班次（而且沒有步行連絡）時，併成「同一班車直接開到地圖外」
+     *  （銜接站不會出現轉乘、座位也是同一班車的連續座位）；相鄰那一段不是高速鉄道（一般鐵路到銜接站再換高速）時，
+     *  延伸段仍是另一班車，保留成獨立一段。回傳 { legs, merged, idx }；不改動傳入的 legs 陣列。 */
+    H.attachExtLeg = function (legs, extLeg, atEnd) {
+      const idx = atEnd ? legs.length - 1 : 0, nb = legs[idx];
+      if (nb && nb.sv && nb.sv.isHS && !nb.walk && !nb.ext) {
+        const out = legs.slice(); out[idx] = H.mergeExtLeg(nb, extLeg, atEnd);
+        return { legs: out, merged: true, idx };
+      }
+      return { legs: atEnd ? legs.concat([extLeg]) : [extLeg].concat(legs), merged: false, idx: atEnd ? legs.length : 0 };
+    };
+    /** 一段行程裡「真正的轉乘次數」：延伸段與相鄰的高速鉄道班次視為同一班車（不算轉乘）；
+     *  延伸段接在一般鐵路之後（需要換成高速鉄道）時，照舊算一次轉乘。 */
     H.legsTransfers = function (legs) {
       let n = 0;
       for (let i = 1; i < legs.length; i++) {
         const a = legs[i - 1], b = legs[i];
-        if (b.ext && a.gou && b.gou && a.gou === b.gou) continue;
+        if ((a.ext && b.sv && b.sv.isHS) || (b.ext && a.sv && a.sv.isHS)) continue;
         n++;
       }
       return n;
