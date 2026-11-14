@@ -58,9 +58,9 @@
 
     // 運行情報：以路線（線名）為單位。整修中的路線標示為暫停運轉。
     const by = new Map();
-    H.net.routes.forEach(r => { const ln = r.displayZh; const e = by.get(ln) || { n: 0, ok: false }; e.n++; if (r.status !== 'maintenance') e.ok = true; by.set(ln, e); });
+    H.net.routes.forEach(r => { const ln = r.displayZh; const e = by.get(ln) || { n: 0, ok: false }; e.n++; if (e.col == null && r.color != null && isFinite(Number(r.color))) e.col = '#' + (Number(r.color) & 0xFFFFFF).toString(16).padStart(6, '0'); if (r.status !== 'maintenance') e.ok = true; by.set(ln, e); });
     const tb = $('#status tbody');
-    [...by.entries()].sort((a, b) => (b[1].ok - a[1].ok) || a[0].localeCompare(b[0], 'ja')).forEach(([ln, e]) => tb.append(h('tr', null, h('td', null, ln), h('td', { class: e.ok ? 'ok' : 'stop' }, e.ok ? '平常運轉' : '整修中（暫停運轉）'))));
+    [...by.entries()].sort((a, b) => (b[1].ok - a[1].ok) || a[0].localeCompare(b[0], 'ja')).forEach(([ln, e]) => tb.append(h('tr', null, h('td', e.col ? { style: '--lc:' + e.col } : null, ln), h('td', { class: e.ok ? 'ok' : 'stop' }, e.ok ? '平常運轉' : '整修中（暫停運轉）'))));
     const up = fmtDate(H.exportedAt); if (up) { const note = $('#status-note'); note.replaceChildren(document.createTextNode(`運行情報為時刻表資料記錄的狀態（資料時點 ${up}）。`), ...(dispNote(H) ? [document.createTextNode(' ' + dispNote(H))] : [])); }
 
     // 最新消息

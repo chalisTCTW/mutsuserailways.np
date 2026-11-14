@@ -1,0 +1,175 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap");
+/* 光瀨都市鉄道 入口網站 ── 1.3.0 設計更新（theme.css）
+ * 在 site.css 之後載入，只改「外觀」，不動功能與頁面結構。
+ * 方針：①字體只用 Noto Sans 一族（日／中／英各取對應字形），不再混用襯線體；字重只用 400／500／700／900。
+ *       ②沉靜的企業官網版面（細線、留白、英文小標），並加入副色：暖黃（深色底的強調）、砂金（編號與細線）、各路線種別色。
+ *       ③按鈕・卡片・列表有 hover 回饋，首頁與各區塊進場有淡入；有「減少動態」設定的人一律關閉。 */
+
+:root {
+  --font: "Noto Sans TC", "Noto Sans JP", "Hiragino Sans", "Microsoft JhengHei", "PingFang TC", "Noto Sans CJK TC", "Noto Sans CJK JP", sans-serif;
+  --serif: var(--font);
+  --sand: #a87a1f;       /* 砂金：編號、細線（白底上對比 4.5:1 以上） */
+  --acc: #ffd21f;        /* 暖黃：只用在深綠底上的強調 */
+  --hair: #e4e1d8;       /* 細線 */
+  --warm: #f7f5ef;       /* 暖灰：hover 底色 */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+html[lang="ja"] { --font: "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Noto Sans CJK JP", "Noto Sans CJK TC", sans-serif; }
+body { font-family: var(--font); font-weight: 400; letter-spacing: .01em; }
+button, select, input, textarea { font-family: inherit; }
+b, strong, th { font-weight: 700; }
+h1, h2, h3 { font-family: var(--font); }
+
+/* ── 動態的共通設定 ── */
+@keyframes hkUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes hkIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hkKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }
+@keyframes hkPulse { 50% { opacity: .35; } }
+a, .btn, button, select, input { transition: color .25s var(--ease), background-color .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease), transform .25s var(--ease); }
+
+/* ── 標頭：深綠細條（標誌・語言）＋白底選單列 ── */
+header.sh .sh-brand span { font: 700 18px/1.2 var(--font); letter-spacing: .08em; }
+body[data-page="home"] header.sh { position: relative; background: var(--g0); }
+body[data-page="home"] header.sh .sh-in { padding-top: 12px; padding-bottom: 12px; }
+@media (min-width: 1421px) {
+  header.sh, body[data-page="home"] header.sh { background: linear-gradient(180deg, var(--g0) 0 64px, #fff 64px); border-bottom: 1px solid var(--hair); }
+  .sh-in, body[data-page="home"] header.sh .sh-in { display: grid; grid-template-columns: 1fr auto; grid-template-rows: 64px auto; align-items: center; gap: 0 18px; padding: 0 16px; }
+  .sh-brand { grid-area: 1 / 1; }
+  header.sh .util { grid-area: 1 / 2; }
+  header.sh .gnav { grid-area: 2 / 1 / 3 / 3; }
+  header.sh .gnav ul { justify-content: center; flex-wrap: wrap; gap: 0 8px; }
+  header.sh .gnav a { display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; color: var(--ink); opacity: 1; padding: 14px 14px 12px; font-size: 14px; font-weight: 500; text-align: center; }
+  header.sh .gnav a:hover { background: none; color: var(--g1); }
+  header.sh .gnav .en { display: block; font-size: 9.5px; letter-spacing: .16em; color: #6d7d76; font-weight: 500; opacity: 1; text-transform: uppercase; margin: 0; }
+  html[lang="en"] header.sh .gnav .en { display: none; }
+  header.sh .gnav a::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 3px; background: var(--g1); transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease); }
+  header.sh .gnav a:hover::after, header.sh .gnav a[aria-current="page"]::after { transform: scaleX(1); }
+  header.sh .gnav a[aria-current="page"] { box-shadow: none; background: none; color: var(--g1); font-weight: 700; }
+  .sh-in, body[data-page="home"] header.sh .sh-in { position: relative; }
+  header.sh .gnav li.admin { position: absolute; top: 15px; right: 168px; margin: 0; }
+  header.sh .gnav li.admin a { border: 1px solid rgba(255, 255, 255, .6); color: #fff; padding: 6px 14px; font-size: 12.5px; flex-direction: row; }
+  header.sh .gnav li.admin a::after { display: none; }
+  header.sh .gnav li.admin a:hover { background: #fff; color: var(--g0); }
+  header.sh .gnav li.admin .en { display: none; }
+}
+header.sh .langsw button { transition: background-color .25s, color .25s; }
+header.sh .langsw button:hover { background: rgba(255, 255, 255, .18); }
+
+/* ── 首頁主視覺 ── */
+.hero { height: clamp(420px, 64vh, 580px); }
+.slide img { object-position: center 55%; }
+.slide.on img { animation: hkKen 26s ease-in-out infinite alternate; }
+.slide::after { height: 78%; background: linear-gradient(to top, rgba(6, 26, 20, .82) 0, rgba(6, 26, 20, .38) 55%, rgba(6, 26, 20, 0) 100%); }
+.slide.on .cap > * { animation: hkUp .9s var(--ease) both; }
+.slide.on .cap > *:nth-child(2) { animation-delay: .12s; }
+.slide.on .cap > *:nth-child(3) { animation-delay: .22s; }
+.slide.on .cap > *:nth-child(4) { animation-delay: .32s; }
+.cap { padding-bottom: 64px; }
+.cap .tag { border: 0; padding: 0 0 0 34px; position: relative; color: var(--acc); font-weight: 700; font-size: 12px; letter-spacing: .28em; text-transform: uppercase; line-height: 22px; }
+.cap .tag::before { content: ""; position: absolute; left: 0; top: 50%; width: 24px; height: 2px; background: var(--acc); }
+.cap h2 { font: 700 clamp(28px, 4vw, 46px)/1.35 var(--font); letter-spacing: .04em; margin: 10px 0 12px; }
+.cap p { font-size: 15.5px; font-weight: 400; line-height: 1.8; }
+.cap a.more { background: none; color: #fff; padding: 0 0 6px; margin-top: 18px; font-size: 13px; font-weight: 700; letter-spacing: .18em; border-bottom: 1px solid rgba(255, 255, 255, .7); position: relative; }
+.cap a.more::after { content: " →"; display: inline-block; transition: transform .3s var(--ease); }
+.cap a.more:hover { background: none; color: var(--acc); border-color: var(--acc); }
+.cap a.more:hover::after { transform: translateX(6px); }
+.hero-ctl button { border-radius: 50%; transition: background-color .25s, transform .25s; }
+.hero-ctl button:hover { transform: scale(1.12); }
+
+/* ── 版面進場 ── */
+main .sec, main .pagehead, main .crumb, main .gsec { animation: hkUp .8s var(--ease) both; }
+main .sec:nth-of-type(2), main .gsec:nth-of-type(2) { animation-delay: .06s; }
+main .sec:nth-of-type(3), main .gsec:nth-of-type(3) { animation-delay: .12s; }
+main .sec:nth-of-type(n+4), main .gsec:nth-of-type(n+4) { animation-delay: .18s; }
+
+/* ── 區塊標題：英文小標在上、主標在下 ── */
+.sec > h2, .gsec > h2 { display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 8px; font: 700 28px/1.35 var(--font); letter-spacing: .03em; border: 0; padding: 0; margin: 0 0 26px; }
+.sec > h2 small, .gsec > h2 small, .h2 small { display: block; margin: 0; font: 700 12px/1 var(--font); letter-spacing: .28em; color: var(--g1); text-transform: uppercase; }
+.sec > h2 small::before, .gsec > h2 small::before, .h2 small::before { content: ""; display: inline-block; width: 22px; height: 2px; background: var(--sand); vertical-align: middle; margin-right: 10px; }
+html[lang="en"] .sec > h2, html[lang="en"] .gsec > h2 { flex-direction: column; }
+.h2 { font: 700 22px/1.4 var(--font); }
+.pagehead { border-bottom: 1px solid var(--hair); padding-bottom: 14px; }
+.pagehead h1 { font: 700 30px/1.35 var(--font); letter-spacing: .03em; }
+.h3 { font: 700 18px/1.5 var(--font); }
+.sec { margin-top: 64px; }
+main { padding-bottom: 72px; }
+
+/* ── ご案内：編號＋細線，hover 時線條展開 ── */
+.tiles { counter-reset: tile; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0 40px; }
+.tiles a { counter-increment: tile; display: flex; flex-direction: column; gap: 8px; position: relative; border: 0; border-top: 1px solid #d9d5c8; padding: 28px 30px 24px 0; background: linear-gradient(var(--g1), var(--g1)) no-repeat left top / 0 3px; transition: background-size .5s var(--ease), color .25s; }
+.tiles a:hover { background: linear-gradient(var(--g1), var(--g1)) no-repeat left top / 100% 3px; }
+.tiles a::before { content: "0" counter(tile); font-size: 13px; font-weight: 700; letter-spacing: .22em; color: var(--sand); }
+.tiles a::after { top: 26px; right: 0; transition: transform .3s var(--ease); }
+.tiles a:hover::after { transform: translateX(6px); }
+.tiles strong { font-size: 18px; font-weight: 700; }
+.tiles a:hover strong { text-decoration: none; color: var(--g1); }
+.tiles span { font-size: 14px; line-height: 1.8; color: #4f5b56; }
+
+/* ── 查詢區 ── */
+.finder { border: 1px solid var(--hair); border-top: 3px solid var(--g1); background: #fff; }
+.finder .tabs, .tabs { border-bottom: 1px solid var(--hair); }
+.tabs button { border: 0; border-bottom: 3px solid transparent; background: none; padding: 12px 22px; margin: 0 0 -1px; font-weight: 500; color: #4f5b56; }
+.tabs button[aria-selected="true"] { background: none; color: var(--g1); border-color: var(--g1); font-weight: 700; }
+.tabs button:hover:not([aria-selected="true"]) { background: var(--warm); color: var(--g1); }
+select, input[type=time], input[type=text], input[type=date], input[type=number] { border: 1px solid #b9c3be; height: 42px; border-radius: 2px; }
+select:hover, input:hover { border-color: var(--g1); }
+select:focus, input:focus { border-color: var(--g1); box-shadow: 0 0 0 3px rgba(31, 107, 84, .18); outline: 0; }
+label.f { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: #3f4b46; }
+.btn { height: 42px; line-height: 40px; padding: 0 28px; border-radius: 2px; font-weight: 700; letter-spacing: .06em; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(18, 63, 49, .22); }
+.btn:active { transform: none; box-shadow: none; }
+.btn.ghost:hover { box-shadow: 0 6px 14px rgba(18, 63, 49, .12); }
+
+/* ── 表格・運行情報・消息 ── */
+table.tbl { border-top: 1px solid var(--ink); }
+.tbl th, .tbl td { border: 0; border-bottom: 1px solid var(--hair); padding: 12px 14px; }
+.tbl thead th { background: none; font-size: 12px; letter-spacing: .14em; color: #4f5b56; border-bottom: 1px solid var(--ink); }
+.tbl tbody tr:nth-child(even) td { background: none; }
+.tbl tbody tr { transition: background-color .25s; }
+.tbl tbody tr:hover td { background: var(--warm); }
+#status td:first-child { display: flex; align-items: center; gap: 12px; }
+#status td:first-child::before { content: ""; flex: none; width: 6px; height: 20px; border-radius: 2px; background: var(--lc, #c9c4b4); }
+.ok::before { width: 9px; height: 9px; border-radius: 50%; background: #1fa35a; vertical-align: 0; animation: hkPulse 2.4s ease-in-out infinite; }
+.stop::before { border-radius: 50%; width: 9px; height: 9px; border-width: 2px; }
+dl.news { border-top: 1px solid var(--ink); }
+dl.news .row { border-bottom: 1px solid var(--hair); padding: 16px 6px; transition: background-color .25s, padding-left .25s var(--ease); }
+dl.news .row:hover { background: var(--warm); padding-left: 16px; }
+dl.news dt { font-weight: 500; letter-spacing: .06em; }
+dl.news .cat { border: 0; background: #e5efea; color: var(--g0); font-weight: 700; border-radius: 2px; letter-spacing: .06em; }
+dl.news dd a { text-underline-offset: 4px; text-decoration-thickness: 1px; }
+dl.news dd a:hover { color: var(--g1); text-decoration-thickness: 2px; }
+
+/* ── 景點卡片 ── */
+.spots a { transition: transform .4s var(--ease); }
+.spots a:hover { transform: translateY(-6px); }
+.spots a img { transition: box-shadow .4s var(--ease), filter .4s; }
+.spots a:hover img { box-shadow: 0 14px 28px rgba(18, 63, 49, .25); filter: saturate(1.1); }
+.spots strong, .spots b { font-weight: 700; }
+
+/* ── 營運狀況列 ── */
+.svcbar .svc-badge { font-weight: 700; letter-spacing: .1em; }
+
+/* ── 頁尾 ── */
+footer a { text-decoration: none; transition: color .2s; }
+footer a:hover { color: var(--acc); }
+footer .nav a { position: relative; padding-bottom: 2px; }
+footer .nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--acc); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
+footer .nav a:hover::after { transform: scaleX(1); }
+
+/* ── 手機 ── */
+@media (max-width: 820px) {
+  .sec { margin-top: 48px; }
+  .sec > h2, .gsec > h2 { font-size: 23px; margin-bottom: 20px; }
+  .pagehead h1 { font-size: 23px; }
+  .cap h2 { font-size: clamp(24px, 7vw, 32px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ── 線上訂票表單：欄位依寬度自動換行，搜尋按鈕不再被切字 ── */
+.bk-form { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; }
+.bk-form .btn { width: 100%; white-space: nowrap; padding: 0 16px; }
+.bk-form .hs-field { margin: 0; }
+.bk-trip { transition: background-color .25s, padding-left .25s var(--ease); }
+.bk-trip:hover:not(:disabled) { background: var(--warm); }
