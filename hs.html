@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>万瀨高速鉄道｜光瀨都市鉄道</title>
+<meta name="description" content="光瀨都市鉄道 公式網站：時刻表、票價、即時列車動態。（Minecraft 架空鐵路）">
+<link rel="icon" type="image/png" href="assets/img/mark-light.png">
+<link rel="stylesheet" href="assets/css/site.css?v=1.4.0">
+<link rel="stylesheet" href="assets/css/theme.css?v=1.4.0">
+
+<link rel="stylesheet" href="assets/css/hs.css?v=1.4.0">
+</head>
+<body data-page="hs">
+<header class="sh"><div class="sh-in"><a class="sh-brand" href="index.html" aria-label="光瀨都市鉄道 首頁"><img src="assets/img/mark-dark.png" alt="" width="30" height="34"><span>光瀨都市鉄道</span></a><nav class="gnav" id="gnav" aria-label="主要選單"><ul><li><a href="timetable.html">時刻表・票價<span class="en">Timetable / Fares</span></a></li><li><a href="hs.html" aria-current="page">高速鉄道<span class="en">High-Speed Rail</span><b class="new">NEW</b></a></li><li><a href="routes.html">設備與服務介紹<span class="en">Facilities &amp; Services</span></a></li><li><a href="booking.html">線上訂票<span class="en">Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li><a href="sights.html">沿線景點與車站介紹<span class="en">Sights & Stations</span></a></li><li><a href="guide.html">乘車指南・FAQ<span class="en">Guide / FAQ</span></a></li><li><a href="airport.html">機場聯外交通<span class="en">Airport</span></a></li><li class="admin"><a id="adminlink" href="atos.html">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav><div class="util"><div class="wrap"></div></div><button class="sh-menu" type="button" aria-expanded="false" aria-controls="gnav" aria-label="選單"><span></span></button></div></header>
+<script>(function(){var h=document.querySelector("header.sh");if(!h)return;var b=h.querySelector(".sh-menu");if(!b)return;function set(o){h.classList.toggle("open",o);b.setAttribute("aria-expanded",o?"true":"false")}b.addEventListener("click",function(){set(!h.classList.contains("open"))});h.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".gnav a"))set(false)});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false)});})();</script>
+<div id="svcbar" class="svcbar" role="status" hidden></div>
+<main class="hs">
+<section class="hs-hero" aria-label="万瀨高速鉄道">
+  <img src="assets/photo/hs-sunset.webp" alt="夕陽下行駛在高架橋上的高速列車">
+  <div class="hs-hero-tx"><span class="hs-badge">2026.11.16　開通</span><h1>万瀨高速鉄道</h1><p>一日往返，從容自在。</p><a class="hs-cta" href="#hs-day">看一日往返的行程 <span aria-hidden="true">→</span></a></div>
+  <div class="hs-count" id="hs-count" aria-live="polite"><small id="hs-count-l"></small><b id="hs-count-n">–</b><span id="hs-count-u"></span></div>
+</section>
+<section class="hs-band" aria-label="開通紀念"><div class="hs-band-in"><div class="hs-d"><small>OPENING MEMORIAL</small>2026.11.16</div><div class="hs-q">万瀨高速鉄道，通車。<br>謹以此頁，紀念這一天。</div><a class="hs-tk" href="booking.html"><img src="assets/img/hs-ticket.webp" alt=""><span><em style="font-style:normal">開業記念 指定席特急券</em> →</span></a></div></section>
+<div class="wrap hs-wrap">
+<section class="hs-sec" id="hs-day" aria-labelledby="hs-h-day"><p class="hs-lbl">DAY TRIP</p><h2 id="hs-h-day">一日往返，剛剛好</h2>
+<p class="hs-lead">早上出發，在目的地盡情停留，傍晚再搭高速鉄道回來。從出發到返回，一天之內就能完成。</p>
+<div class="hs-tl">
+<div class="hs-tn"><em>01　OUTBOUND</em><h3>往程</h3><p>新勝守　→　新岩沢</p><span class="hs-big" id="hs-first">–</span><small>新勝守 首班</small><span class="hs-big" id="hs-dur">–</span><small>所要時間（新勝守→新岩沢）</small></div>
+<div class="hs-tn"><em>02　STAY</em><h3>停留</h3><p>在新岩沢・高之川市盡情遊玩</p><span class="hs-big" id="hs-stay">–</span><small>首班抵達到末班發車之間，最長可停留</small></div>
+<div class="hs-tn"><em>03　RETURN</em><h3>返程</h3><p>新岩沢　→　新勝守</p><span class="hs-big" id="hs-ret">–</span><small>新岩沢 末班</small><small id="hs-ret2"></small></div>
+</div><p class="hs-note">時刻依目前的時刻表資料自動計算；尖峰時段約每 8 分鐘一班。</p></section>
+
+<section class="hs-sec" id="hs-map" aria-labelledby="hs-h-map"><p class="hs-lbl">ROUTE MAP</p><h2 id="hs-h-map">路線圖</h2>
+<p class="hs-lead">新勝守至東平倉由光瀨都市鉄道管轄，東平倉至新岩沢由白令鉄道管轄。新岩沢為目前開業的終點。</p>
+<div class="hs-scroll"><div class="hs-track"><div class="hs-seg a"></div><div class="hs-seg b"></div><div class="hs-stub"></div><div class="hs-train" aria-hidden="true">HR-新01</div>
+<a class="hs-st" style="left:0%" href="#hs-tr"><i></i>新勝守<span class="hs-chip g">可轉乘新幹線</span></a>
+<a class="hs-st" style="left:20%" href="#hs-tr"><i></i>新光瀨<span class="hs-chip y">步行轉乘</span></a>
+<a class="hs-st" style="left:40%" href="#hs-tr"><i></i>東平倉<span class="hs-chip g">可直接轉乘</span></a>
+<a class="hs-st" style="left:60%" href="#hs-tr"><i></i>花宮天照</a>
+<a class="hs-st" style="left:80%" href="#hs-tr"><i></i>豐守</a>
+<a class="hs-st end" style="left:100%" href="#hs-tr"><i></i>新岩沢<span class="hs-chip k">目前終點</span><span class="hs-chip o">轉乘秋葉鉄道</span></a>
+</div></div>
+<div class="hs-legend"><span><i class="a"></i>光瀨都市鉄道 管轄（新勝守～東平倉）</span><span><i class="b"></i>白令鉄道 管轄（東平倉～新岩沢）</span><span><i class="c"></i>延伸方向（高之川市中心）</span></div></section>
+
+<section class="hs-sec" id="hs-fleet" aria-labelledby="hs-h-fleet"><p class="hs-lbl">FLEET</p><h2 id="hs-h-fleet">HR-新01系</h2>
+<p class="hs-lead">2026 年登場，擔任万瀨高速鉄道的所有列車。</p>
+<div class="hs-fleet"><dl class="hs-spec">
+<div><dt>登場</dt><dd>2026</dd></div>
+<div><dt>編組</dt><dd>8 輛</dd></div>
+<div><dt>座席</dt><dd>2+2 配置。1・8 號車（車頭・車尾）各 8 席（2 排），其餘車輛每節 40 席</dd></div>
+<div><dt>設備</dt><dd>USB 充電口・閱讀燈</dd></div>
+<div><dt>最高速度</dt><dd><span class="hs-spd">250<small>km/h</small></span></dd></div></dl>
+<div class="hs-pics"><figure class="hs-pic big"><img src="assets/photo/hs-interior.webp" alt=""><figcaption>車內・2+2 座席</figcaption></figure>
+<figure class="hs-pic"><img src="assets/photo/hs-viaduct.webp" alt=""><figcaption>高架橋上的 HR-新01系</figcaption></figure>
+<div class="hs-two"><figure class="hs-pic"><img src="assets/photo/hs-platform1.webp" alt=""><figcaption>月台上的 HR-新01系</figcaption></figure><figure class="hs-pic"><img src="assets/photo/hs-platform2.webp" alt=""><figcaption>與月台並行</figcaption></figure></div></div></div></section>
+
+<section class="hs-sec" id="hs-tr" aria-labelledby="hs-h-tr"><p class="hs-lbl">TRANSFER</p><h2 id="hs-h-tr">轉乘與利用</h2>
+<p class="hs-lead">各站的轉乘方式不同，出發前先確認。</p>
+<div class="hs-trg">
+<article class="hs-card"><header><span class="n">01</span><h3>新勝守</h3><span class="hs-chip g">直接轉乘</span></header><p>可直接持光瀨都市鉄道車票和高速鉄道車票，由 2F 轉乘通道的檢票閘門，直接連接到新幹線車站月台轉乘。</p></article>
+<article class="hs-card"><header><span class="n">02</span><h3>新光瀨</h3><span class="hs-chip y">步行轉乘</span></header><p>請由幸村／新光瀨站北口出站，依指標徒步前往新光瀨站搭乘。</p></article>
+<article class="hs-card"><header><span class="n">03</span><h3>東平倉</h3><span class="hs-chip g">直接轉乘</span></header><p>可直接持光瀨都市鉄道車票和高速鉄道車票，由 1F 聯絡通道進入高速鉄道站內。</p></article>
+<article class="hs-card warn"><div><header><span class="n">04</span><h3>新岩沢</h3><span class="hs-chip o">需另購車票</span></header><p>持光瀨都市鉄道車票前往高之川市中心，請在本站轉乘秋葉鉄道新都心線，並另外購買秋葉鉄道新都心線的車票。</p></div><figure class="hs-pic"><img src="assets/photo/hs-takanokawa.webp" alt=""><figcaption>高之川市</figcaption></figure></article>
+</div></section>
+
+<section class="hs-sec" id="hs-ticket" aria-labelledby="hs-h-tk"><p class="hs-lbl">TIMETABLE &amp; TICKET</p><h2 id="hs-h-tk">班次・票價・訂票</h2>
+<p class="hs-lead">高速鉄道為全車指定席，沒有立席特急券；票價另計。</p>
+<table class="hs-fare"><thead><tr><th>區間</th><th>乘車券</th><th>指定席特急券</th><th>合計（單程）</th></tr></thead><tbody id="hs-fares"></tbody></table>
+<div class="hs-link"><a class="hs-lk" href="timetable.html"><b>時刻表</b><span>高速鉄道各站的全日時刻表與現在的發車。</span></a><a class="hs-lk" href="timetable.html"><b>票價查詢</b><span>查詢乘車券與指定席特急券的合計。</span></a><a class="hs-lk" href="booking.html"><b>線上訂票</b><span>前往訂票頁，選擇座位並發出開業記念車票。</span></a></div></section>
+
+<section class="hs-sec" id="hs-news" aria-labelledby="hs-h-nw"><p class="hs-lbl">NEWS</p><h2 id="hs-h-nw">高速鉄道的最新消息</h2><dl class="news" id="hs-newslist"></dl></section>
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <img src="assets/img/mark-dark.png" alt="">
+    <div class="nav"><a href="timetable.html">時刻表與班次/票價查詢</a><a href="hs.html">高速鉄道</a><a href="routes.html">設備與服務介紹</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="sights.html">沿線景點與車站介紹</a><a href="guide.html">乘車指南與常見問題</a><a href="airport.html">機場聯外交通</a><a href="routes.html?s=kobana">特急こばな</a></div>
+    <div class="copy">© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。</div>
+  </div>
+</footer>
+<script src="assets/js/site-config.js?v=1.4.0"></script>
+<script src="assets/js/i18n-dict.js?v=1.4.0"></script>
+<script src="assets/js/i18n.js?v=1.4.0"></script>
+<script src="assets/js/hk-status.js?v=1.4.0"></script>
+<script src="assets/js/atos-model.js?v=1.4.0"></script>
+<script src="assets/js/hk-core.js?v=1.4.0"></script>
+<script src="assets/js/hk-map.js?v=1.4.0"></script>
+<script src="assets/js/layout-seed.js?v=1.4.0"></script>
+<script src="assets/js/hk-ui.js?v=1.4.0"></script>
+<script src="assets/js/booking.js?v=1.4.0"></script>
+<script src="assets/js/pages2.js?v=1.4.0"></script>
+<script src="assets/js/pages3.js?v=1.4.0"></script>
+<script src="assets/js/site.js?v=1.4.0"></script>
+<script src="assets/js/hs.js?v=1.4.0"></script>
+</body>
+</html>
