@@ -38,6 +38,7 @@
   const seatName = (car, k) => `${car + 1}号車 ${Math.floor(k / 4) + 1}${COLS[k % 4]}`;
 
   function booking(H, root) {
+    const realRoot = root; root = h('div', { class: 'bk-route' });
     const q = new URLSearchParams(location.search);
     const opts = H.stations.map(st => h('option', { value: st.id }, st.zh));
     const fSel = h('select', { 'aria-label': '出發站' }, opts.map(o => o.cloneNode(true))), tSel = h('select', { 'aria-label': '抵達站' }, opts.map(o => o.cloneNode(true)));
@@ -369,7 +370,72 @@
           h('button', { class: 'btn', type: 'button', onclick: () => window.print() }, '列印'), h('button', { class: 'btn ghost', type: 'button', onclick: () => search() }, '重新查詢')));
       box.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    const pp = passPanel(H); pp.hidden = true;
+    const tabBtn = (id, label) => h('button', { type: 'button', role: 'tab', class: 'bk-tab', id: 'bkt-' + id, 'aria-selected': 'false', onclick: () => show(id) }, label);
+    const tRoute = tabBtn('route', '乗車券・特急券'), tPass = tabBtn('pass', '優惠套票（1・3・5・7日券）');
+    function show(id) { const isP = id === 'pass'; pp.hidden = !isP; root.hidden = isP; tRoute.setAttribute('aria-selected', String(!isP)); tPass.setAttribute('aria-selected', String(isP)); try { history.replaceState(null, '', isP ? '#pass' : location.pathname + location.search); } catch (e) {} }
+    realRoot.append(h('div', { class: 'bk-tabs', role: 'tablist' }, tRoute, tPass), root, pp);
+    show(location.hash === '#pass' || q.get('tab') === 'pass' ? 'pass' : 'route');
     if (q.get('from') && q.get('to')) search();
   }
+
+  /* ═════════ 1.6.0 優惠套票（1・3・5・7日券）：票面沿用一般車票 10.5 : 5.7 的版型 ═════════ */
+  const PASSES = [
+    { n: 1, price: 1500, col: '#14533f', img: 'assets/photo/heikura1.webp', pos: '50% 45%', alt: '平倉市革命紀念公園', who: '市區半日～一日遊' },
+    { n: 3, price: 4500, col: '#1b6b53', img: 'assets/photo/pass-3.webp', pos: '50% 55%', alt: '東平倉站的藍白列車', who: '3 天 2 夜的短期旅行' },
+    { n: 5, price: 7000, col: '#a87a1f', img: 'assets/photo/pass-5.webp', pos: '50% 50%', alt: '霧中高架橋上的列車', who: '長假與慢遊' },
+    { n: 7, price: 9600, col: '#136880', img: 'assets/photo/hs-viaduct.webp', pos: '50% 50%', alt: '通過高架橋的高速鉄道', who: '一週完整旅行・含指定席與高速鉄道', seatFree: true, hs: 2 }
+  ];
+  const passPerDay = p => Math.round(p.price / p.n);
+  function passCard(p, o) {
+    o = o || {}; const sf = o.seatFee || 500, no = o.no || String(p.n).padStart(4, '0'), HSC = '#136880';
+    const lines = p.seatFree
+      ? [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['指定席　座席料金込み', 'Reserved seats included', 1], ['高速鉄道　2往復無料', '2 round trips on HSR free', 1]]
+      : [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['各停・快速・環状快速・特快', 'Local / Rapid / Loop / Limited Exp.'], [`指定席は別途 ¥${sf.toLocaleString('en-US')}`, 'Seat fee extra']];
+    const validJa = o.range ? o.range : (p.n === 1 ? '当日限り' : `連続${p.n}日間`), validEn = o.rangeEn || (p.n === 1 ? 'Valid on the day' : `Valid ${p.n} days`);
+    return h('article', { class: 'tk tkP' + (p.seatFree ? ' tkP-hs' : ''), 'data-i18n-off': '', style: `--tk:${p.col}` },
+      h('div', { class: 'tkA-side' }, h('b', { lang: 'ja' }, p.n + '日券'), h('em', { lang: 'en' }, p.n + ' DAY PASS'), h('small', { lang: 'ja' }, '光瀬都市鉄道', h('br'), 'フリーパス')),
+      h('div', { class: 'tkA-body' },
+        h('div', { class: 'tkP-ph', style: `background-image:url(${p.img});background-position:${p.pos}`, role: 'img', 'aria-label': p.alt }),
+        h('div', { class: 'tkA-top' }, h('span', { lang: 'ja' }, '光瀬都市鉄道　フリーパス', h('br'), h('i', { lang: 'en' }, 'Hikarise Visitor Pass')), h('span', { class: 'r', lang: 'ja' }, '有効　' + validJa, h('br'), h('i', { lang: 'en' }, validEn))),
+        p.seatFree ? h('div', { class: 'tkP-mem' }, h('b', { lang: 'ja' }, '指定席込み'), h('small', { lang: 'en' }, 'SEAT FEE INCLUDED')) : null,
+        h('div', { class: 'tkP-mid' }, h('div', { class: 'tkP-pr' }, h('small', null, '¥'), p.price.toLocaleString('en-US')),
+          h('ul', null, lines.map(l => h('li', { class: l[2] ? 'em' : '' }, h('span', { lang: 'ja' }, l[0]), h('i', { lang: 'en' }, l[1]))))),
+        h('div', { class: 'tkP-ft' }, h('span', { lang: 'ja' }, `1日あたり 約¥${passPerDay(p).toLocaleString('en-US')}`), h('span', { class: 'no' }, 'No.' + no))));
+  }
+  HK.passes = { list: PASSES, card: passCard, perDay: passPerDay };
+
+  /** 預約頁的「優惠套票」分頁：選券種・開始日・人數，開出模擬的券（不儲存） */
+  function passPanel(H) {
+    const sf = H.cfg && H.cfg.seatFee || 500, today = new Date(), pad = n => String(n).padStart(2, '0');
+    const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const st = { p: PASSES[1] }, dIn = h('input', { type: 'date', value: iso(today) });
+    const nSel = h('select', { 'aria-label': '枚數' }, [1, 2, 3, 4, 5, 6].map(n => h('option', { value: n }, n + ' 枚')));
+    const cards = h('div', { class: 'pass-grid' }), out = h('div', { class: 'pass-out' });
+    const ymd = s => s.replaceAll('-', '/');
+    const draw = () => {
+      cards.replaceChildren(...PASSES.map(p => h('button', { type: 'button', class: 'pass-pick', 'aria-pressed': String(st.p === p), onclick: () => { st.p = p; draw(); } }, passCard(p, { seatFee: sf }), h('span', { class: 'pass-sel' }, st.p === p ? '選取中' : '選擇這張'))));
+      const p = st.p, n = Number(nSel.value), d0 = new Date(dIn.value + 'T00:00:00'), d1 = new Date(d0); d1.setDate(d1.getDate() + p.n - 1);
+      const range = p.n === 1 ? ymd(dIn.value) : `${ymd(dIn.value)}～${ymd(iso(d1))}`;
+      out.replaceChildren(h('h3', { class: 'h3' }, '開票內容'),
+        h('div', { class: 'pass-ticket' }, passCard(p, { seatFee: sf, range, rangeEn: 'Valid ' + range, no: String(Math.abs(hash(p.n + dIn.value + n)) % 1e4).padStart(4, '0') })),
+        h('table', { class: 'tbl', style: 'max-width:520px;margin-top:12px' }, h('tbody', null,
+          h('tr', null, h('th', null, '券種'), h('td', null, `${p.n} 日券　大人`)),
+          h('tr', null, h('th', null, '使用期間'), h('td', null, range)),
+          h('tr', null, h('th', null, '單價'), h('td', null, yen(p.price))),
+          h('tr', { class: 'tot' }, h('th', null, `合計　${n} 枚`), h('td', null, yen(p.price * n)))),
+        ),
+        p.seatFree ? h('p', { class: 'note' }, '七日券已含指定席座席費，以及高速鉄道 2 往復（乘車費）。') : h('p', { class: 'note' }, '搭乘指定席列車時，須另付指定席座席費。'),
+        h('div', { class: 'noprint', style: 'margin-top:10px;display:flex;gap:10px' }, h('button', { class: 'btn', type: 'button', onclick: () => window.print() }, '列印')),
+        h('p', { class: 'note' }, '本頁為模擬開票，不會儲存。套票的實際販售方式與販售地點，將於本網站公告。'));
+    };
+    dIn.addEventListener('change', draw); nSel.addEventListener('change', draw);
+    const panel = h('div', { class: 'pass-panel' },
+      h('p', { class: 'lead' }, '期間內可無限次搭乘光瀨都市鉄道的自由席列車。選一張券、指定開始日期，就能開出模擬的套票。'),
+      h('div', { class: 'finder' }, h('div', { class: 'bk-form' }, h('label', { class: 'f' }, h('span', null, '開始日'), dIn), h('label', { class: 'f' }, h('span', null, '枚數（大人）'), nSel))),
+      cards, out);
+    draw(); return panel;
+  }
+  HK.passPanel = passPanel;
   HK.booking = booking;
 })();

@@ -58,6 +58,23 @@
         tr.append(name, c(yen(f.yen)), c(yen(f.seat)), tot); rows.append(tr);
       });
     }
+    // 轉乘三站：車站介紹與照片（與「景點與車站」的車站頁共用 data/stations.json，只維護一份）
+    try {
+      const sd = await window.HK.getJSON('data/stations.json', true);
+      document.querySelectorAll('.hs-card[data-st]').forEach(card => {
+        const e = ((sd && sd.stations) || []).find(x => x.name === card.dataset.st); if (!e) return;
+        const old = card.querySelector('p'), box = document.createElement('div');
+        (e.intro || []).forEach(t => { const p = document.createElement('p'); p.textContent = t; box.append(p); });
+        if (old && box.children.length) old.replaceWith(...box.children);
+        if (e.photos && e.photos[0]) {
+          const f = document.createElement('figure'); f.className = 'hs-pic hs-stpic';
+          const im = document.createElement('img'); im.src = e.photos[0].src; im.alt = e.photos[0].alt || ''; const c = document.createElement('figcaption'); c.textContent = e.photos[0].cap || '';
+          f.append(im, c); card.querySelector('header').after(f);
+        }
+        const a = document.createElement('a'); a.className = 'hs-more'; a.href = 'station.html?n=' + encodeURIComponent(e.name); a.textContent = '車站介紹'; card.append(a);
+      });
+      if (window.HK_I18N && window.HK_I18N.scan) window.HK_I18N.scan(document.querySelector('.hs-trg'));
+    } catch (_) { /* 沒有車站資料也能顯示原本的轉乘文字 */ }
     // 消息
     const news = await window.HK.getJSON('data/news.json', true), dl = $('#hs-newslist');
     (news || []).filter(n => n.tag === '高速鉄道').forEach(n => {

@@ -107,7 +107,7 @@
       Q('兒童與長者有折扣嗎？', h('p', null, '12 歲以下與 60 歲以上的乘車券為大人的一半（四捨五入到整數）。指定席券與立席特急券不打折。')),
       Q('指定席券與立席特急券是多少錢？', h('p', null, `指定席券 ${yen(sf)}；特急的立席特急券為指定席的一半（${yen(st)}），不保證有座位，也不能選座位。特快只有 1・2 号車是指定席，3 号車以後為自由席，不用另外付費。`)),
       Q('哪些列車需要指定席？', h('p', null, '特急為全車指定席；特快的 1・2 号車為指定席。各停、快速、環狀快速都是全車自由席。')),
-      Q('有周遊券或優惠套票嗎？', h('p', null, '有。往返機場的旅客可以使用「三日券」（3,900 円）與「五日券」（4,800 円），期間內可無限次搭乘光瀨都市鉄道所有非指定席列車；搭乘指定席列車時只需另付指定席費用。詳細請見', link('airport.html', '機場聯外交通'), '。')),
+      Q('有周遊券或優惠套票嗎？', h('p', null, '有。往返機場的旅客可以使用「一日券」（1,500 円）、「三日券」（4,500 円）、「五日券」（7,000 円）與「七日券」（9,600 円），期間內可無限次搭乘光瀨都市鉄道的自由席列車；搭乘指定席列車時只需另付指定席費用。七日券已含指定席座席費與高速鉄道 2 往復。詳細請見', link('airport.html', '機場聯外交通'), '。')),
       Q('在哪裡買指定席券？', h('p', null, '可以到', link('booking.html', '線上訂票'), '選擇列車與座位。')),
       h('h3', { class: 'h3' }, '乘車'),
       Q('時刻表上「特」「快」「環」是什麼意思？', h('p', null, '那是種別的略稱：不是各停、快速的列車，會以種別名稱的第一個字標示（例如特急＝「特」、特快＝「特」、環狀快速＝「環」）。各停不標示。完整的種別請看列車名稱。')),
@@ -133,7 +133,7 @@
     root.append(h('div', { class: 'aphero' },
       h('img', { src: 'assets/photo/ad2.webp', alt: '空港LINER與松澤國際機場', loading: 'eager' }),
       h('div', { class: 'aph-t' }, h('span', { class: 'tag' }, '空港LINER'), h('h2', null, '松澤國際機場　⇄　光瀨市區'), h('p', null, '一車直達，最快 11 分鐘。'))));
-    root.append(h('p', { class: 'lead' }, '松澤國際機場（松沢国際空港站）有特急與特快直達光瀨市區，不需要轉乘。下面是搭乘方式、所要時間、班次，以及專為旅客準備的三日券與五日券。'));
+    root.append(h('p', { class: 'lead' }, '松澤國際機場（松沢国際空港站）有特急與特快直達光瀨市區，不需要轉乘。下面是搭乘方式、所要時間、班次，以及專為旅客準備的一日券、三日券、五日券與七日券。'));
 
     // 搭乘方式
     root.append(sec('搭乘方式', 'How to ride',
@@ -179,14 +179,11 @@
     // 套票
     let fareLine = null;
     if (ap && center) { const f = H.fare(ap.id, center.id); if (f) { const one = f.yen, rt = one * 2; fareLine = { one, rt }; } }
-    const pass = (title, price, who, lines) => h('div', { class: 'gcard pass' }, h('h3', null, title), h('p', { class: 'price' }, price), h('p', { class: 'who' }, who), h('ul', null, lines.map(x => h('li', null, x))));
-    root.append(sec('優惠套票　三日券・五日券', 'Visitor Passes',
-      h('p', null, '專為旅客準備的套票。購買後，在使用期間內可以「無限次搭乘光瀨都市鉄道所有非指定席列車」，搭乘指定席列車時，只需要另外付指定席費用（不需再付乘車券）。'),
-      h('div', { class: 'gcards two' },
-        pass('三日券', '3,900 円', '適合：3 天 2 夜的短期旅行', ['連續 3 天內無限次搭乘', '各停、快速、環狀快速、特快自由席都能搭', `搭乘特急、特快指定席只需另付指定席券 ${yen(sf)}`]),
-        pass('五日券', '4,800 円', '適合：長假與慢遊', ['連續 5 天內無限次搭乘', '各停、快速、環狀快速、特快自由席都能搭', `搭乘特急、特快指定席只需另付指定席券 ${yen(sf)}`])),
-      fareLine ? h('p', { class: 'note' }, `參考：${ap.zh}～${center.zh} 單程乘車券 ${yen(fareLine.one)}、來回 ${yen(fareLine.rt)}。三日券（3,900 円）大約搭 ${Math.ceil(3900 / fareLine.one)} 次這樣的單程就回本；五日券（4,800 円）約 ${Math.ceil(4800 / fareLine.one)} 次。以每天往返市區與景點計算，通常很划算。`) : null,
-      h('p', { class: 'note' }, '套票購買方式與販售地點，將於本網站公告。')));
+    root.append(sec('優惠套票　一日券・三日券・五日券・七日券', 'Visitor Passes',
+      h('p', null, '專為旅客準備的套票。購買後，在使用期間內可以無限次搭乘光瀨都市鉄道的自由席列車；搭乘指定席列車時，只需要另外付指定席費用（不需再付乘車券）。七日券已含指定席座席費，並含高速鉄道 2 往復。'),
+      h('div', { class: 'pass-grid static' }, HK.passes.list.map(p => HK.passes.card(p, { seatFee: sf }))),
+      fareLine ? h('p', { class: 'note' }, `參考：${ap.zh}～${center.zh} 單程乘車券 ${yen(fareLine.one)}、來回 ${yen(fareLine.rt)}。一日券（${yen(1500)}）大約搭 ${Math.ceil(1500 / fareLine.one)} 次這樣的單程就回本；三日券（${yen(4500)}）約 ${Math.ceil(4500 / fareLine.one)} 次。以每天往返市區與景點計算，通常很划算。`) : null,
+      h('p', { class: 'note' }, h('a', { href: 'booking.html#pass' }, '到線上訂票，開立模擬套票'), '　套票的實際販售方式與販售地點，將於本網站公告。')));
     root.append(sec('注意事項', null, h('ul', { class: 'spoints' },
       h('li', null, '特急為全車指定席；沒有指定席券時，可購買立席特急券，但不保證有座位。'),
       h('li', null, '行李較多時，請盡量使用指定席車廂的行李放置處，避免阻擋走道與車門。'),

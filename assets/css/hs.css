@@ -74,3 +74,7 @@
 .hs-lk b { font-size: 19px; font-weight: 700; } .hs-lk span { font-size: 14px; line-height: 1.8; color: #4f5b56; }
 @media (max-width: 860px) { .hs-link { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .hs-hero img, .hs-train, .hs-hero-tx, .hs-count { animation: none; } }
+
+.hs-stpic { margin: 0 0 14px; } .hs-stpic img { aspect-ratio: 16 / 8; }
+.hs-card p + p { margin-top: 8px; }
+.hs-more { display: inline-block; margin-top: 14px; font-weight: 700; font-size: 14px; color: var(--hs); text-decoration: none; border-bottom: 2px solid var(--hs); padding-bottom: 1px; } .hs-more::after { content: " →"; }

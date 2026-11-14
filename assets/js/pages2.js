@@ -376,17 +376,19 @@
     if (!st) root.append(h('p', { class: 'note' }, '這個車站尚未收錄在目前的時刻表資料中，所以還沒有時刻表與路線資料；新的路網快照上傳後會自動出現。'));
 
     const sec = (title, ...kids) => { const el = h('section', { class: 'sp-sec' }, h('h2', null, title), ...kids); root.append(el); return el; };
+    /* 1.5.0：時刻表・停靠的列車・月台 預設收起（details），標題旁的小字是摘要；網址帶 #tt／#trains／#pf 時自動展開 */
+    const secC = (id, title, sum, ...kids) => { const el = h('details', { class: 'sp-sec sp-fold', id }, h('summary', null, h('h2', null, title), sum ? h('span', { class: 'sum' }, sum) : null), h('div', { class: 'sp-foldbody' }, ...kids)); if (location.hash === '#' + id) el.open = true; root.append(el); return el; };
 
     if (st) {
       /* 時刻表 */
-      sec('時刻表', HK.ttPanel(H, sid));
+      secC('tt', '時刻表', first != null ? `首班 ${H.hm(first)}／末班 ${H.hm(last)}` : '', HK.ttPanel(H, sid));
 
       /* 各種別的停靠狀況 */
       const byRoute = new Map();
       tr.forEach(x => { if (x.t < 0 || x.t >= H.DAY) return; let g = byRoute.get(x.sv.routeName); if (!g) byRoute.set(x.sv.routeName, g = { sv: x.sv, n: 0, day: 0, dests: new Map(), ts: [] }); g.n++; if (x.t >= 36000 && x.t < 57600) g.day++; g.ts.push(x.t); const dn = H.destOf(x.sv, x.i); g.dests.set(dn, (g.dests.get(dn) || 0) + 1); });
       if (byRoute.size) {
         const rows = [...byRoute.values()].sort((a, b) => b.n - a.n); rows.forEach(g => { const f = H.firstLast(g.ts.slice().sort((a, b) => a - b)); g.first = f[0]; g.last = f[1]; });
-        sec('停靠的列車', h('div', { class: 'tblwrap' }, h('table', { class: 'sp-tbl' },
+        secC('trains', '停靠的列車', `${rows.length} 種`, h('div', { class: 'tblwrap' }, h('table', { class: 'sp-tbl' },
           h('thead', null, h('tr', null, h('th', null, '路線・種別'), h('th', null, '行先'), h('th', null, '日間每小時'), h('th', null, '一天的班數'), h('th', null, '首班／末班'))),
           h('tbody', null, rows.map(g => h('tr', null,
             h('td', null, h('i', { class: 'dot', style: `background:${g.sv.color}` }), g.sv.routeName),
@@ -399,7 +401,7 @@
       H.svcs.forEach(sv => sv.stops.forEach((t, i) => { if (t.station !== sid || t.pax === false || !t.platformName) return; const k = String(t.platformName); let g = byPf.get(k); if (!g) byPf.set(k, g = { pf: k, routes: new Set(), dests: new Map(), dw: new Map() }); g.routes.add(sv.routeName); const dn = H.destOf(sv, i); g.dests.set(dn, (g.dests.get(dn) || 0) + 1); const dw = Math.round(t.dep - t.arr); g.dw.set(dw, (g.dw.get(dw) || 0) + 1); }));
       if (byPf.size) {
         const rows = [...byPf.values()].sort((a, b) => a.pf.localeCompare(b.pf, 'ja', { numeric: true }));
-        sec('月台', h('div', { class: 'tblwrap' }, h('table', { class: 'sp-tbl' },
+        secC('pf', '月台', `${rows.length} 個月台`, h('div', { class: 'tblwrap' }, h('table', { class: 'sp-tbl' },
           h('thead', null, h('tr', null, h('th', null, '月台'), h('th', null, '行先'), h('th', null, '路線・種別'))),
           h('tbody', null, rows.map(g => h('tr', null, h('td', null, `${g.pf} 番線`), h('td', null, [...g.dests.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(d => d[0]).join('、')), h('td', null, [...g.routes].join('、'))))))));
       }

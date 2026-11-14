@@ -404,10 +404,6 @@ window.HK_I18N_DICT = {
 "周遊券やお得なきっぷはありますか？",
 "Are there passes or discount tickets?"
 ],
-"有。往返機場的旅客可以使用「三日券」（3,900 円）與「五日券」（4,800 円），期間內可無限次搭乘光瀨都市鉄道所有非指定席列車；搭乘指定席列車時只需另付指定席費用。詳細請見": [
-"あります。空港を往復する旅行者向けに「3日券」（3,900円）と「5日券」（4,800円）があり、期間中は光瀨都市鉄道の指定席以外の全列車に乗り放題です。指定席列車に乗るときは指定席料金のみ別途かかります。詳しくは",
-"Yes. For travelers using the airport there are a “3-day pass” (¥3,900) and a “5-day pass” (¥4,800), valid for unlimited rides on all non-reserved trains. On reserved-seat trains you pay only the reserved-seat fee. For details see"
-],
 "機場聯外交通": [
 "空港アクセス",
 "Airport access"
@@ -552,10 +548,6 @@ window.HK_I18N_DICT = {
 "乗り換えなし、最速11分。",
 "No transfers—as fast as 11 minutes."
 ],
-"松澤國際機場（松沢国際空港站）有特急與特快直達光瀨市區，不需要轉乘。下面是搭乘方式、所要時間、班次，以及專為旅客準備的三日券與五日券。": [
-"松沢国際空港（松沢国際空港駅）から光瀨市内へは特急・特別快速が直通し、乗り換えは不要です。乗り方、所要時間、本数、旅行者向けの3日券・5日券をご案内します。",
-"Limited Express and Special Rapid run directly from Matsuzawa International Airport station to central Hikarise with no transfer. Here are how to ride, travel times, frequency, and the 3-day and 5-day passes for visitors."
-],
 "搭乘方式": [
 "ご利用方法",
 "How to ride"
@@ -648,10 +640,6 @@ window.HK_I18N_DICT = {
 "本数は松沢国際空港駅から発車する本日の列車数です。",
 "Counts are trains departing Matsuzawa International Airport station today."
 ],
-"優惠套票 三日券・五日券": [
-"お得なきっぷ　3日券・5日券",
-"Passes: 3-day and 5-day"
-],
 "專為旅客準備的套票。購買後，在使用期間內可以「無限次搭乘光瀨都市鉄道所有非指定席列車」，搭乘指定席列車時，只需要另外付指定席費用（不需再付乘車券）。": [
 "旅行者向けのきっぷです。購入後、利用期間中は「光瀨都市鉄道の指定席以外の全列車」に乗り放題で、指定席列車に乗るときは指定席料金のみ別途かかります（乗車券は不要）。",
 "Passes for visitors. During the validity period you can ride all non-reserved trains of Hikarise Urban Railway without limit; on reserved-seat trains you pay only the reserved-seat fee (no fare ticket needed)."
@@ -695,14 +683,6 @@ window.HK_I18N_DICT = {
 "連續 5 天內無限次搭乘": [
 "連続5日間乗り放題",
 "Unlimited rides for 5 consecutive days"
-],
-"參考：${ap.zh}～${center.zh} 單程乘車券 ${yen(fareLine.one)}、來回 ${yen(fareLine.rt)}。三日券（3,900 円）大約搭 ${Math.ceil(3900 / fareLine.one)} 次這樣的單程就回本；五日券（4,800 円）約 ${Math.ceil(4800 / fareLine.one)} 次。以每天往返市區與景點計算，通常很划算。": [
-"目安：{0}～{1} 間の片道乗車券は {2}、往復は {3}。3日券（3,900円）は片道約{4}回、5日券（4,800円）は約{5}回で元が取れます。毎日市内と観光地を往復するなら、たいていお得です。",
-"Guide: a one-way fare between {0} and {1} is {2}, round trip {3}. The 3-day pass (¥3,900) pays for itself after about {4} such one-way trips; the 5-day pass (¥4,800) after about {5}. If you go back and forth between the city and sights daily, it is usually a good deal."
-],
-"套票購買方式與販售地點，將於本網站公告。": [
-"きっぷの購入方法と販売場所は、本サイトでお知らせします。",
-"How and where to buy passes will be announced on this site."
 ],
 "注意事項": [
 "ご注意",
@@ -1976,10 +1956,6 @@ window.HK_I18N_DICT = {
 "松沢国際空港　乗り換えなし",
 "Matsuzawa International Airport — no transfers"
 ],
-"特急・特快直達光瀨市區，最快 11 分鐘。三日券 3,900 円、五日券 4,800 円，可無限次搭乘所有非指定席列車。": [
-"特急・特別快速で光瀨市内へ直通、最速11分。3日券3,900円・5日券4,800円で、指定席以外の全列車に乗り放題。",
-"Limited Express and Special Rapid run directly to central Hikarise—as fast as 11 minutes. The ¥3,900 3-day pass and ¥4,800 5-day pass cover unlimited rides on all non-reserved trains."
-],
 "詳細": [
 "詳細",
 "Details"
@@ -2203,10 +2179,6 @@ window.HK_I18N_DICT = {
 "特急こばな 登場 勝守、天鳥崎、本磯島一車直達（新 8000 形）": [
 "特急こばな　登場　勝守・天鳥崎・本磯島へ乗り換えなし（新8000形）",
 "Limited Express Kobana debuts — no transfer to Katsumori, Amatorizaki, Motoisojima (new 8000 series)"
-],
-"機場三日券（3,900 円）・五日券（4,800 円） 可無限次搭乘所有非指定席列車": [
-"空港3日券（3,900円）・5日券（4,800円）　指定席以外の全列車に乗り放題",
-"Airport 3-day pass (¥3,900) and 5-day pass (¥4,800) — unlimited rides on all non-reserved trains"
 ],
 "新2100形 營運開始 最高時速 160 公里": [
 "新2100形　営業運転開始　最高時速160km",
@@ -3939,5 +3911,265 @@ window.HK_I18N_DICT = {
 "2026.11.16 開通；一日往返、路線圖、轉乘方式與車輛介紹": [
 "2026.11.16開業。日帰り、路線図、乗り換え、車両のご案内",
 "Opens 16 Nov 2026: day trip, route map, transfers and trains"
+],
+"米色的高架站房，也是轉乘高速鉄道的車站：可直接持光瀨都市鉄道車票和高速鉄道車票，由 1F 聯絡通道進入高速鉄道站內。": [
+"ベージュ色の高架駅舎で、高速鉄道の乗換駅でもあります。光瀬都市鉄道の乗車券と高速鉄道の券を持ったまま、1階連絡通路から高速鉄道の駅構内へ入れます。",
+"A beige elevated station building and a transfer point for the high-speed railway: with both a Hikarise Urban Railway ticket and a high-speed ticket, enter the high-speed station through the 1F connecting passage."
+],
+"雪中米色的東平倉高架站房": [
+"雪の中のベージュ色の東平倉高架駅舎",
+"The beige elevated station building of Higashi-Hekura in the snow"
+],
+"米色的高架站房": [
+"ベージュ色の高架駅舎",
+"Beige elevated station building"
+],
+"北出口": [
+"北口",
+"North exit"
+],
+"市街方面": [
+"市街地方面",
+"Towards the town centre"
+],
+"南出口": [
+"南口",
+"South exit"
+],
+"平倉高校、長距離客運轉運站方面": [
+"平倉高校、長距離バスターミナル方面",
+"Towards Hekura High School and the long-distance bus terminal"
+],
+"2F": [
+"2階",
+"2F"
+],
+"1F": [
+"1階",
+"1F"
+],
+"B1": [
+"地下1階",
+"B1"
+],
+"在來線月台": [
+"在来線ホーム",
+"Conventional-line platforms"
+],
+"高速鉄道月台": [
+"高速鉄道ホーム",
+"High-speed platforms"
+],
+"在來線剪票口": [
+"在来線改札口",
+"Conventional-line ticket gates"
+],
+"售票廳": [
+"きっぷ売り場",
+"Ticket hall"
+],
+"仰望みつせ站房大樓": [
+"見上げるみつせ駅ビル",
+"Looking up at the Mitsuse station building"
+],
+"仰望站房大樓": [
+"駅ビルを見上げる",
+"Looking up at the station building"
+],
+"見津瀨通、aters百貨店、舊合同廳舍方面": [
+"見津瀬通、aters百貨店、旧合同庁舎方面",
+"Towards Mitsuse-dori, the aters department store and the Former Joint Government Building"
+],
+"公車站、流星樹、佐山教育大學方面": [
+"バス乗り場、流星樹、佐山教育大学方面",
+"Towards the bus stops, the Ryusei Tree and Sayama University of Education"
+],
+"遠方可以看到現代感新站房的車站，是轉乘高速鉄道的車站。": [
+"遠くに近代的な新駅舎が見える駅で、高速鉄道の乗換駅です。",
+"A station with a modern new building visible in the distance — the transfer point for the high-speed railway."
+],
+"雪地遠方的新勝守新站房": [
+"雪原の向こうに見える新勝守の新駅舎",
+"The new Shin-Katsumori station building beyond the snowfield"
+],
+"雪地遠方的現代新站房": [
+"雪原の向こうの近代的な新駅舎",
+"A modern new station building beyond the snow"
+],
+"轉乘通道（連接新幹線車站月台）": [
+"乗換通路（新幹線駅のホームへ直結）",
+"Transfer passage (direct to the Shinkansen-style platforms)"
+],
+"轉乘高速鉄道的車站。請由北口出站，依指標徒步前往新光瀨站（高速鉄道）搭乘。": [
+"高速鉄道の乗換駅です。北口から出て、案内表示に従い徒歩で新光瀬駅（高速鉄道）へお進みください。",
+"The transfer station for the high-speed railway. Leave by the north exit and follow the signs on foot to Shin-Mitsuse station (high-speed railway)."
+],
+"照片下方的車站是高速鉄道的新光瀨站，前方則是本站。": [
+"写真の下側にあるのが高速鉄道の新光瀬駅、手前が当駅です。",
+"In the photo, the station below is the high-speed Shin-Mitsuse station; the one in front is this station."
+],
+"俯瞰幸村／新光瀨站與下方的高速鉄道新光瀨站": [
+"幸村／新光瀬駅と、その下の高速鉄道新光瀬駅を見下ろす",
+"Overlooking Yukimura / Shin-Mitsuse station and the high-speed Shin-Mitsuse station below"
+],
+"下方是高速鉄道的新光瀨站": [
+"下側が高速鉄道の新光瀬駅",
+"Below: the high-speed Shin-Mitsuse station"
+],
+"北口": [
+"北口",
+"North exit"
+],
+"依指標徒步前往新光瀨站（高速鉄道）": [
+"案内表示に従い徒歩で新光瀬駅（高速鉄道）へ",
+"Follow the signs on foot to Shin-Mitsuse station (high-speed railway)"
+],
+"木質柱子與玻璃屋頂的站體，月台在地下，採光很好。": [
+"木の柱とガラス屋根の駅で、ホームは地下にありながら採光がよい造りです。",
+"A station of wooden pillars and a glass roof; the platforms are underground yet well lit."
+],
+"附近有佐山教育大學。": [
+"近くに佐山教育大学があります。",
+"Sayama University of Education is nearby."
+],
+"木質柱子與玻璃屋頂的咲海研究学園都市站月台": [
+"木の柱とガラス屋根の咲海研究学園都市駅ホーム",
+"The platform of Sekiumi Science City station with wooden pillars and a glass roof"
+],
+"木質柱子與玻璃屋頂的月台": [
+"木の柱とガラス屋根のホーム",
+"Platform with wooden pillars and a glass roof"
+],
+"現代風格的佐山教育大學": [
+"モダンな佐山教育大学",
+"The modern Sayama University of Education"
+],
+"佐山教育大學": [
+"佐山教育大学",
+"Sayama University of Education"
+],
+"舊合同廳舍": [
+"旧合同庁舎",
+"Former Joint Government Building"
+],
+"歷史建築・市區": [
+"歴史的建築・市街地",
+"Historic building · City"
+],
+"1850 年代光瀨的合同廳舍，歐式的白色建築。": [
+"1850年代の光瀬の合同庁舎。白い欧風建築です。",
+"Hikarise's joint government building of the 1850s, a white European-style building."
+],
+"舊合同廳舍是 1850 年代光瀨的合同廳舍，白色的歐式外觀，屋頂中央立著小塔，正面一整排柱子，非常有格調。": [
+"旧合同庁舎は1850年代の光瀬の合同庁舎です。白い欧風の外観で、屋根の中央に小さな塔が立ち、正面にずらりと並ぶ柱が気品を添えています。",
+"The Former Joint Government Building was Hikarise's joint government building in the 1850s: a white European-style facade, a small tower at the centre of the roof, and a row of columns across the front."
+],
+"建築前方是整理得很漂亮的花圃與步道，雪景與花朵並存的時節特別好拍。從みつせ站東出口的方向走過去就會看到。": [
+"建物の前には手入れの行き届いた花壇と歩道が広がり、雪と花が同時に見られる季節は特に写真映えします。みつせ駅の東口方面へ歩くと見えてきます。",
+"In front of the building are well-kept flower beds and paths, especially photogenic when snow and flowers appear together. Walk from the east exit of Mitsuse station and you will see it."
+],
+"1850 年代光瀨的合同廳舍": [
+"1850年代の光瀬の合同庁舎",
+"Hikarise's joint government building of the 1850s"
+],
+"白色的歐式建築": [
+"白い欧風建築",
+"White European-style architecture"
+],
+"前方有花圃與步道": [
+"手前に花壇と歩道",
+"Flower beds and paths in front"
+],
+"最近車站：みつせ（東出口方向）": [
+"最寄り駅：みつせ（東口方面）",
+"Nearest station: Mitsuse (towards the east exit)"
+],
+"花圃後方的白色歐式建築，舊合同廳舍": [
+"花壇の向こうの白い欧風建築、旧合同庁舎",
+"The Former Joint Government Building, a white European-style building behind the flower beds"
+],
+"優惠套票 一日券・三日券・五日券・七日券": [
+"おトクなパス　1日券・3日券・5日券・7日券",
+"Visitor Passes: 1-, 3-, 5- and 7-day"
+],
+"專為旅客準備的套票。購買後，在使用期間內可以無限次搭乘光瀨都市鉄道的自由席列車；搭乘指定席列車時，只需要另外付指定席費用（不需再付乘車券）。七日券已含指定席座席費，並含高速鉄道 2 往復。": [
+"旅行者向けのパスです。期間中は光瀬都市鉄道の自由席列車に乗り放題。指定席に乗るときは、乗車券は不要で、指定席料金だけを別に支払います。7日券は指定席料金込みで、高速鉄道2往復も含まれます。",
+"Passes made for visitors. During the validity period you can ride non-reserved trains on the Hikarise Urban Railway as often as you like; for reserved-seat trains you only pay the seat fee (no separate fare). The 7-day pass includes the seat fee and 2 round trips on the High-Speed Railway."
+],
+"參考：${ap.zh}～${center.zh} 單程乘車券 ${yen(fareLine.one)}、來回 ${yen(fareLine.rt)}。一日券（${yen(1500)}）大約搭 ${Math.ceil(1500 / fareLine.one)} 次這樣的單程就回本；三日券（${yen(4500)}）約 ${Math.ceil(4500 / fareLine.one)} 次。以每天往返市區與景點計算，通常很划算。": [
+"目安：{0}～{1} 間の片道乗車券は {2}、往復は {3}。1日券（{4}）は片道約{5}回、3日券（{6}）は約{7}回で元が取れます。毎日市内と観光地を往復するなら、たいていお得です。",
+"Guide: a one-way fare between {0} and {1} is {2}, round trip {3}. The 1-day pass ({4}) pays for itself after about {5} such one-way trips; the 3-day pass ({6}) after about {7}. If you go back and forth between the city and sights daily, it is usually a good deal."
+],
+"到線上訂票，開立模擬套票": [
+"オンライン予約でパスを発行（シミュレーション）",
+"Issue a mock pass in Online Booking"
+],
+"套票的實際販售方式與販售地點，將於本網站公告。": [
+"パスの実際の販売方法・販売場所は、このサイトでお知らせします。",
+"How and where passes are actually sold will be announced on this site."
+],
+"有。往返機場的旅客可以使用「一日券」（1,500 円）、「三日券」（4,500 円）、「五日券」（7,000 円）與「七日券」（9,600 円），期間內可無限次搭乘光瀨都市鉄道的自由席列車；搭乘指定席列車時只需另付指定席費用。七日券已含指定席座席費與高速鉄道 2 往復。詳細請見": [
+"はい。1日券（1,500円）・3日券（4,500円）・5日券（7,000円）・7日券（9,600円）があり、期間中は光瀬都市鉄道の自由席列車に乗り放題です。指定席に乗るときは指定席料金のみ別にかかります。7日券は指定席料金込みで、高速鉄道2往復も含まれます。詳しくは",
+"Yes. There are 1-day (¥1,500), 3-day (¥4,500), 5-day (¥7,000) and 7-day (¥9,600) passes with unlimited rides on non-reserved trains; for reserved seats you only pay the seat fee. The 7-day pass includes the seat fee and 2 round trips on the High-Speed Railway. See"
+],
+"松澤國際機場（松沢国際空港站）有特急與特快直達光瀨市區，不需要轉乘。下面是搭乘方式、所要時間、班次，以及專為旅客準備的一日券、三日券、五日券與七日券。": [
+"松沢国際空港駅からは特急・特快が光瀬市街まで直通で、乗り換えは不要です。以下に乗り方、所要時間、本数、そして旅行者向けの1日券・3日券・5日券・7日券をご案内します。",
+"Limited express and special rapid trains run straight from Matsuzawa International Airport to central Hikarise with no transfer. Below: how to ride, travel times, frequency, and the 1-, 3-, 5- and 7-day visitor passes."
+],
+"特急・特快直達光瀨市區，最快 11 分鐘。一日券 1,500 円起的優惠套票，可無限次搭乘自由席列車。": [
+"特急・特快で光瀬市街まで最短11分。1日券1,500円からのおトクなパスで、自由席列車に乗り放題。",
+"Limited express and special rapid trains reach central Hikarise in as little as 11 minutes. Passes from ¥1,500 give unlimited rides on non-reserved trains."
+],
+"優惠套票：一日券 1,500 円・三日券 4,500 円・五日券 7,000 円・七日券 9,600 円": [
+"おトクなパス：1日券1,500円・3日券4,500円・5日券7,000円・7日券9,600円",
+"Visitor passes: 1-day ¥1,500 / 3-day ¥4,500 / 5-day ¥7,000 / 7-day ¥9,600"
+],
+"優惠套票（1・3・5・7日券）": [
+"おトクなパス（1・3・5・7日券）",
+"Visitor Passes (1/3/5/7-day)"
+],
+"期間內可無限次搭乘光瀨都市鉄道的自由席列車。選一張券、指定開始日期，就能開出模擬的套票。": [
+"期間中は光瀬都市鉄道の自由席列車に乗り放題です。パスを選び、開始日を指定すると、シミュレーションのパスを発行できます。",
+"Unlimited rides on non-reserved trains during the validity period. Choose a pass and a start date to issue a mock pass."
+],
+"開始日": [
+"開始日",
+"Start date"
+],
+"枚數（大人）": [
+"枚数（大人）",
+"Quantity (adults)"
+],
+"開票內容": [
+"発行内容",
+"Issued pass"
+],
+"選取中": [
+"選択中",
+"Selected"
+],
+"選擇這張": [
+"このパスを選ぶ",
+"Select this pass"
+],
+"券種": [
+"券種",
+"Pass type"
+],
+"使用期間": [
+"利用期間",
+"Validity"
+],
+"單價": [
+"単価",
+"Unit price"
+],
+"七日券已含指定席座席費，以及高速鉄道 2 往復（乘車費）。": [
+"7日券は指定席料金込みで、高速鉄道2往復（運賃）も含まれます。",
+"The 7-day pass includes the seat fee and 2 round trips (fares) on the High-Speed Railway."
+],
+"本頁為模擬開票，不會儲存。套票的實際販售方式與販售地點，將於本網站公告。": [
+"このページはシミュレーションで、保存されません。パスの実際の販売方法・販売場所は、このサイトでお知らせします。",
+"This page is a simulation and nothing is saved. How and where passes are actually sold will be announced on this site."
 ]
 };
