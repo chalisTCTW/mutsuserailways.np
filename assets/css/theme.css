@@ -37,12 +37,12 @@ body[data-page="home"] header.sh .sh-in { padding-top: 12px; padding-bottom: 12p
   .sh-brand { grid-area: 1 / 1; }
   header.sh .util { grid-area: 1 / 2; }
   header.sh .gnav { grid-area: 2 / 1 / 3 / 3; }
-  header.sh .gnav ul { justify-content: center; flex-wrap: wrap; gap: 0 8px; }
-  header.sh .gnav a { display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; color: var(--ink); opacity: 1; padding: 14px 14px 12px; font-size: 14px; font-weight: 500; text-align: center; }
+  header.sh .gnav ul { justify-content: center; flex-wrap: wrap; gap: 0 2px; }
+  header.sh .gnav a { display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; color: var(--ink); opacity: 1; padding: 14px 10px 12px; font-size: 14px; font-weight: 500; text-align: center; }
   header.sh .gnav a:hover { background: none; color: var(--g1); }
   header.sh .gnav .en { display: block; font-size: 9.5px; letter-spacing: .16em; color: #6d7d76; font-weight: 500; opacity: 1; text-transform: uppercase; margin: 0; }
   html[lang="en"] header.sh .gnav .en { display: none; }
-  header.sh .gnav a::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 3px; background: var(--g1); transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease); }
+  header.sh .gnav a::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px; background: var(--g1); transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease); }
   header.sh .gnav a:hover::after, header.sh .gnav a[aria-current="page"]::after { transform: scaleX(1); }
   header.sh .gnav a[aria-current="page"] { box-shadow: none; background: none; color: var(--g1); font-weight: 700; }
   .sh-in, body[data-page="home"] header.sh .sh-in { position: relative; }
@@ -173,3 +173,22 @@ footer .nav a:hover::after { transform: scaleX(1); }
 .bk-form .hs-field { margin: 0; }
 .bk-trip { transition: background-color .25s, padding-left .25s var(--ease); }
 .bk-trip:hover:not(:disabled) { background: var(--warm); }
+
+/* ── 1.4.0：高速鉄道「指定席特急券」專用票面（前輩指定：以後 HS 指定席特急券都用這個設計）──
+ * 尺寸與內文與一般車票 A 案完全相同（10.5 : 5.7），只在票面上方加一條夕陽列車照片、右下角加開業記念章。 */
+.tk.tkA.tkHS { --tk: #136880; background: #f7f9f7; }
+.tkHS .tkA-body { position: relative; padding-top: 2cqw; }
+.tkHS .tkA-body::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 16.6cqw; background: linear-gradient(180deg, rgba(255, 244, 238, .82) 0, rgba(255, 244, 238, .35) 42%, rgba(255, 244, 238, 0) 70%), #e8b9a8 url(../img/hs-ticket.webp) center bottom / cover no-repeat; z-index: 0; }
+.tkHS .tkA-body::after { content: ""; position: absolute; left: 0; right: 0; top: 16.6cqw; height: .5cqw; background: var(--tk); z-index: 0; }
+.tkHS .tkA-body > * { position: relative; z-index: 1; }
+.tkHS .tkA-top { color: #4a2f33; margin-bottom: 9.2cqw; text-shadow: 0 0 .8cqw rgba(255, 240, 232, .9); font-weight: 500; }
+.tkHS .tkA-top i { opacity: .8; }
+.tkHS .tkA-route { margin-top: 1.4cqw; }
+.tkHS-mem { position: absolute !important; right: 2.6cqw; top: 9.3cqw; z-index: 2; display: flex; align-items: center; gap: 1.2cqw; background: #ffd21f; color: #123f31; padding: .7cqw 1.6cqw; font: 900 2.2cqw/1.15 var(--sans, sans-serif); letter-spacing: .08em; box-shadow: 0 .3cqw .8cqw rgba(60, 20, 20, .25); }
+.tkHS-mem small { display: block; font: 700 1.25cqw/1.1 var(--sans, sans-serif); letter-spacing: .12em; }
+.tkHS .tkA-side { background: #136880; }
+@media print { .tkHS .tkA-body::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+
+/* 1.4.0：導覽列「高速鉄道」的 NEW 標籤 */
+header.sh .gnav li:has(.new) a { position: relative; }
+header.sh .gnav .new { position: absolute; top: 4px; right: -2px; display: inline-block; margin-left: 0; background: #ffd21f; color: #123f31; font-size: 9px; font-weight: 900; letter-spacing: .08em; padding: 1px 5px; border-radius: 2px; vertical-align: middle; }

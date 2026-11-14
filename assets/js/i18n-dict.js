@@ -3671,5 +3671,273 @@ window.HK_I18N_DICT = {
 "可利用高速鐵路": [
 "高速鉄道の利用可",
 "High-speed rail allowed"
+],
+"万瀨高速鉄道": [
+"万瀬高速鉄道",
+"Manse High-Speed Railway"
+],
+"夕陽下行駛在高架橋上的高速列車": [
+"夕日の中、高架橋を走る高速列車",
+"A high-speed train on a viaduct at sunset"
+],
+"開通": [
+"開業",
+"Opening"
+],
+"一日往返，從容自在。": [
+"日帰りで、ゆったり往復。",
+"A day trip, there and back, at ease."
+],
+"看一日往返的行程": [
+"日帰り行程を見る",
+"See the day-trip plan"
+],
+"開通紀念": [
+"開業記念",
+"Opening memorial"
+],
+"万瀨高速鉄道，通車。": [
+"万瀬高速鉄道、開業。",
+"Manse High-Speed Railway opens."
+],
+"謹以此頁，紀念這一天。": [
+"この日を記念して、このページを捧げます。",
+"This page marks the day."
+],
+"開業記念 指定席特急券": [
+"開業記念　指定席特急券",
+"Opening-memorial reserved ticket"
+],
+"一日往返，剛剛好": [
+"日帰りで、ちょうどいい",
+"A day trip fits perfectly"
+],
+"早上出發，在目的地盡情停留，傍晚再搭高速鉄道回來。從出發到返回，一天之內就能完成。": [
+"朝に出発し、目的地でたっぷり過ごして、夕方に高速鉄道で戻る。出発から帰着まで、一日で完結します。",
+"Leave in the morning, spend your time at the destination, and ride back in the evening — all in a single day."
+],
+"往程": [
+"往路",
+"Outbound"
+],
+"新勝守 → 新岩沢": [
+"新勝守　→　新岩沢",
+"Shin-Katsumori → Shin-Iwasawa"
+],
+"新勝守 首班": [
+"新勝守 始発",
+"first train from Shin-Katsumori"
+],
+"所要時間（新勝守→新岩沢）": [
+"所要時間（新勝守→新岩沢）",
+"travel time (Shin-Katsumori → Shin-Iwasawa)"
+],
+"停留": [
+"滞在",
+"Stay"
+],
+"在新岩沢・高之川市盡情遊玩": [
+"新岩沢・高之川市でたっぷり楽しむ",
+"Enjoy Shin-Iwasawa and Takanokawa City"
+],
+"首班抵達到末班發車之間，最長可停留": [
+"始発到着から最終発車まで、最長でご滞在いただけます",
+"maximum stay between the first arrival and the last departure"
+],
+"返程": [
+"復路",
+"Return"
+],
+"新岩沢 → 新勝守": [
+"新岩沢　→　新勝守",
+"Shin-Iwasawa → Shin-Katsumori"
+],
+"新岩沢 末班": [
+"新岩沢 最終",
+"last train from Shin-Iwasawa"
+],
+"時刻依目前的時刻表資料自動計算；尖峰時段約每 8 分鐘一班。": [
+"時刻は現在のダイヤから自動計算しています。ラッシュ時はおよそ8分間隔です。",
+"Times are calculated automatically from the current timetable; about every 8 minutes at peak."
+],
+"新勝守至東平倉由光瀨都市鉄道管轄，東平倉至新岩沢由白令鉄道管轄。新岩沢為目前開業的終點。": [
+"新勝守～東平倉は光瀬都市鉄道、東平倉～新岩沢は白令鉄道の管轄です。新岩沢が現在の開業区間の終点です。",
+"Shin-Katsumori to Higashi-Hekura is operated by Hikarise Urban Railway; Higashi-Hekura to Shin-Iwasawa by Bering Railway. Shin-Iwasawa is the current terminus."
+],
+"新勝守": [
+"新勝守",
+"Shin-Katsumori"
+],
+"可轉乘新幹線": [
+"新幹線に乗換可",
+"Shinkansen transfer"
+],
+"新光瀨": [
+"新光瀬",
+"Shin-Mitsuse"
+],
+"可直接轉乘": [
+"直接乗換可",
+"Direct transfer"
+],
+"花宮天照": [
+"花宮天照",
+"Hanamiya-Tensho"
+],
+"豐守": [
+"豊守",
+"Toyomori"
+],
+"新岩沢": [
+"新岩沢",
+"Shin-Iwasawa"
+],
+"目前終點": [
+"現在の終点",
+"Current terminus"
+],
+"轉乘秋葉鉄道": [
+"秋葉鉄道に乗換",
+"Akiba Railway transfer"
+],
+"光瀨都市鉄道 管轄（新勝守～東平倉）": [
+"光瀬都市鉄道 管轄（新勝守～東平倉）",
+"Hikarise Urban Railway (Shin-Katsumori – Higashi-Hekura)"
+],
+"白令鉄道 管轄（東平倉～新岩沢）": [
+"白令鉄道 管轄（東平倉～新岩沢）",
+"Bering Railway (Higashi-Hekura – Shin-Iwasawa)"
+],
+"延伸方向（高之川市中心）": [
+"延伸方向（高之川市中心）",
+"Extension direction (Takanokawa city centre)"
+],
+"2026 年登場，擔任万瀨高速鉄道的所有列車。": [
+"2026年に登場し、万瀬高速鉄道の全列車を担当します。",
+"Debuting in 2026, the HR-Shin01 series runs every service on the line."
+],
+"2+2 配置。1・8 號車（車頭・車尾）各 8 席（2 排），其餘車輛每節 40 席": [
+"2+2配置。1・8号車（先頭・最後尾）は各8席（2列）、その他は1両40席",
+"2+2 layout. Cars 1 and 8 (head and tail) have 8 seats each (2 rows); other cars have 40."
+],
+"設備": [
+"設備",
+"Features"
+],
+"USB 充電口・閱讀燈": [
+"USB充電口・読書灯",
+"USB charging ports, reading lights"
+],
+"車內・2+2 座席": [
+"車内・2+2座席",
+"Interior, 2+2 seating"
+],
+"高架橋上的 HR-新01系": [
+"高架橋を行くHR-新01系",
+"HR-Shin01 on the viaduct"
+],
+"月台上的 HR-新01系": [
+"ホームのHR-新01系",
+"HR-Shin01 at the platform"
+],
+"與月台並行": [
+"ホームと並走",
+"Alongside the platform"
+],
+"轉乘與利用": [
+"乗り換えとご利用方法",
+"Transfers and how to ride"
+],
+"各站的轉乘方式不同，出發前先確認。": [
+"駅ごとに乗り換え方法が異なります。出発前にご確認ください。",
+"Each station has a different transfer method — please check before you go."
+],
+"直接轉乘": [
+"直接乗換",
+"Direct transfer"
+],
+"可直接持光瀨都市鉄道車票和高速鉄道車票，由 2F 轉乘通道的檢票閘門，直接連接到新幹線車站月台轉乘。": [
+"光瀬都市鉄道の乗車券と高速鉄道の券を持ったまま、2階乗換通路の改札から新幹線駅のホームへ直接乗り換えられます。",
+"With both a Hikarise Urban Railway ticket and a high-speed ticket, go through the gates of the 2F transfer passage straight to the Shinkansen-style platform."
+],
+"請由幸村／新光瀨站北口出站，依指標徒步前往新光瀨站搭乘。": [
+"幸村／新光瀬駅の北口から出て、案内表示に従い徒歩で新光瀬駅へお進みください。",
+"Exit Yukimura / Shin-Mitsuse station by the north exit and follow the signs on foot to Shin-Mitsuse station."
+],
+"可直接持光瀨都市鉄道車票和高速鉄道車票，由 1F 聯絡通道進入高速鉄道站內。": [
+"光瀬都市鉄道の乗車券と高速鉄道の券を持ったまま、1階連絡通路から高速鉄道の駅構内へ入れます。",
+"With both tickets, enter the high-speed station through the 1F connecting passage."
+],
+"需另購車票": [
+"別途乗車券が必要",
+"Separate ticket required"
+],
+"持光瀨都市鉄道車票前往高之川市中心，請在本站轉乘秋葉鉄道新都心線，並另外購買秋葉鉄道新都心線的車票。": [
+"光瀬都市鉄道の乗車券で高之川市中心部へ向かう方は、当駅で秋葉鉄道新都心線に乗り換えてください。新都心線の乗車券は別途お求めください。",
+"For the centre of Takanokawa City, change here to the Akiba Railway Shin-Toshin Line and buy that line’s ticket separately."
+],
+"高之川市": [
+"高之川市",
+"Takanokawa City"
+],
+"班次・票價・訂票": [
+"ダイヤ・運賃・予約",
+"Timetable, fares and booking"
+],
+"高速鉄道為全車指定席，沒有立席特急券；票價另計。": [
+"高速鉄道は全車指定席で、立席特急券はありません。運賃は別計算です。",
+"All seats are reserved with no standing tickets; fares are calculated separately."
+],
+"區間": [
+"区間",
+"Section"
+],
+"乘車券": [
+"乗車券",
+"Fare"
+],
+"指定席特急券": [
+"指定席特急券",
+"Reserved seat ticket"
+],
+"合計（單程）": [
+"合計（片道）",
+"Total (one way)"
+],
+"高速鉄道各站的全日時刻表與現在的發車。": [
+"高速鉄道各駅の終日時刻表と、いまの発車。",
+"Full-day timetables for every high-speed station and the next departures."
+],
+"查詢乘車券與指定席特急券的合計。": [
+"乗車券と指定席特急券の合計を調べられます。",
+"Look up the total of fare and reserved-seat ticket."
+],
+"前往訂票頁，選擇座位並發出開業記念車票。": [
+"予約ページで座席を選び、開業記念切符を発券できます。",
+"Choose your seat and issue the opening-memorial ticket."
+],
+"高速鉄道的最新消息": [
+"高速鉄道の最新ニュース",
+"High-speed railway news"
+],
+"万瀨高速鉄道 開通 新勝守～新岩沢，一日往返更從容": [
+"万瀬高速鉄道　開業　新勝守～新岩沢、日帰りもゆったり",
+"Manse High-Speed Railway opens: Shin-Katsumori – Shin-Iwasawa, a relaxed day trip"
+],
+"2026.11.16 開通": [
+"2026.11.16　開業",
+"2026.11.16　Opening"
+],
+"万瀨高速鉄道 開通": [
+"万瀬高速鉄道　開業",
+"Manse High-Speed Railway opens"
+],
+"新勝守～新岩沢，一日往返更從容。最高時速 250 公里，全車指定席。": [
+"新勝守～新岩沢、日帰りもゆったり。最高時速250km、全車指定席。",
+"Shin-Katsumori – Shin-Iwasawa, a relaxed day trip. 250 km/h top speed, all seats reserved."
+],
+"2026.11.16 開通；一日往返、路線圖、轉乘方式與車輛介紹": [
+"2026.11.16開業。日帰り、路線図、乗り換え、車両のご案内",
+"Opens 16 Nov 2026: day trip, route map, transfers and trains"
 ]
 };

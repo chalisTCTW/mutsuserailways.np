@@ -16,14 +16,14 @@
   function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
   /** 這班車的座位占用：回傳 booked[car][seatIdx] = [[from,to),...]（以停靠站序號計） */
-  function occupancy(key, cars, nStops, depSec) {
+  function occupancy(key, cars, nStops, depSec, edge) {   // edge＝1・8 号車（車頭／車尾）的座位數（高速鉄道 8 席＝2+2 共 2 排）；省略＝每節都是 ROWS 排
     const r = rng(hash(key)), hr = depSec / 3600 % 24;
     const peak = (hr >= 6.5 && hr < 9.5) || (hr >= 16.5 && hr < 19.5);
     const load = Math.min(0.92, Math.max(0.12, (peak ? 0.72 : hr >= 22 || hr < 6 ? 0.18 : 0.42) + (r() - 0.5) * 0.3));
     const out = [];
     for (let c = 0; c < cars; c++) {
       const carLoad = Math.min(0.95, Math.max(0.05, load + (r() - 0.5) * 0.2)), seats = [];
-      for (let k = 0; k < ROWS * 4; k++) {
+      for (let k = 0, nSeat = edge && (c === 0 || c === cars - 1) ? edge : ROWS * 4; k < nSeat; k++) {
         const segs = []; let i = 0;
         while (i < nStops - 1) {
           if (r() < carLoad * 0.8) { const len = 1 + Math.floor(r() * Math.max(1, nStops - 1) * 0.8); segs.push([i, Math.min(nStops - 1, i + len)]); i += len; } else i += 1 + Math.floor(r() * 2);
@@ -81,7 +81,7 @@
       const ri = H.reserveInfo(leg.sv);
       const info = { leg, ri, a, b, key: `${date}|${leg.sv.idx}|${((base % DAY) + DAY) % DAY}`, nStops: st.length };
       if (ri && a >= 0 && b > a) {
-        info.occ = occupancy(info.key, ri.cars, st.length, s0.dep);
+        info.occ = occupancy(info.key, ri.cars, st.length, s0.dep, ri.edgeCarSeats);
         info.free = 0; for (let ci = 0; ci < ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
       } else info.ri = ri && a >= 0 && b > a ? ri : null;
       return info;
@@ -96,7 +96,7 @@
       const ri = H.reserveInfo(extLeg.sv), s0 = extLeg.stops[0], s1 = extLeg.stops[extLeg.stops.length - 1], nStops = extLeg.stops.length;
       const key = `ext|${s0.station}|${s1.station}|${date}|${((s0.dep % DAY) + DAY) % DAY}`;
       const info = { leg: extLeg, ri, a: 0, b: nStops - 1, key, nStops };
-      info.occ = occupancy(key, ri.cars, nStops, s0.dep);
+      info.occ = occupancy(key, ri.cars, nStops, s0.dep, ri.edgeCarSeats);
       info.free = 0; for (let ci = 0; ci < ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, info.a, info.b)) info.free++; });
       return info;
     }
@@ -112,7 +112,7 @@
       if (atEnd) { a = base.a; b = base.b + extN; } else { a = 0; b = extN + (base.b - base.a); }
       info.a = a; info.b = b; info.nStops = b + 1;
       info.key = base.key + '|x' + extLeg.stops[atEnd ? extLeg.stops.length - 1 : 0].station;
-      info.occ = occupancy(info.key, base.ri.cars, info.nStops, merged.stops[0].dep);
+      info.occ = occupancy(info.key, base.ri.cars, info.nStops, merged.stops[0].dep, base.ri.edgeCarSeats);
       info.free = 0; for (let ci = 0; ci < base.ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
       return info;
     }
@@ -265,7 +265,7 @@
         }));
         grid.replaceChildren(h('div', { class: 'bk-head' }, ...COLS.slice(0, 2).map(x => h('b', null, x)), h('span'), ...COLS.slice(2).map(x => h('b', null, x))));
         const car = cars[st.car];
-        for (let r = 0; r < ROWS; r++) {
+        for (let r = 0, rows = Math.ceil(car.length / 4); r < rows; r++) {
           const row = h('div', { class: 'bk-row' });
           for (let col = 0; col < 4; col++) {
             const k = r * 4 + col, free = isFree(car[k], l.a, l.b), on = st.seats.some(x => x.car === st.car && x.k === k);
@@ -312,7 +312,7 @@
         if (!l.ri) return;
         const st = S.legs[i], sv = l.leg.sv, s0 = l.leg.stops[0], sN = l.leg.stops[l.leg.stops.length - 1];
         const seat = st.mode === 'seat' ? st.seats.map(x => seatName(x.car, x.k)).join('、') : st.mode === 'stand' ? '立席（座位なし）' : `自由席（${l.ri.reservedCars + 1}号車以後）`;
-        ex.push({ no: noFor('ex' + i), col: sv.isHS ? HSC : 'var(--g1)', kind: '特急券', en: 'EXPRESS TICKET', sub: sv.routeName, from: H.stName(s0.station), to: H.stName(sN.station), fromEn: enOf(s0.station), toEn: enOf(sN.station), subEn: pretty((l.leg.sv.route && l.leg.sv.route.en) || ''), modeEn: modeEnOf(st.mode), seatBi: st.mode === 'seat' ? h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, st.seats.map(x => seatName(x.car, x.k)).join('、')), h('span', { class: 'en', lang: 'en' }, st.seats.map(x => seatEn(x.car, x.k)).join(', '))) : h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, seat), h('span', { class: 'en', lang: 'en' }, st.mode === 'stand' ? 'Standing (no seat)' : 'Non-reserved seating')), dep: HK.hm(s0.dep), arr: HK.hm(sN.arr), date, sv, gou: l.leg.gou || '', mode: modeLabel(l, st.mode), seat, fee: yen(legFee(l, st)), n: P.n, stops: l.leg.stops.length - 1 });
+        ex.push({ no: noFor('ex' + i), col: sv.isHS ? HSC : 'var(--g1)', kind: '特急券', en: 'EXPRESS TICKET', hs: !!sv.isHS, sub: sv.routeName, from: H.stName(s0.station), to: H.stName(sN.station), fromEn: enOf(s0.station), toEn: enOf(sN.station), subEn: pretty((l.leg.sv.route && l.leg.sv.route.en) || ''), modeEn: modeEnOf(st.mode), seatBi: st.mode === 'seat' ? h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, st.seats.map(x => seatName(x.car, x.k)).join('、')), h('span', { class: 'en', lang: 'en' }, st.seats.map(x => seatEn(x.car, x.k)).join(', '))) : h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, seat), h('span', { class: 'en', lang: 'en' }, st.mode === 'stand' ? 'Standing (no seat)' : 'Non-reserved seating')), dep: HK.hm(s0.dep), arr: HK.hm(sN.arr), date, sv, gou: l.leg.gou || '', mode: modeLabel(l, st.mode), seat, fee: yen(legFee(l, st)), n: P.n, stops: l.leg.stops.length - 1 });
       });
 
       const logo = () => h('img', { src: 'assets/img/mark-dark.png', alt: '', width: 24, height: 24 });
@@ -329,12 +329,15 @@
         h('table', { class: 'tbl tk-fare' }, h('tbody', null, ...(isEx ? [] : t.rows.map(r => h('tr', null, h('th', null, r[0]), h('td', null, r[1])))), h('tr', { class: 'tot' }, h('th', null, isEx ? `${t.mode} ${t.n} 位` : '合計'), h('td', null, isEx ? t.fee : t.total)))),
         h('footer', { style: `border-top-color:${t.col}` }, ...tail(t)));
 
+      // 1.4.0：高速鉄道指定席特急券的「開業記念」章（site-config.js 的 hsMemorial＝開業日；設成空字串就不印）
+      const HK_CFG_MEM = () => (window.HK_CONFIG && window.HK_CONFIG.hsMemorial) || '';
       // ── 方案 A：硬券・指定券風（1.2.5：定案。日文＋英文同時印在票面上，與網站語言無關；票面固定 10.5 : 5.7） ──
       const T2 = (ja, en, cls) => h('span', { class: 'bi' + (cls ? ' ' + cls : '') }, h('span', { class: 'ja', lang: 'ja' }, ja), h('span', { class: 'en', lang: 'en' }, en));
-      const cardA = (t, isEx) => h('article', { class: 'tk tkA', 'data-i18n-off': '', style: `--tk:${t.col}` },
+      const cardA = (t, isEx) => h('article', { class: 'tk tkA' + (isEx && t.hs ? ' tkHS' : ''), 'data-i18n-off': '', style: `--tk:${t.col}` },
         h('div', { class: 'tkA-side' }, h('b', { lang: 'ja' }, t.kind), h('em', { lang: 'en' }, isEx ? 'EXPRESS TICKET' : 'FARE TICKET'), isEx ? h('small', null, '指定席', h('br'), 'Reserved') : null),
         h('div', { class: 'tkA-body' },
           h('div', { class: 'tkA-top' }, h('span', null, isEx ? (t.sub + (t.gou ? ' ' + t.gou : '')) : '光瀨都市鉄道', h('br'), h('i', { lang: 'en' }, isEx ? (t.subEn || 'Hikarise Urban Railway') : 'Hikarise Urban Railway')), h('span', { class: 'r' }, t.date + ' 発行', h('br'), h('i', { lang: 'en' }, 'Issued ' + t.date))),
+          isEx && t.hs && HK_CFG_MEM() ? h('div', { class: 'tkHS-mem' }, h('b', { lang: 'ja' }, '開業記念'), h('small', { lang: 'en' }, HK_CFG_MEM().replace(/-/g, '.'), h('br'), 'OPENING')) : null,
           h('div', { class: 'tkA-route' },
             h('div', { class: 'st' }, h('b', { lang: 'ja' }, t.from), h('i', { lang: 'en' }, t.fromEn), h('em', null, t.dep + ' 発 dep.')),
             h('div', { class: 'ar' }, '→'),
