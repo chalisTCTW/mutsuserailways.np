@@ -4171,5 +4171,61 @@ window.HK_I18N_DICT = {
 "本頁為模擬開票，不會儲存。套票的實際販售方式與販售地點，將於本網站公告。": [
 "このページはシミュレーションで、保存されません。パスの実際の販売方法・販売場所は、このサイトでお知らせします。",
 "This page is a simulation and nothing is saved. How and where passes are actually sold will be announced on this site."
+],
+"乘車": [
+"乗車",
+"Ride"
+],
+"出行": [
+"おでかけ",
+"Explore"
+],
+"乘車總覽": [
+"乗車 総合案内",
+"Ride Overview"
+],
+"出行總覽": [
+"おでかけ 総合案内",
+"Explore Overview"
+],
+"乘車｜光瀨都市鉄道": [
+"乗車｜光瀨都市鉄道",
+"Ride | Hikarise Urban Railway"
+],
+"出行｜光瀨都市鉄道": [
+"おでかけ｜光瀨都市鉄道",
+"Explore | Hikarise Urban Railway"
+],
+"光瀨都市鉄道 乘車總覽：時刻表、票價、高速鉄道、特急こばな。（Minecraft 架空鐵路）": [
+"光瀨都市鉄道 乗車総合案内：時刻表、運賃、高速鉄道、特急こばな。（Minecraft 架空鉄道）",
+"Hikarise Urban Railway Ride overview: timetables, fares, the High-Speed Railway and Ltd. Exp. Kobana. (Minecraft fictional railway)"
+],
+"光瀨都市鉄道 出行總覽：沿線景點、車站介紹、乘車指南、機場聯外交通。（Minecraft 架空鐵路）": [
+"光瀨都市鉄道 おでかけ総合案内：沿線の見どころ、駅案内、ご利用案内、空港アクセス。（Minecraft 架空鉄道）",
+"Hikarise Urban Railway Explore overview: sights along the line, station guides, travel tips and airport access. (Minecraft fictional railway)"
+],
+"同分類選單": [
+"同分類メニュー",
+"Section menu"
+],
+"時刻表、票價、各列車種別與高速鉄道——光瀨都市鉄道的所有搭乘資訊都在這裡。": [
+"時刻表、運賃、列車種別、そして高速鉄道——光瀨都市鉄道の乗車に関する情報はすべてここに。",
+"Timetables, fares, train types and the High-Speed Railway — everything about riding Hikarise Urban Railway, all in one place."
+],
+"沿線景點、車站介紹、乘車指南與機場聯外交通，出門前先看這裡。": [
+"沿線の見どころ、駅案内、ご利用案内、空港アクセス——お出かけ前にまずはここをチェック。",
+"Sights along the line, station guides, travel tips and airport access — check here before you head out."
+],
+"車站時刻表、乘車・轉乘查詢、票價查詢、路線圖": [
+"駅時刻表、乗り換え案内、運賃検索、路線図",
+"Station timetables, transfer info, fare search and the route map"
+],
+"＞ 乘車": [
+"＞ 乗車",
+"＞ Ride"
+],
+"＞ 出行": [
+"＞ おでかけ",
+"＞ Explore"
 ]
 };
