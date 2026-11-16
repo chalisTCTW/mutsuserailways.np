@@ -59,18 +59,29 @@
         tr.append(name, c(yen(f.yen)), seatTd, tot); rows.append(tr);
       });
     }
-    // 1.9.0：新勝守這一端的「上羽本線」延伸（上羽神別・汐崎）——還沒通車，這裡先用一般鐵路票價預覽，
-    // 跟上面的高速鉄道獨立票價表分開放，標明是預覽、不是正式票價。
+    // 1.9.0：新勝守這一端的「上羽本線」延伸（上羽神別・汐崎）。1.9.2：上羽神別已經通車變成真站了，
+    // 這一站改用真正的乘車路徑／票價（H.fare，跟訂票頁一致），不再用下面那個「地圖外延伸」的粗略估算；
+    // 汐崎還沒出現在快照裡，繼續用 H.ext2FareExt 的估算值，並標示「預覽」避免跟正式票價混在一起。
     const ext2box = $('#hs-ext2-fares');
     if (ext2box && H.ext2FareExt && H.ext2QueryStations && H.ext2QueryStations.length) {
       const note = $('#hs-ext2-note'), table = $('#hs-ext2-table');
       if (note) note.hidden = false; if (table) table.hidden = false;
+      const fromSt = (H.stations || []).find(s => s.zh === '新勝守');
       H.ext2QueryStations.filter(s => s.zh !== '新勝守').forEach(s => {
-        const f = H.ext2FareExt('新勝守', s.zh); if (!f) return;
+        let yenVal, previewTag = '';
+        if (s.real && fromSt && H.fare) {
+          const toSt = (H.stations || []).find(s2 => s2.zh === s.zh);
+          const real = toSt ? H.fare(fromSt.id, toSt.id) : null;
+          if (!real) return;
+          yenVal = real.yen;
+        } else {
+          const f = H.ext2FareExt('新勝守', s.zh); if (!f) return;
+          yenVal = f.yen; previewTag = L('（預覽）', '（仮）', ' (preview)');
+        }
         const tr = document.createElement('tr');
-        const name = document.createElement('td'); name.textContent = '新勝守 ⇄ ' + s.zh;
+        const name = document.createElement('td'); name.textContent = '新勝守 ⇄ ' + s.zh + previewTag;
         const td = (txt) => { const d = document.createElement('td'); d.textContent = txt; return d; };
-        tr.append(name, td(yen(f.yen)), td('－'), td(yen(f.yen)));
+        tr.append(name, td(yen(yenVal)), td('－'), td(yen(yenVal)));
         ext2box.append(tr);
       });
     }
