@@ -9,7 +9,8 @@
     castle: ['城', '#7a5a2e'], port: ['港', '#1f6f8b'], shrine: ['社', '#9c4a2f'],
     museum: ['博', '#4a5fa0'], kuribashi: ['購', '#c77d2e'], tomise: ['河', '#2f7d6b'],
     heikura: ['紀', '#6b5a8c'], 'tomiya-arena': ['競', '#2f6d3a'], 'kaiei-museum': ['美', '#8c3a6b'],
-    'ryusei-tree': ['觀', '#3a7a8c'], 'old-godo-hall': ['建', '#8c6b3a']
+    'ryusei-tree': ['觀', '#3a7a8c'], 'old-godo-hall': ['建', '#8c6b3a'],
+    customs: ['稅', '#5a6b3a'], farm: ['農', '#7a8c3a'], church: ['堂', '#3a4a6b'], library: ['書', '#2f6d8c']
   };
   const q = new URLSearchParams(location.search);
   const pad = n => String(n).padStart(2, '0');

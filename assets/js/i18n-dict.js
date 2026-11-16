@@ -4288,5 +4288,91 @@ window.HK_I18N_DICT = {
 "© 光瀨都市鉄道　本サイトはMinecraft架空鉄道「光瀨都市圏」の設定・情報ページです。内容はすべて架空のものです。",
 "© Hikarise Urban Railway — This site is a setting/information page for the fictional Minecraft railway \"Hikarise Metropolitan Area\". All content is fictional."
 ],
-"區間（一般鐵路・預覽）": ["区間（一般鉄道・プレビュー）", "Section (regular rail, preview)"]
+"區間（一般鐵路・預覽）": ["区間（一般鉄道・プレビュー）", "Section (regular rail, preview)"],
+"近代建築・歷史": ["近代建築・歴史", "Modern architecture / history"],
+"1895 年設立的港務稅關局，歐式巴洛克風格，現在開放昔日展廳與宿舍參觀。": [
+"1895年に設立された港湾税関で、欧風バロック様式の建物です。現在は往時の展示室と職員宿舎を公開しています。",
+"A harbor customs office established in 1895, built in a European Baroque style. Its former exhibition halls and staff quarters are now open to visitors."
+],
+"舊港務局海關所建於 1895 年，當年是負責名島港進出口貨物課稅與檢查的稅關局，歐式巴洛克風格的外觀、對稱的立面與厚重的石砌牆身，是名島港一帶最顯眼的近代建築之一。": [
+"旧港務局税関所は1895年に建てられ、当時は名島港の輸出入貨物の課税と検査を担う税関でした。欧風バロック様式の外観、左右対称のファサードと重厚な石積みの壁が特徴で、名島港周辺で最も目を引く近代建築のひとつです。",
+"The Old Harbor Customs House was built in 1895 as the customs office responsible for taxing and inspecting cargo passing through Namijima Port. Its European Baroque exterior, symmetrical facade, and heavy stone walls make it one of the most striking modern buildings in the area."
+],
+"館內保留了昔日的辦公展廳，也開放當年海關人員的宿舍區，可以看到辦公用具、稅關印章與老照片等展示。從名島港站出來沿港邊走幾分鐘就能到，適合安排在搭船或散步行程之間順道參觀。": [
+"館内には当時の執務展示室が保存され、税関職員の宿舎エリアも公開されています。当時の事務用品や税関の印章、古い写真などの展示が見られます。名島港駅から港沿いを数分歩けば到着でき、乗船や散歩の合間に立ち寄るのにぴったりです。",
+"Inside, the former office display rooms have been preserved, and the staff quarters where customs officers once lived are also open to the public, with displays of period office supplies, customs seals, and old photographs. It is a few minutes' walk along the harbor from Namijima Port Station, making it an easy stop between a boat ride and a stroll."
+],
+"1895 年設立的港務稅關局": ["1895年に設立された港湾税関", "Harbor customs office established in 1895"],
+"歐式巴洛克風格建築": ["欧風バロック様式の建物", "European Baroque-style building"],
+"開放昔日展廳與海關人員宿舍": ["往時の展示室と税関職員宿舎を公開", "Former exhibition halls and staff quarters open to visitors"],
+"最近車站：名島港": ["最寄り駅：名島港", "Nearest station: Namijima Port"],
+"歐式巴洛克風格的建築外觀": ["欧風バロック様式の外観", "European Baroque exterior"],
+"開放參觀的昔日展廳": ["公開されている往時の展示室", "The former exhibition hall, now open to visitors"],
+"觀光農場・親子": ["観光農場・ファミリー", "Tourist farm / family"],
+"適合親子同遊的觀光農場，特定季節可以賞花、採玫瑰、草莓、葡萄，還能餵食羊駝。": [
+"親子で楽しめる観光農場で、季節によって花見やバラ・いちご・ぶどうの収穫体験ができ、アルパカへの餌やりもできます。",
+"A family-friendly tourist farm where, depending on the season, you can enjoy flower viewing, pick roses, strawberries or grapes, and feed alpacas."
+],
+"波別觀光農場是一座以親子遊客為主的觀光農場，園區依季節種植玫瑰、草莓、葡萄等作物，開放期間可以自己動手採收，帶一點回家當伴手禮。": [
+"波別観光農場は親子連れの観光客を主な対象とした観光農場です。園内は季節に合わせてバラ・いちご・ぶどうなどを栽培しており、収穫期には自分の手で摘み取ってお土産として持ち帰ることができます。",
+"Namibetsu Tourist Farm is a tourist farm aimed mainly at families. The grounds grow roses, strawberries, grapes and other crops depending on the season, and during harvest periods visitors can pick their own to take home as souvenirs."
+],
+"農場裡也養了一群羊駝，準備了飼料讓遊客近距離餵食，很受小朋友歡迎。從上羽安來站過去車程不遠，很適合安排半天的親子行程。": [
+"農場ではアルパカの群れも飼育されており、餌を用意して間近で餌やり体験ができ、子どもたちに大人気です。上羽安来駅からも車ですぐの距離にあり、半日の家族旅行にぴったりです。",
+"The farm is also home to a herd of alpacas, and feed is provided so visitors can feed them up close, a big hit with kids. It is a short drive from Kamiba-Yasuki Station, making it perfect for a half-day family outing."
+],
+"適合親子同遊的觀光農場": ["親子で楽しめる観光農場", "A tourist farm great for families"],
+"依季節賞花、採玫瑰・草莓・葡萄": ["季節ごとの花見やバラ・いちご・ぶどうの収穫体験", "Seasonal flower viewing and picking roses, strawberries, or grapes"],
+"可以近距離餵食羊駝": ["アルパカに間近で餌やりができる", "Feed alpacas up close"],
+"最近車站：上羽安來": ["最寄り駅：上羽安来", "Nearest station: Kamiba-Yasuki"],
+"農場裡的溫室與畜舍": ["農場内の温室と畜舎", "Greenhouses and animal barns on the farm"],
+"教堂・建築": ["教会・建築", "Church / architecture"],
+"1864 年由俄羅斯傳道士建立的東正教教堂，歐式外觀搭配大量水晶窗，氣氛莊嚴。": [
+"1864年にロシア人宣教師によって建てられた正教会の教会堂です。欧風の外観と数多くのステンドグラスが特徴で、荘厳な雰囲気があります。",
+"An Eastern Orthodox church built in 1864 by Russian missionaries, with a European exterior and many stained-glass windows, giving it a solemn atmosphere."
+],
+"真跡主教教堂由俄羅斯傳道士於 1864 年建立，是當地歷史最久的東正教教堂之一。深色石牆搭配高聳的鐘塔，外觀厚重而莊嚴，是北倉間一帶的地標。": [
+"真跡主教教会は1864年にロシア人宣教師によって建てられ、この地域で最も歴史の古い正教会のひとつです。濃い色の石壁と高くそびえる鐘楼を持ち、重厚で荘厳な外観は北倉間周辺のランドマークとなっています。",
+"Shinseki Cathedral was built in 1864 by Russian missionaries and is one of the oldest Eastern Orthodox churches in the area. Its dark stone walls and tall bell tower give it a heavy, solemn appearance, and it serves as a landmark around Kitakurama."
+],
+"教堂內部最大的特色是整排大面積的彩色水晶窗，陽光穿過時會在長廊地面灑下七彩的光影，搭配垂吊的燈具與整齊排列的長椅，氣氛相當寧靜。從北倉間站步行就能到。": [
+"教会内部最大の特徴は、ずらりと並ぶ大きな色ガラスの窓です。日差しが差し込むと回廊の床に七色の光と影を落とし、吊り下げられた照明と整然と並ぶ長椅子とあいまって、とても静謐な雰囲気を作り出しています。北倉間駅から徒歩で行くことができます。",
+"The church's biggest highlight is its row of large stained-glass windows; when sunlight streams through, it casts colorful patterns of light across the aisle floor, and together with the hanging lamps and neat rows of pews, creates a very serene atmosphere. It is within walking distance of Kitakurama Station."
+],
+"1864 年由俄羅斯傳道士建立的東正教教堂": ["1864年にロシア人宣教師が建てた正教会", "Eastern Orthodox church built in 1864 by Russian missionaries"],
+"歐式石造外觀與高聳鐘塔": ["欧風の石造りの外観と高い鐘楼", "European stone exterior with a tall bell tower"],
+"大量彩色水晶窗，光影效果特別": ["数多くの色ガラス窓による独特の光と影", "Many stained-glass windows create a striking play of light"],
+"最近車站：北倉間": ["最寄り駅：北倉間", "Nearest station: Kitakurama"],
+"石造外觀與高聳的鐘塔": ["石造りの外観と高い鐘楼", "Stone exterior and tall bell tower"],
+"彩色水晶窗與莊嚴的長廊": ["色ガラス窓と荘厳な回廊", "Stained-glass windows and the solemn aisle"],
+"建築・學術": ["建築・学術", "Architecture / academic"],
+"2021 年啟用的環保建築圖書館，館內有文藝風格咖啡廳，部分展廳對外開放。": [
+"2021年に開館したエコ建築の図書館です。館内には文芸風のカフェがあり、一部の展示スペースは一般にも公開されています。",
+"A library built with eco-friendly architecture, opened in 2021. It has a literary-style cafe inside, and part of its exhibition space is open to the public."
+],
+"佐山教育大學水晶圖書館於 2021 年啟用，以環保建築工法為設計主軸，大面積的玻璃天棚引入自然採光，白色的書架與閱覽區層層展開，像是一座室內的水晶盒子。": [
+"佐山教育大学水晶図書館は2021年に開館し、エコ建築を設計の軸としています。大面積のガラス天井から自然光が差し込み、白い書架と閲覧スペースが幾重にも広がる様子は、まるで屋内の水晶の箱のようです。",
+"Sayama University of Education Crystal Library opened in 2021, designed around eco-friendly construction methods. A large glass ceiling lets in natural light, and the white bookshelves and reading areas unfold layer upon layer, like a crystal box indoors."
+],
+"圖書館裡附設一間文藝風格的咖啡廳，也規劃了一部分展廳對校外遊客開放，即使不是學生，也可以安排時間進來感受這座建築。從咲海研究学園都市站出來不遠就能走到。": [
+"図書館には文芸風のカフェが併設されており、一部の展示スペースは学外の来訪者にも開放されています。学生でなくても、時間を作ってこの建築を体感しに訪れることができます。咲海研究学園都市駅から歩いてすぐです。",
+"The library has an attached literary-style cafe, and part of its exhibition space is open to visitors from outside the university. Even if you are not a student, you can still stop by to experience the building. It is a short walk from Sakiumi Science City Station."
+],
+"2021 年啟用的環保建築圖書館": ["2021年開館のエコ建築図書館", "Eco-friendly library opened in 2021"],
+"大面積玻璃天棚、自然採光": ["大面積のガラス天井による自然採光", "Large glass ceiling for natural light"],
+"附設文藝風格咖啡廳": ["文芸風のカフェを併設", "Attached literary-style cafe"],
+"部分展廳對外開放": ["一部の展示スペースは一般公開", "Part of the exhibition space is open to the public"],
+"最近車站：咲海研究学園都市": ["最寄り駅：咲海研究学園都市", "Nearest station: Sakiumi Science City"],
+"挑高的書架與閱覽區": ["吹き抜けの書架と閲覧スペース", "Double-height bookshelves and reading area"],
+"對外開放的一樓空間": ["一般公開されている1階スペース", "The ground-floor space open to the public"],
+"「上羽本線」延伸段的車站，目前還是地圖與時刻表上的預覽資料，實際路線通車後會自動補上完整時刻表。": [
+"「上羽本線」延伸区間の駅で、現在は地図と時刻表上ではプレビューデータの段階です。実際に路線が開業すると、自動的に完全な時刻表が反映されます。",
+"A station on the \"Joba Main Line\" extension. It is currently only preview data on the map and timetable; once the line actually opens, the full timetable will appear automatically."
+],
+"鄰近上羽地區，是新勝守往汐崎方向延伸計畫中的中間站。": [
+"上羽地区の近くに位置し、新勝守から汐崎方面への延伸計画における中間駅です。",
+"Located near the Kamiba area, it is an intermediate station on the planned extension from Shin-Katsumori toward Shiozaki."
+],
+"上羽神別站的站體設計": ["上羽神別駅の駅舎デザイン", "Kamiba-Kanbetsu Station building design"],
+"上羽神別站・站體設計（": ["上羽神別駅・駅舎デザイン（", "Kamiba-Kanbetsu Station - building design ("]
 };
