@@ -299,6 +299,10 @@ footer .copy { width: 100%; font-size: 12px; opacity: .85; border-top: 1px solid
 .bk-ct[aria-pressed="true"] { background: var(--g1); color: #fff; } .bk-ct[aria-pressed="true"] small { color: #fff; }
 .bk-grid { display: inline-block; padding: 12px 16px; border: 2px solid var(--g1); border-radius: 18px 18px 6px 6px; background: var(--g4); }
 .bk-head, .bk-row { display: grid; grid-template-columns: 38px 38px 28px 38px 38px; gap: 6px; align-items: center; margin-bottom: 6px; text-align: center; }
+/* 1.9.0：商務車廂（1+2）只有 3 個座位欄＋走道，grid-template-columns 少一欄。 */
+.bk-grid.biz { border-color: var(--hs-c, #136880); }
+.bk-grid.biz .bk-head, .bk-grid.biz .bk-row { grid-template-columns: 44px 28px 44px 44px; }
+.bk-grid.biz .seat { width: 44px; }
 .bk-head b { font-size: 12px; color: var(--muted); } .bk-row .aisle { font-size: 11px; color: var(--muted); }
 .seat { width: 38px; height: 34px; border: 1px solid var(--g1); border-radius: 6px 6px 3px 3px; background: #fff; color: var(--g0); cursor: pointer; font-size: 12px; padding: 0; }
 .seat.sel { background: var(--g1); color: #fff; }

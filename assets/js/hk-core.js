@@ -535,6 +535,46 @@
       const ext = CFG.hsExt; if (!ext || !ext.afterZh) return null;
       return stations.find(s => s.zh === ext.afterZh) || null;
     };
+    /* 1.9.0：新勝守這一端的「上羽本線」延伸（CFG.hsExt2，見 site-config.js）——跟上面的 hsExt 是同一套寫法，
+     * 差別只在於這段算一般鐵路票價（fareBase／fareStep），不是高速鉄道獨立票價。純粹是預覽用的設定，
+     * 不是遊戲內真正存在的站／路線，不會進地圖、不會進拓樸；等快照裡真的出現這兩站時，把它們的名字從
+     * CFG.hsExt2.stops 移去 real（跟當年新勝守／新光瀨／東平倉从 hsExt.stops 移進 hsExt.real 一樣的做法）即可，
+     * 不需要改這裡任何一行程式碼或票價公式——因為那時它們會是普通（非 HIGH_SPEED）路線，自動走一般的
+     * H.fare()／H.journeyFare()，用不到下面這幾個 ext2 專用函式了。 */
+    H.ext2Stops = []; H.ext2QueryStations = [];
+    (function () {
+      const ext = CFG.hsExt2; if (!ext || !ext.stops || !ext.stops.length) return;
+      (ext.real || []).forEach(zh => { const st = stations.find(s => s.zh === zh); if (st) H.ext2QueryStations.push({ id: st.id, zh, real: true }); });
+      const anchor = stations.find(s => s.zh === ext.afterZh);
+      if (anchor && !H.ext2QueryStations.some(s => s.zh === ext.afterZh)) H.ext2QueryStations.push({ id: anchor.id, zh: ext.afterZh, real: true });
+      let prevZh = ext.afterZh;
+      ext.stops.forEach(e => {
+        const entry = { id: 'ext2:' + e.zh, zh: e.zh, en: e.en || '', real: false, km: e.km || 0, min: e.min || 0, zoneBoundary: !!e.zoneBoundary, provisional: !!e.provisional, prevZh };
+        H.ext2Stops.push(entry); H.ext2QueryStations.push(entry); prevZh = e.zh;
+      });
+      if (window.HK_I18N) window.HK_I18N.names(H.ext2Stops.filter(e => e.en).map(e => [e.zh, e.en]));
+    })();
+    /** 上羽本線延伸欄位的試算票價：跟 H.hsFareExt 同一套「沿固定順序＋zoneBoundary 計算跨區數」的算法，
+     *  只是改用一般鐵路的 fareBase／fareStep（不是 hsFareStep），而且允許 crossed＝0（同一收費區內只收起步價，
+     *  不像高速鉄道「至少算跨 1 區」）。回傳 isHS:false，讓畫面知道這是一般鐵路試算，不是高速鉄道票價。 */
+    H.ext2FareExt = function (aZh, bZh) {
+      const list = H.ext2QueryStations; if (!list.length) return null;
+      const ia = list.findIndex(s => s.zh === aZh), ib = list.findIndex(s => s.zh === bZh);
+      if (ia < 0 || ib < 0 || ia === ib) return null;
+      const lo = Math.min(ia, ib), hi = Math.max(ia, ib);
+      let crossed = 0, km = 0;
+      for (let i = lo + 1; i <= hi; i++) { const node = list[i]; km += node.km || 0; if (node.zoneBoundary) crossed++; }
+      const base = CFG.fareBase + CFG.fareStep * crossed;
+      return { yen: base, base: CFG.fareBase, step: CFG.fareStep, crossed, zones: crossed, path: list.slice(lo, hi + 1).map(s => s.zh), km, isHS: false, ext: true, provisional: list.slice(lo, hi + 1).some(s => s.provisional) };
+    };
+    H.ext2Duration = function (aZh, bZh) {
+      const list = H.ext2QueryStations; if (!list.length) return 0;
+      const ia = list.findIndex(s => s.zh === aZh), ib = list.findIndex(s => s.zh === bZh);
+      if (ia < 0 || ib < 0 || ia === ib) return 0;
+      const lo = Math.min(ia, ib), hi = Math.max(ia, ib);
+      let sec = 0; for (let i = lo + 1; i <= hi; i++) sec += (list[i].min || 0) * 60;
+      return sec;
+    };
     /** 高速鉄道獨立查詢欄位用：兩個站名（地圖內的真實站、或地圖外的假想延伸站皆可）之間的票價。
      *  不經過一般票價的拓樸搜尋（高速鉄道不在 H.adj 裡），而是沿著 H.hsQueryStations 這個固定順序直接算：
      *  真實站之間沿用「有沒有共同收費區」的分區定義；碰到假想延伸站的那一段，收費區跨越與否照 CFG.hsExt
@@ -758,8 +798,15 @@
       if (sv._ri !== undefined) return sv._ri;
       let out = null;
       if (sv.isHS) {
-        const cars = CFG.hsCars, edge = CFG.hsEdgeCarSeats;
-        out = { mode: 'all', cars, reservedCars: cars, seats: CFG.seatsPerCar * (cars - 2) + edge * 2, fee: CFG.hsSeatFee, standFee: 0, noStanding: true, perCar: CFG.seatsPerCar, edgeCarSeats: edge };
+        // 1.9.0：1・2 号車是商務車廂（CFG.hsBusinessCars／hsBusinessLayout），座位數改用設定值、指定席費用另外算（hsBusinessFee）；
+        // 其餘車廂（含 1・8 号車以外都不再套用舊的 edge 座位數——只有真正是頭尾車廂、又不是商務車廂時才用 hsEdgeCarSeats）。
+        const cars = CFG.hsCars, edge = CFG.hsEdgeCarSeats, biz = CFG.hsBusinessCars || [], bizLayout = CFG.hsBusinessLayout || {};
+        const carSeats = []; let seats = 0;
+        for (let c = 1; c <= cars; c++) {
+          const n = (biz.includes(c) && bizLayout[c]) ? bizLayout[c].seats : (c === 1 || c === cars) ? edge : CFG.seatsPerCar;
+          carSeats.push(n); seats += n;
+        }
+        out = { mode: 'all', cars, reservedCars: cars, seats, fee: CFG.hsSeatFee, bizFee: CFG.hsBusinessFee, bizCars: biz, carSeats, standFee: 0, noStanding: true, perCar: CFG.seatsPerCar, edgeCarSeats: edge };
       } else {
         for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) {
           const rc = r.mode === 'part' ? r.reservedCars : r.cars;

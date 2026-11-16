@@ -46,17 +46,40 @@
         if (stay > 0) t('#hs-stay', L(`最長約 ${Math.floor(stay / 3600)} 小時`, `最長 約${Math.floor(stay / 3600)}時間`, `up to ~${Math.floor(stay / 3600)} h`));
       }
     }
-    // 票價
-    const rows = $('#hs-fares');
+    // 票價（1.9.0：指定席特急券分「商務車廂」「一般車廂」兩個價，不再是單一數字）
+    const rows = $('#hs-fares'), bizFee = (CFG.hsBusinessFee != null) ? CFG.hsBusinessFee : 1600;
     if (rows && H.hsFareExt) {
       ['新勝守', '新光瀨', '東平倉'].forEach(nm => {
         const f = H.hsFareExt(nm, '新岩沢'); if (!f) return;
         const tr = document.createElement('tr'), c = (txt, extra) => { const td = document.createElement('td'); td.textContent = txt; if (extra) td.append(extra); return td; };
         const name = document.createElement('td'); name.textContent = nm + ' ⇄ 新岩沢';
+        const seatTd = document.createElement('td'); seatTd.innerHTML = yen(f.seat) + '<small style="display:block;color:var(--hs-c,#136880)">' + L('商務車廂', 'ビジネスシート', 'Business class') + ' ' + yen(bizFee) + '</small>';
         const tot = document.createElement('td'), bb = document.createElement('b'); bb.textContent = yen(f.total); tot.append(bb);
         if (nm === '新勝守') { const sm = document.createElement('small'); mark(sm); sm.textContent = L('往返', '往復', 'round trip') + ' ' + yen(f.total * 2); tot.append(sm); }
-        tr.append(name, c(yen(f.yen)), c(yen(f.seat)), tot); rows.append(tr);
+        tr.append(name, c(yen(f.yen)), seatTd, tot); rows.append(tr);
       });
+    }
+    // 1.9.0：新勝守這一端的「上羽本線」延伸（上羽神別・汐崎）——還沒通車，這裡先用一般鐵路票價預覽，
+    // 跟上面的高速鉄道獨立票價表分開放，標明是預覽、不是正式票價。
+    const ext2box = $('#hs-ext2-fares');
+    if (ext2box && H.ext2FareExt && H.ext2QueryStations && H.ext2QueryStations.length) {
+      const note = $('#hs-ext2-note'), table = $('#hs-ext2-table');
+      if (note) note.hidden = false; if (table) table.hidden = false;
+      H.ext2QueryStations.filter(s => s.zh !== '新勝守').forEach(s => {
+        const f = H.ext2FareExt('新勝守', s.zh); if (!f) return;
+        const tr = document.createElement('tr');
+        const name = document.createElement('td'); name.textContent = '新勝守 ⇄ ' + s.zh;
+        const td = (txt) => { const d = document.createElement('td'); d.textContent = txt; return d; };
+        tr.append(name, td(yen(f.yen)), td('－'), td(yen(f.yen)));
+        ext2box.append(tr);
+      });
+    }
+    // 1.9.0：上下行完整時刻表——跟首頁列車卡片同一套視覺語言，直接沿用 HK.lineBlock（路線資訊頁同一份渲染邏輯，
+    // 已經有「上行／下行」切換、停靠站時刻、班距，不用再另外寫一份）。
+    const ttBox = $('#hs-timetable');
+    if (ttBox && window.HK.groupsOf && window.HK.lineBlock) {
+      const groups = window.HK.groupsOf(H), g = groups.find(x => /高速鉄道/.test(x.name));
+      if (g) { let di = 0; const setDi = n => { di = n; window.HK.lineBlock(H, groups, g, di, ttBox, setDi); }; window.HK.lineBlock(H, groups, g, di, ttBox, setDi); }
     }
     // 轉乘三站：車站介紹與照片（與「景點與車站」的車站頁共用 data/stations.json，只維護一份）
     try {

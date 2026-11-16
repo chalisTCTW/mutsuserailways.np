@@ -10,20 +10,23 @@
   const HK = window.HK, { h } = HK;
   const DAY = 86400, yen = n => '¥' + Number(n).toLocaleString('en-US');
   const COLS = ['A', 'B', 'C', 'D'], ROWS = 10;
+  // 1.9.0：商務車廂（1+2 配置）用 3 欄，沿用日本「グリーン車」慣例座位代號（A／C／D，中間 B 空出當走道字母）。
+  const COLS_BIZ = ['A', 'C', 'D'];
+  const colsOf = (car, ri) => (ri && ri.bizCars && ri.bizCars.includes(car + 1)) ? COLS_BIZ : COLS;
 
   /* 決定性亂數 */
   function hash(str) { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return x >>> 0; }
   function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
   /** 這班車的座位占用：回傳 booked[car][seatIdx] = [[from,to),...]（以停靠站序號計） */
-  function occupancy(key, cars, nStops, depSec, edge) {   // edge＝1・8 号車（車頭／車尾）的座位數（高速鉄道 8 席＝2+2 共 2 排）；省略＝每節都是 ROWS 排
+  function occupancy(key, cars, nStops, depSec, carSeats) {   // carSeats＝每節車廂座位數的陣列（依車廂序，1.9.0 起取代單一的 edge 數字）；省略＝每節都是 ROWS*4 席
     const r = rng(hash(key)), hr = depSec / 3600 % 24;
     const peak = (hr >= 6.5 && hr < 9.5) || (hr >= 16.5 && hr < 19.5);
     const load = Math.min(0.92, Math.max(0.12, (peak ? 0.72 : hr >= 22 || hr < 6 ? 0.18 : 0.42) + (r() - 0.5) * 0.3));
     const out = [];
     for (let c = 0; c < cars; c++) {
       const carLoad = Math.min(0.95, Math.max(0.05, load + (r() - 0.5) * 0.2)), seats = [];
-      for (let k = 0, nSeat = edge && (c === 0 || c === cars - 1) ? edge : ROWS * 4; k < nSeat; k++) {
+      for (let k = 0, nSeat = (carSeats && carSeats[c] != null) ? carSeats[c] : ROWS * 4; k < nSeat; k++) {
         const segs = []; let i = 0;
         while (i < nStops - 1) {
           if (r() < carLoad * 0.8) { const len = 1 + Math.floor(r() * Math.max(1, nStops - 1) * 0.8); segs.push([i, Math.min(nStops - 1, i + len)]); i += len; } else i += 1 + Math.floor(r() * 2);
@@ -35,7 +38,7 @@
     return out;
   }
   const isFree = (segs, a, b) => !segs.some(([s, e]) => s < b && a < e);
-  const seatName = (car, k) => `${car + 1}号車 ${Math.floor(k / 4) + 1}${COLS[k % 4]}`;
+  const seatName = (car, k, ri) => { const ca = colsOf(car, ri); return `${car + 1}号車 ${Math.floor(k / ca.length) + 1}${ca[k % ca.length]}`; };
 
   function booking(H, root) {
     const realRoot = root; root = h('div', { class: 'bk-route' });
@@ -82,7 +85,7 @@
       const ri = H.reserveInfo(leg.sv);
       const info = { leg, ri, a, b, key: `${date}|${leg.sv.idx}|${((base % DAY) + DAY) % DAY}`, nStops: st.length };
       if (ri && a >= 0 && b > a) {
-        info.occ = occupancy(info.key, ri.cars, st.length, s0.dep, ri.edgeCarSeats);
+        info.occ = occupancy(info.key, ri.cars, st.length, s0.dep, ri.carSeats);
         info.free = 0; for (let ci = 0; ci < ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
       } else info.ri = ri && a >= 0 && b > a ? ri : null;
       return info;
@@ -97,7 +100,7 @@
       const ri = H.reserveInfo(extLeg.sv), s0 = extLeg.stops[0], s1 = extLeg.stops[extLeg.stops.length - 1], nStops = extLeg.stops.length;
       const key = `ext|${s0.station}|${s1.station}|${date}|${((s0.dep % DAY) + DAY) % DAY}`;
       const info = { leg: extLeg, ri, a: 0, b: nStops - 1, key, nStops };
-      info.occ = occupancy(key, ri.cars, nStops, s0.dep, ri.edgeCarSeats);
+      info.occ = occupancy(key, ri.cars, nStops, s0.dep, ri.carSeats);
       info.free = 0; for (let ci = 0; ci < ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, info.a, info.b)) info.free++; });
       return info;
     }
@@ -113,7 +116,7 @@
       if (atEnd) { a = base.a; b = base.b + extN; } else { a = 0; b = extN + (base.b - base.a); }
       info.a = a; info.b = b; info.nStops = b + 1;
       info.key = base.key + '|x' + extLeg.stops[atEnd ? extLeg.stops.length - 1 : 0].station;
-      info.occ = occupancy(info.key, base.ri.cars, info.nStops, merged.stops[0].dep, base.ri.edgeCarSeats);
+      info.occ = occupancy(info.key, base.ri.cars, info.nStops, merged.stops[0].dep, base.ri.carSeats);
       info.free = 0; for (let ci = 0; ci < base.ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
       return info;
     }
@@ -192,17 +195,25 @@
       out.append(h('div', { id: 'bk-seat' }));
     }
 
+    // 1.9.0：有商務車廂（ri.bizCars）的班次（目前只有高速鉄道），預設選一般車廂、車廂 tab 停在第一節非商務車廂。
+    function firstCarIdx(ri, cls) {
+      if (!ri || !ri.bizCars || !ri.bizCars.length) return 0;
+      const bizSet = new Set(ri.bizCars.map(n => n - 1));
+      for (let c = 0; c < ri.cars; c++) { if (bizSet.has(c) === (cls === 'biz')) return c; }
+      return 0;
+    }
     function pick(c, tf) {
       const P = pax();
       // 1.1.0：高速鐵路沒有立席特急券可以當空位不足時的備案，沒位置也只能停在「指定席」（之後畫面會顯示空席不足）。
-      const S = state.sel = { c, tf, P, legs: c.legs.map(l => ({ mode: !l.ri ? 'none' : (l.free >= P.n ? 'seat' : (l.ri.noStanding ? 'seat' : l.ri.mode === 'all' ? 'stand' : 'free')), seats: [], car: 0 })) };
+      const S = state.sel = { c, tf, P, legs: c.legs.map(l => ({ mode: !l.ri ? 'none' : (l.free >= P.n ? 'seat' : (l.ri.noStanding ? 'seat' : l.ri.mode === 'all' ? 'stand' : 'free')), seats: [], cls: 'std', car: firstCarIdx(l.ri, 'std') })) };
       draw();
       document.getElementById('bk-seat').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function legFee(l, st) {
       if (!l.ri || st.mode === 'none') return 0;
-      if (st.mode === 'seat') return l.ri.fee * state.sel.P.n;
+      // 1.9.0：商務車廂（st.cls==='biz'）用 ri.bizFee，其餘車廂照舊用 ri.fee。非商務車種（ri.bizFee 未設定）不受影響。
+      if (st.mode === 'seat') return (st.cls === 'biz' && l.ri.bizFee ? l.ri.bizFee : l.ri.fee) * state.sel.P.n;
       if (st.mode === 'stand') return l.ri.standFee * state.sel.P.n;
       return 0;
     }
@@ -230,9 +241,16 @@
           box.append(blk); return;
         }
         const choose = (m) => () => { st.mode = m; st.seats = []; draw(); };
+        const chooseCls = (cls) => () => { st.mode = 'seat'; st.cls = cls; st.car = firstCarIdx(l.ri, cls); st.seats = []; draw(); };
         const opts = [];
         const seatDisabled = l.free < P.n;
-        opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'seat' ? '' : 'ghost'), disabled: seatDisabled, onclick: choose('seat') }, `指定席 ${yen(l.ri.fee)}／位${seatDisabled ? '（空席不足）' : ''}`));
+        // 1.9.0：有商務車廂（ri.bizCars）的種別（目前只有高速鉄道）分兩顆按鈕：商務車廂（1・2 号車／貴）、一般車廂（3 号車以後／原價）。
+        if (l.ri.bizCars && l.ri.bizCars.length) {
+          opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'seat' && st.cls === 'biz' ? '' : 'ghost'), disabled: seatDisabled, onclick: chooseCls('biz') }, `指定席（商務車廂・${l.ri.bizCars.join('・')}号車）${yen(l.ri.bizFee)}／位${seatDisabled ? '（空席不足）' : ''}`));
+          opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'seat' && st.cls !== 'biz' ? '' : 'ghost'), disabled: seatDisabled, onclick: chooseCls('std') }, `指定席（一般車廂）${yen(l.ri.fee)}／位${seatDisabled ? '（空席不足）' : ''}`));
+        } else {
+          opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'seat' ? '' : 'ghost'), disabled: seatDisabled, onclick: choose('seat') }, `指定席 ${yen(l.ri.fee)}／位${seatDisabled ? '（空席不足）' : ''}`));
+        }
         // 1.1.0：高速鐵路沒有立席特急券（noStanding）——只有指定席這一個選項，不能像特急那樣買站票逃過空位不足。
         if (l.ri.mode === 'all' && !l.ri.noStanding) opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'stand' ? '' : 'ghost'), onclick: choose('stand') }, `立席特急券 ${yen(l.ri.standFee)}／位（座位なし）`));
         else if (l.ri.mode === 'part') opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'free' ? '' : 'ghost'), onclick: choose('free') }, `自由席 ${yen(0)}（${l.ri.reservedCars + 1}号車以後・座位なし）`));
@@ -245,7 +263,7 @@
       const go = h('button', { class: 'btn', type: 'button', disabled: !S.c.legs.every((l, i) => !l.ri || S.legs[i].mode !== 'seat' || S.legs[i].seats.length === P.n), onclick: () => ticket() }, '確認並發行車票');
       const rows = [[`乘車券（${labelOf(fSel.value)}→${labelOf(tSel.value)}）`, `大人 ${P.a} × ${yen(tf.adult)}` + (P.c ? `／兒童 ${P.c} × ${yen(tf.child)}` : '') + (P.s ? `／優待 ${P.s} × ${yen(tf.senior)}` : ''), yen(T.base)]];
       // 1.1.2：延伸段已經通車，跟真正班次一樣是 S.c.legs 裡的一段，這裡的迴圈本來就會把它的指定席費用一起列出來。
-      S.c.legs.forEach((l, i) => { if (l.ri) rows.push([`${l.leg.sv.routeName}${l.leg.gou ? ' ' + l.leg.gou : ''}　${modeLabel(l, S.legs[i].mode)}`, S.legs[i].mode === 'seat' ? `${yen(l.ri.fee)} × ${P.n}` : S.legs[i].mode === 'stand' ? `${yen(l.ri.standFee)} × ${P.n}` : '', yen(legFee(l, S.legs[i]))]); });
+      S.c.legs.forEach((l, i) => { if (l.ri) rows.push([`${l.leg.sv.routeName}${l.leg.gou ? ' ' + l.leg.gou : ''}　${modeLabel(l, S.legs[i].mode)}${S.legs[i].mode === 'seat' && S.legs[i].cls === 'biz' ? '（商務車廂）' : ''}`, S.legs[i].mode === 'seat' ? `${yen(S.legs[i].cls === 'biz' && l.ri.bizFee ? l.ri.bizFee : l.ri.fee)} × ${P.n}` : S.legs[i].mode === 'stand' ? `${yen(l.ri.standFee)} × ${P.n}` : '', yen(legFee(l, S.legs[i]))]); });
       box.append(h('div', { class: 'fare-box', style: 'margin-top:12px' }, h('table', { class: 'tbl' }, h('tbody', null,
         rows.map(r => h('tr', null, h('th', null, r[0], r[1] ? h('small', { style: 'display:block;font-weight:400;color:var(--muted)' }, r[1]) : null), h('td', { style: 'text-align:right' }, r[2]))),
         h('tr', { class: 'tot' }, h('th', null, '合計'), h('td', { style: 'text-align:right;font-weight:700' }, yen(T.total))))),
@@ -259,24 +277,31 @@
       wrap.append(carTabs, grid, info, h('div', { class: 'bk-legend' }, h('span', null, h('i', { class: 'st free' }), '空位'), h('span', null, h('i', { class: 'st sel' }), '已選'), h('span', null, h('i', { class: 'st taken' }), '已被預約')),
         h('p', { class: 'note' }, '1 号車＝進行方向最前端。' + (ri.mode === 'part' ? `指定席為 1～${ri.reservedCars} 号車。` : '')));
       const cars = l.occ.slice(0, ri.reservedCars);
+      // 1.9.0：有商務車廂時，車廂 tab 只顯示目前選擇的那一種（商務＝ri.bizCars、一般＝其餘），不能混選；
+      // 商務車廂（1+2）用 3 欄、走道在第 1 欄之後，一般車廂（2+2）維持原本 4 欄、走道在第 2 欄之後。
+      const bizSet = new Set((ri.bizCars || []).map(n => n - 1));
       function d2() {
-        carTabs.replaceChildren(...cars.map((car, ci) => {
-          const free = car.filter(sg => isFree(sg, l.a, l.b)).length, mine = st.seats.filter(x => x.car === ci).length;
+        const tabIdx = bizSet.size ? cars.map((_, i) => i).filter(i => (st.cls === 'biz') === bizSet.has(i)) : cars.map((_, i) => i);
+        if (!tabIdx.includes(st.car)) st.car = tabIdx[0];
+        carTabs.replaceChildren(...tabIdx.map(ci => {
+          const car = cars[ci], free = car.filter(sg => isFree(sg, l.a, l.b)).length, mine = st.seats.filter(x => x.car === ci).length;
           return h('button', { type: 'button', class: 'bk-ct', 'aria-pressed': String(ci === st.car), onclick: () => { st.car = ci; d2(); } }, `${ci + 1}号車`, h('small', null, `空${free}${mine ? ` ✓${mine}` : ''}`));
         }));
-        grid.replaceChildren(h('div', { class: 'bk-head' }, ...COLS.slice(0, 2).map(x => h('b', null, x)), h('span'), ...COLS.slice(2).map(x => h('b', null, x))));
+        const isBiz = bizSet.has(st.car), ca = isBiz ? COLS_BIZ : COLS, aisleAt = isBiz ? 1 : 2;
+        grid.className = 'bk-grid' + (isBiz ? ' biz' : '');
+        grid.replaceChildren(h('div', { class: 'bk-head' }, ...ca.slice(0, aisleAt).map(x => h('b', null, x)), h('span'), ...ca.slice(aisleAt).map(x => h('b', null, x))));
         const car = cars[st.car];
-        for (let r = 0, rows = Math.ceil(car.length / 4); r < rows; r++) {
+        for (let r = 0, rows = Math.ceil(car.length / ca.length); r < rows; r++) {
           const row = h('div', { class: 'bk-row' });
-          for (let col = 0; col < 4; col++) {
-            const k = r * 4 + col, free = isFree(car[k], l.a, l.b), on = st.seats.some(x => x.car === st.car && x.k === k);
-            if (col === 2) row.append(h('span', { class: 'aisle' }, String(r + 1)));
-            row.append(h('button', { type: 'button', class: 'seat ' + (on ? 'sel' : free ? 'free' : 'taken'), disabled: !free, 'aria-label': `${seatName(st.car, k)} ${free ? '空位' : '已被預約'}`, 'aria-pressed': String(on),
-              onclick: () => { if (on) st.seats = st.seats.filter(x => !(x.car === st.car && x.k === k)); else { if (st.seats.length >= P.n) st.seats.shift(); st.seats.push({ car: st.car, k }); } draw(); } }, COLS[col]));
+          for (let col = 0; col < ca.length; col++) {
+            const k = r * ca.length + col, free = isFree(car[k], l.a, l.b), on = st.seats.some(x => x.car === st.car && x.k === k);
+            if (col === aisleAt) row.append(h('span', { class: 'aisle' }, String(r + 1)));
+            row.append(h('button', { type: 'button', class: 'seat ' + (on ? 'sel' : free ? 'free' : 'taken'), disabled: !free, 'aria-label': `${seatName(st.car, k, ri)} ${free ? '空位' : '已被預約'}`, 'aria-pressed': String(on),
+              onclick: () => { if (on) st.seats = st.seats.filter(x => !(x.car === st.car && x.k === k)); else { if (st.seats.length >= P.n) st.seats.shift(); st.seats.push({ car: st.car, k }); } draw(); } }, ca[col]));
           }
           grid.append(row);
         }
-        info.textContent = st.seats.length ? `已選（${st.seats.length}／${P.n}）：` + st.seats.map(x => seatName(x.car, x.k)).join('、') : `尚未選擇座位（需要 ${P.n} 個）`;
+        info.textContent = st.seats.length ? `已選（${st.seats.length}／${P.n}）：` + st.seats.map(x => seatName(x.car, x.k, ri)).join('、') : `尚未選擇座位（需要 ${P.n} 個）`;
       }
       d2();
       return wrap;
@@ -298,7 +323,7 @@
       const pretty = x => { x = String(x || ''); return x === x.toUpperCase() ? x.toLowerCase().replace(/(^|[\s\-/])([a-z])/g, (_, a, b) => a + b.toUpperCase()) : x; };
       const enOf = id => { const e = isV(id) ? vInfo(id) : (H.stById[id] || {}); return pretty((e && e.en) || '') || (isV(id) ? (vInfo(id) || {}).zh : H.stName(id)); };
       const paxEn = `Adult ${P.a}` + (P.c ? ` / Child ${P.c}` : '') + (P.s ? ` / Senior ${P.s}` : '');
-      const seatEn = (car, k) => `Car ${car + 1} Seat ${Math.floor(k / 4) + 1}${COLS[k % 4]}`;
+      const seatEn = (car, k, ri) => { const ca = colsOf(car, ri); return `Car ${car + 1} Seat ${Math.floor(k / ca.length) + 1}${ca[k % ca.length]}`; };
       const modeEnOf = m => m === 'seat' ? 'Reserved' : m === 'stand' ? 'Standing' : m === 'free' ? 'Non-reserved' : 'Fare only';
 
       // 一、全區間乘車券
@@ -312,8 +337,8 @@
       S.c.legs.forEach((l, i) => {
         if (!l.ri) return;
         const st = S.legs[i], sv = l.leg.sv, s0 = l.leg.stops[0], sN = l.leg.stops[l.leg.stops.length - 1];
-        const seat = st.mode === 'seat' ? st.seats.map(x => seatName(x.car, x.k)).join('、') : st.mode === 'stand' ? '立席（座位なし）' : `自由席（${l.ri.reservedCars + 1}号車以後）`;
-        ex.push({ no: noFor('ex' + i), col: sv.isHS ? HSC : 'var(--g1)', kind: '特急券', en: 'EXPRESS TICKET', hs: !!sv.isHS, sub: sv.routeName, from: H.stName(s0.station), to: H.stName(sN.station), fromEn: enOf(s0.station), toEn: enOf(sN.station), subEn: pretty((l.leg.sv.route && l.leg.sv.route.en) || ''), modeEn: modeEnOf(st.mode), seatBi: st.mode === 'seat' ? h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, st.seats.map(x => seatName(x.car, x.k)).join('、')), h('span', { class: 'en', lang: 'en' }, st.seats.map(x => seatEn(x.car, x.k)).join(', '))) : h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, seat), h('span', { class: 'en', lang: 'en' }, st.mode === 'stand' ? 'Standing (no seat)' : 'Non-reserved seating')), dep: HK.hm(s0.dep), arr: HK.hm(sN.arr), date, sv, gou: l.leg.gou || '', mode: modeLabel(l, st.mode), seat, fee: yen(legFee(l, st)), n: P.n, stops: l.leg.stops.length - 1 });
+        const seat = st.mode === 'seat' ? st.seats.map(x => seatName(x.car, x.k, l.ri)).join('、') + (st.cls === 'biz' ? '（商務車廂）' : '') : st.mode === 'stand' ? '立席（座位なし）' : `自由席（${l.ri.reservedCars + 1}号車以後）`;
+        ex.push({ no: noFor('ex' + i), col: sv.isHS ? HSC : 'var(--g1)', kind: '特急券', en: 'EXPRESS TICKET', hs: !!sv.isHS, sub: sv.routeName, from: H.stName(s0.station), to: H.stName(sN.station), fromEn: enOf(s0.station), toEn: enOf(sN.station), subEn: pretty((l.leg.sv.route && l.leg.sv.route.en) || ''), modeEn: modeEnOf(st.mode), seatBi: st.mode === 'seat' ? h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, st.seats.map(x => seatName(x.car, x.k, l.ri)).join('、')), h('span', { class: 'en', lang: 'en' }, st.seats.map(x => seatEn(x.car, x.k, l.ri)).join(', '))) : h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, seat), h('span', { class: 'en', lang: 'en' }, st.mode === 'stand' ? 'Standing (no seat)' : 'Non-reserved seating')), dep: HK.hm(s0.dep), arr: HK.hm(sN.arr), date, sv, gou: l.leg.gou || '', mode: modeLabel(l, st.mode), seat, fee: yen(legFee(l, st)), n: P.n, stops: l.leg.stops.length - 1 });
       });
 
       const logo = () => h('img', { src: 'assets/img/mark-dark.png', alt: '', width: 24, height: 24 });

@@ -4,6 +4,13 @@
   'use strict';
   const HK = window.HK, { h, typeTag, typeMark } = HK;
   const DAY = 86400;
+  /* 1.8.0：景點分類徽章顏色＋徽章字（取分類第一個字），依景點 id 對應，純顯示用，不影響景點資料本身 */
+  const SIGHT_BADGE = {
+    castle: ['城', '#7a5a2e'], port: ['港', '#1f6f8b'], shrine: ['社', '#9c4a2f'],
+    museum: ['博', '#4a5fa0'], kuribashi: ['購', '#c77d2e'], tomise: ['河', '#2f7d6b'],
+    heikura: ['紀', '#6b5a8c'], 'tomiya-arena': ['競', '#2f6d3a'], 'kaiei-museum': ['美', '#8c3a6b'],
+    'ryusei-tree': ['觀', '#3a7a8c'], 'old-godo-hall': ['建', '#8c6b3a']
+  };
   const q = new URLSearchParams(location.search);
   const pad = n => String(n).padStart(2, '0');
   const hm = t => HK.hm(t);
@@ -245,7 +252,8 @@
       sightsBox.append(h('article', { class: 'sight', id: d.id },
         h('figure', { class: 'sfig' }, main, cap, thumbs),
         h('div', { class: 'sbody' },
-          h('div', { class: 'stag' }, d.tag),
+          h('div', { class: 'stag', style: SIGHT_BADGE[d.id] ? `--bc:${SIGHT_BADGE[d.id][1]}` : null },
+          SIGHT_BADGE[d.id] ? h('span', { class: 'bic' }, SIGHT_BADGE[d.id][0]) : null, d.tag),
           h('h2', null, d.name, h('small', null, `${d.kana}　${d.en}`)),
           h('p', { class: 'slead' }, d.lead),
           ...d.body.map(p => h('p', null, p)),
@@ -320,7 +328,10 @@
       const rows = list.filter(x => line === 'all' || servesLine(x.st, line));
       grid.replaceChildren(...(rows.length ? rows.map(x => {
         const e = x.e, st = x.st, lines = st ? chipLines(H, st.id, null) : [], sg = sightsOfStation(data, e.name);
-        return h('a', { class: 'dcard stcard', href: stationHref(H, e.name) },
+        let primary = null;
+        if (st) for (const sv of H.svcs) { if (sv.stops.some(t => t.station === st.id && t.pax !== false)) { primary = sv; break; } }
+        return h('a', { class: 'dcard stcard', href: stationHref(H, e.name), style: primary ? `--bc:${primary.color}` : null },
+          primary ? h('span', { class: 'lbadge', title: primary.line }, primary.line.slice(0, 1)) : null,
           x.ph.length ? h('img', { src: x.ph[0].src, alt: x.ph[0].alt || '', loading: 'lazy' }) : null,
           h('h3', null, st ? H.codeBadges(st.id) : null, st ? st.zh : e.name, st && st.en ? h('small', null, st.en) : null),
           lines.length ? h('div', { class: 'sl' }, lines) : null,
