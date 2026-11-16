@@ -4234,7 +4234,7 @@ window.HK_I18N_DICT = {
 "新勝守から東平倉までは光瀨都市鉄道、東平倉から新岩沢までは白令鉄道の管轄で、新岩沢が現在の開業区間の終点です。新勝守からは一部の列車が「上羽本線」に直通し、上羽神別・汐崎まで延伸します。この区間は一般鉄道区間（運賃は別計算、下記参照）で、先に地図へまとめて示しています。",
 "Shin-Katsumori to Tōhirakura is operated by Hikarise Urban Railway, and Tōhirakura to Shin-Iwasawa by Bering Railway; Shin-Iwasawa is the current end of the open section. Some services from Shin-Katsumori also run through onto the \"Jōba Main Line,\" extending to Kamiba-Kanbetsu and Shiozaki. That section is a regular-rail section (fares calculated separately, see below), shown here on the map ahead of time."
 ],
-"一般鐵路區間・延伸預覽（新勝守～汐崎，暫定資料）": ["一般鉄道区間・延伸区間プレビュー（新勝守～汐崎、データは仮）", "Regular-rail section · extension preview (Shin-Katsumori–Shiozaki, provisional data)"],
+"一般鐵路區間・延伸預覽（新勝守～汐崎）": ["一般鉄道区間・延伸区間プレビュー（新勝守～汐崎）", "Regular-rail section · extension preview (Shin-Katsumori–Shiozaki)"],
 "列車陣容": ["列車ラインナップ", "Our Trains"],
 "新8000形1000番台・主動擺錘振子式傾斜": ["新8000形1000番台・制御付き振子式（アクティブ）", "New 8000 Series 1000s · Active tilting"],
 "新8000形0番台・全車指定席（另有立席）": ["新8000形0番台・全車指定席（立席特急券もあり）", "New 8000 Series 0s · All-reserved (standing tickets also available)"],
@@ -4274,15 +4274,19 @@ window.HK_I18N_DICT = {
 "一般鐵路區間（新勝守～汐崎，預覽）": ["一般鉄道区間（新勝守～汐崎、プレビュー）", "Regular rail section (Shin-Katsumori–Shiozaki, preview)"],
 "地圖外・資料暫定": ["地図外・データは仮", "Off-map · data provisional"],
 "高速鉄道・一般鐵路轉乘": ["高速鉄道・一般鉄道乗換", "High-speed / regular rail transfer"],
-"暫定・待快照更新": ["仮・データ更新待ち", "Provisional, pending data update"],
-"尚未開業": ["未開業", "Not yet open"],
-"以下為「上羽本線」延伸段（新勝守～上羽神別・汐崎）的試算票價：這段是一般鐵路區間，只算乘車券，不是高速鉄道獨立票價；標 * 的距離為暫定數字，待地圖更新後會改用正式資料。": [
-"以下は「上羽本線」延伸区間（新勝守～上羽神別・汐崎）の試算運賃です：この区間は一般鉄道区間として乗車券のみで計算し、高速鉄道独自運賃ではありません。* 印の距離は暫定値で、地図の更新後に正式なデータに置き換わります。",
-"Below are estimated fares for the \"Jōba Main Line\" extension (Shin-Katsumori–Kamiba-Kanbetsu/Shiozaki): this section uses only the ordinary-rail base fare, not the high-speed rail's independent fare. Distances marked * are provisional and will be replaced with official data once the map is updated."
+"以下為「上羽本線」延伸段（新勝守～上羽神別・汐崎）的試算票價：這段是一般鐵路區間，只算乘車券，不是高速鉄道獨立票價。": [
+"以下は「上羽本線」延伸区間（新勝守～上羽神別・汐崎）の試算運賃です：この区間は一般鉄道区間として乗車券のみで計算し、高速鉄道独自運賃ではありません。",
+"Below are estimated fares for the \"Jōba Main Line\" extension (Shin-Katsumori–Kamiba-Kanbetsu/Shiozaki): this section uses only the ordinary-rail base fare, not the high-speed rail's independent fare."
 ],
 "新岩沢～新勝守（上羽神別方向）上下行時刻表": ["新岩沢～新勝守（上羽神別方面）上り・下り時刻表", "Shin-Iwasawa–Shin-Katsumori (toward Kamiba-Kanbetsu) Up/Down Timetable"],
 "下面是万瀨高速鉄道線的完整停靠站與上下行時刻，跟其他列車卡片同一套格式；用上方「上行／下行」切換方向。": [
 "以下は万瀨高速鉄道線の全停車駅と上り・下りの時刻です。他の列車カードと同じ形式で、上部の「上り／下り」で方向を切り替えられます。",
 "Below is the full stop list and up/down timetable for the Manse High-Speed Rail line, in the same card format as the other train cards. Use the \"Up/Down\" switch above to change direction."
-]
+],
+"2026.11.16　開通": ["2026.11.16　開業", "Opened 2026.11.16"],
+"© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。": [
+"© 光瀨都市鉄道　本サイトはMinecraft架空鉄道「光瀨都市圏」の設定・情報ページです。内容はすべて架空のものです。",
+"© Hikarise Urban Railway — This site is a setting/information page for the fictional Minecraft railway \"Hikarise Metropolitan Area\". All content is fictional."
+],
+"區間（一般鐵路・預覽）": ["区間（一般鉄道・プレビュー）", "Section (regular rail, preview)"]
 };

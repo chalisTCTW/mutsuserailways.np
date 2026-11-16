@@ -68,7 +68,7 @@
       H.ext2QueryStations.filter(s => s.zh !== '新勝守').forEach(s => {
         const f = H.ext2FareExt('新勝守', s.zh); if (!f) return;
         const tr = document.createElement('tr');
-        const name = document.createElement('td'); name.textContent = '新勝守 ⇄ ' + s.zh + (f.provisional ? '　*' : '');
+        const name = document.createElement('td'); name.textContent = '新勝守 ⇄ ' + s.zh;
         const td = (txt) => { const d = document.createElement('td'); d.textContent = txt; return d; };
         tr.append(name, td(yen(f.yen)), td('－'), td(yen(f.yen)));
         ext2box.append(tr);
