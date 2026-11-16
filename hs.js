@@ -53,7 +53,7 @@
         const f = H.hsFareExt(nm, '新岩沢'); if (!f) return;
         const tr = document.createElement('tr'), c = (txt, extra) => { const td = document.createElement('td'); td.textContent = txt; if (extra) td.append(extra); return td; };
         const name = document.createElement('td'); name.textContent = nm + ' ⇄ 新岩沢';
-        const seatTd = document.createElement('td'); seatTd.innerHTML = yen(f.seat) + '<small style="display:block;color:var(--hs-c,#136880)">' + L('商務車廂', '商務車廂', 'Business') + ' ' + yen(bizFee) + '</small>';
+        const seatTd = document.createElement('td'); seatTd.innerHTML = yen(f.seat) + '<small style="display:block;color:var(--hs-c,#136880)">' + L('商務車廂', 'ビジネスシート', 'Business class') + ' ' + yen(bizFee) + '</small>';
         const tot = document.createElement('td'), bb = document.createElement('b'); bb.textContent = yen(f.total); tot.append(bb);
         if (nm === '新勝守') { const sm = document.createElement('small'); mark(sm); sm.textContent = L('往返', '往復', 'round trip') + ' ' + yen(f.total * 2); tot.append(sm); }
         tr.append(name, c(yen(f.yen)), seatTd, tot); rows.append(tr);

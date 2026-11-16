@@ -4227,5 +4227,62 @@ window.HK_I18N_DICT = {
 "＞ 出行": [
 "＞ おでかけ",
 "＞ Explore"
+],
+
+/* 1.9.0：首頁列車卡片／高速鉄道商務車廂／上羽本線延伸預覽 新增的翻譯 */
+"新勝守至東平倉由光瀨都市鉄道管轄，東平倉至新岩沢由白令鉄道管轄，新岩沢為目前開業的終點。新勝守另有部分班次直通「上羽本線」延伸至上羽神別、汐崎，這段是一般鐵路區間（票價另計，見下方），地圖先一併畫出來。": [
+"新勝守から東平倉までは光瀨都市鉄道、東平倉から新岩沢までは白令鉄道の管轄で、新岩沢が現在の開業区間の終点です。新勝守からは一部の列車が「上羽本線」に直通し、上羽神別・汐崎まで延伸します。この区間は一般鉄道区間（運賃は別計算、下記参照）で、先に地図へまとめて示しています。",
+"Shin-Katsumori to Tōhirakura is operated by Hikarise Urban Railway, and Tōhirakura to Shin-Iwasawa by Bering Railway; Shin-Iwasawa is the current end of the open section. Some services from Shin-Katsumori also run through onto the \"Jōba Main Line,\" extending to Kamiba-Kanbetsu and Shiozaki. That section is a regular-rail section (fares calculated separately, see below), shown here on the map ahead of time."
+],
+"一般鐵路區間・延伸預覽（新勝守～汐崎，暫定資料）": ["一般鉄道区間・延伸区間プレビュー（新勝守～汐崎、データは仮）", "Regular-rail section · extension preview (Shin-Katsumori–Shiozaki, provisional data)"],
+"列車陣容": ["列車ラインナップ", "Our Trains"],
+"新8000形1000番台・主動擺錘振子式傾斜": ["新8000形1000番台・制御付き振子式（アクティブ）", "New 8000 Series 1000s · Active tilting"],
+"新8000形0番台・全車指定席（另有立席）": ["新8000形0番台・全車指定席（立席特急券もあり）", "New 8000 Series 0s · All-reserved (standing tickets also available)"],
+"新2100形・含松歲線直通班次": ["新2100形・松歳線直通列車を含む", "New 2100 Series · includes Matsutoshi Line through-service trains"],
+"10000形・新1150形": ["10000形・新1150形", "10000 Series / New 1150 Series"],
+"HR-新01系・2026.11.16 開通": ["HR-新01系・2026年11月16日開業", "HR-Shin01 Series · opened 2026-11-16"],
+"新8000形1000番台・特急あおさぎ": ["新8000形1000番台・特急あおさぎ", "New 8000 Series 1000s, Ltd. Exp. AOSAGI"],
+"新8000形0番台・特急こばな": ["新8000形0番台・特急こばな", "New 8000 Series 0s, Ltd. Exp. KOBANA"],
+"新2100形・花川本線特別快速": ["新2100形・花川本線特別快速", "New 2100 Series, Hanakawa Main Line Special Rapid"],
+"10000形／新1150形・環狀快速白藏山線直通": ["10000形／新1150形・環状快速白藏山線直通", "10000/New 1150 Series, Loop Semi-Fast (Shirakura Line)"],
+"HR-新01系・万瀨高速鉄道": ["HR-新01系・万瀨高速鉄道", "HR-Shin01 Series, Manse High-Speed Rail"],
+"1・2 號車為商務車廂（1+2 配置）：1 號車 4 排 12 席、2 號車 12 排 36 席；3～8 號車為一般車廂（2+2 配置），8 號車（車尾）8 席（2 排），其餘每節 40 席": [
+"1・2号車はビジネスシート車両（1＋2配置）：1号車は4列12席、2号車は12列36席。3～8号車は一般車両（2＋2配置）で、8号車（最後尾）は8席（2列）、その他は各車40席",
+"Cars 1 and 2 are business class (1+2 layout): Car 1 has 4 rows of 12 seats, Car 2 has 12 rows of 36 seats. Cars 3–8 are standard class (2+2 layout); Car 8 (rear) has 8 seats (2 rows), the rest have 40 seats each"
+],
+"USB 充電口・閱讀燈（商務車廂另有加寬座椅與小桌板）": [
+"USB充電ポート・読書灯（ビジネスシート車両は座席幅拡大・小テーブル付き）",
+"USB charging ports, reading lights (business class also has wider seats and a small tray table)"
+],
+"商務車廂・1+2 座席（1・2 號車）": ["ビジネスシート・1+2 配置（1・2号車）", "Business class · 1+2 seating (Cars 1–2)"],
+"一般車廂・2+2 座席": ["一般車両・2+2 座席", "Standard class · 2+2 seating"],
+"商務車廂（1・2 號車）只有指定席特急券漲為": ["ビジネスシート車両（1・2号車）のみ、座席指定特急券が値上げされ", "Only the business-class cars (Cars 1–2) see a reserved-seat surcharge increase to"],
+"／位；3～8 號車的一般車廂指定席特急券維持 ¥800／位不變。": [
+"／席になります。3～8号車の一般車両は座席指定特急券 ¥800／席のまま変更ありません。",
+"/seat. The standard-class reserved-seat surcharge for Cars 3–8 remains unchanged at ¥800/seat."
+],
+"上羽本線（新勝守支線）・延伸預覽": ["上羽本線（新勝守支線）・延伸区間プレビュー", "Jōba Main Line (Shin-Katsumori Branch) · Extension Preview"],
+"部分班次由新勝守直通運行「上羽本線」，延伸至上羽神別、汐崎。這段屬於": [
+"一部の列車は新勝守から「上羽本線」に直通し、上羽神別・汐崎まで延伸します。この区間は",
+"Some services run through from Shin-Katsumori onto the \"Jōba Main Line,\" extending to Kamiba-Kanbetsu and Shiozaki. This section is treated as a"
+],
+"一般鐵路區間": ["一般鉄道区間", "regular-rail section"],
+"，不計入高速鉄道獨立票價——只要沒有同時跨進新勝守～東平倉／新岩沢，就只用一般鐵路乘車券計算（票價見下方「班次・票價・訂票」）。整體仍以新勝守・新光瀨～新岩沢為主軸，這段延伸只是先把地圖補齊；上羽神別、汐崎目前地圖內還沒有這兩站，距離・時間為暫定數字。": [
+"として扱い、高速鉄道独自運賃には含まれません——新勝守～東平倉／新岩沢の高速鉄道区間にまたがらない限り、一般鉄道の乗車券のみで計算します（運賃は下記「ダイヤ・運賃・予約」参照）。全体としては新勝守・新光瀨～新岩沢を主軸とし、この延伸区間は地図を補うものです。上羽神別・汐崎は現在地図上にまだ存在しない駅で、距離・所要時間は暫定値です。",
+", and is not part of the high-speed rail's independent fare — as long as a trip does not also cross the Shin-Katsumori–Tōhirakura/Shin-Iwasawa high-speed section, it is priced using ordinary rail fares only (see \"Timetable, Fares & Booking\" below). The core corridor remains Shin-Katsumori/Shin-Mitsuse–Shin-Iwasawa; this extension is shown here mainly to complete the map. Kamiba-Kanbetsu and Shiozaki are not yet on the map as real stations, so their distances and times are provisional."
+],
+"一般鐵路區間（新勝守～汐崎，預覽）": ["一般鉄道区間（新勝守～汐崎、プレビュー）", "Regular rail section (Shin-Katsumori–Shiozaki, preview)"],
+"地圖外・資料暫定": ["地図外・データは仮", "Off-map · data provisional"],
+"高速鉄道・一般鐵路轉乘": ["高速鉄道・一般鉄道乗換", "High-speed / regular rail transfer"],
+"暫定・待快照更新": ["仮・データ更新待ち", "Provisional, pending data update"],
+"尚未開業": ["未開業", "Not yet open"],
+"以下為「上羽本線」延伸段（新勝守～上羽神別・汐崎）的試算票價：這段是一般鐵路區間，只算乘車券，不是高速鉄道獨立票價；標 * 的距離為暫定數字，待地圖更新後會改用正式資料。": [
+"以下は「上羽本線」延伸区間（新勝守～上羽神別・汐崎）の試算運賃です：この区間は一般鉄道区間として乗車券のみで計算し、高速鉄道独自運賃ではありません。* 印の距離は暫定値で、地図の更新後に正式なデータに置き換わります。",
+"Below are estimated fares for the \"Jōba Main Line\" extension (Shin-Katsumori–Kamiba-Kanbetsu/Shiozaki): this section uses only the ordinary-rail base fare, not the high-speed rail's independent fare. Distances marked * are provisional and will be replaced with official data once the map is updated."
+],
+"新岩沢～新勝守（上羽神別方向）上下行時刻表": ["新岩沢～新勝守（上羽神別方面）上り・下り時刻表", "Shin-Iwasawa–Shin-Katsumori (toward Kamiba-Kanbetsu) Up/Down Timetable"],
+"下面是万瀨高速鉄道線的完整停靠站與上下行時刻，跟其他列車卡片同一套格式；用上方「上行／下行」切換方向。": [
+"以下は万瀨高速鉄道線の全停車駅と上り・下りの時刻です。他の列車カードと同じ形式で、上部の「上り／下り」で方向を切り替えられます。",
+"Below is the full stop list and up/down timetable for the Manse High-Speed Rail line, in the same card format as the other train cards. Use the \"Up/Down\" switch above to change direction."
 ]
 };
