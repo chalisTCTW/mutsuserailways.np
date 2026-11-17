@@ -278,7 +278,12 @@
         // member.number 常常只單純寫「特急」兩個字（沒有車次別名，例如一般特急あおさぎ也是這樣）；
         // 只有在去掉「特急」之後還留下東西（例如高速鉄道的「特急とりさわ」→「とりさわ」）才當成可用的簡稱，否則維持用路線全名。
         const numNick = numStr.replace(/特急/g, '').replace(/[\s　]+/g, '');
-        const up = upOf(sv), k = full + '|' + (up ? 1 : 0);
+        // 1.9.5：分組鍵優先用「車次別名」（例如「とりさわ」）而不是路線全名——這樣「万瀨高速鉄道線」（只到東平倉）
+        // 跟「万瀨高速鉄道線上羽線直通」（直通到上羽神別・汐崎）雖然是兩個不同的路線全名，但因為共用同一個「とりさわ」
+        // 別名，其實是同一個特急車次系統裡「有些只到東平倉、有些直通更遠」的差別，編號要接在一起（1号、3号、5号…連續），
+        // 不是各自從 1 號起算。沒有別名的車種（例如一般特急あおさぎ／こばな，member.number 只單純寫「特急」兩個字）
+        // 退回用路線全名當分組鍵，維持原本各自獨立編號的行為，不受影響。
+        const up = upOf(sv), k = (numNick || full) + '|' + (up ? 1 : 0);
         let g = groups.get(k); if (!g) groups.set(k, g = { full, up, list: [], nick: numNick ? numStr : '' });
         sv.depot.departures.forEach(D => g.list.push({ tod: ((Math.round(D + sv.stops[0].dep) % DAY) + DAY) % DAY, idx: sv.idx }));
       });

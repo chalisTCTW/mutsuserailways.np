@@ -90,23 +90,99 @@
     // 1.9.4：前輩要求「班次、時刻表優先顯示每一班車每一站的時間（含班次號，例如「とりさわ5号」），長條圖呈現班次
     // 密度移到更後面」——這項更新先在「設施介紹」頁（pages4.js）做好，高速鉄道這裡也要比照辦理：中間插入
     // HK.fullTable（全日逐班時刻表，欄名優先顯示 H.gouOf 算出來的班次號），長條圖、停車一覽維持在最後面。
+    // 1.9.5：前輩回報「完全看不到直通進去上羽線高速鉄道車次的」──因為 groupsOf 是照「路線全名」分組，
+    // 「万瀨高速鉄道線」（只到東平倉）跟「万瀨高速鉄道線上羽線直通」（直通到上羽神別・汐崎）是兩個不同的名字，
+    // 變成兩個分開的 group，而原本這裡只用 groups.find(...) 挑第一個符合的，另一個就完全沒畫出來。
+    // 這裡改成把兩個 group 的所有 sv 都抓出來，依「東平倉是不是終點」分成「下行（往東平倉／直通上羽神別・汐崎）」
+    // 「上行（往新勝守）」兩個方向桶；同一個桶裡，用停靠站最多的那個班型（直通車）當版型，把兩種班型的每一班
+    // 都換算到同一個時間基準上依時間排列，合併成一張時刻表──對不到站的短程班次格子顯示「－」。
     const ttBox = $('#hs-timetable');
-    if (ttBox && window.HK.groupsOf && window.HK.lineBlockTop && window.HK.lineBlockBottom && window.HK.fullTable) {
-      const groups = window.HK.groupsOf(H), g = groups.find(x => /高速鉄道/.test(x.name));
-      if (g) {
+    if (ttBox && window.HK.groupsOf) {
+      const allGroups = window.HK.groupsOf(H);
+      const hsSvs = allGroups.filter(x => /高速鉄道/.test(x.name)).flatMap(x => x.svs);
+      if (hsSvs.length) {
+        const buckets = [[], []]; // 0 = 下行（往東平倉，含直通上羽神別・汐崎）／1 = 上行（往新勝守）
+        hsSvs.forEach(sv => {
+          const hp = sv.stops.findIndex(s => H.stName(s.station) === '東平倉');
+          buckets[hp === sv.stops.length - 1 ? 0 : 1].push(sv);
+        });
+        const templateOf = list => list.reduce((a, b) => (b.stops.filter(s => s.pax !== false).length > a.stops.filter(s => s.pax !== false).length ? b : a));
+        const ownOffset = (sv, j) => { const t0 = sv.stops[0].dep; return (j === sv.stops.length - 1 ? sv.stops[j].arr : sv.stops[j].dep) - t0; };
+        function mergedRuns(list) {
+          const tmpl = templateOf(list), runs = [];
+          list.forEach(sv => {
+            const t0 = sv.stops[0].dep, k = tmpl.stops.findIndex(s => s.station === sv.stops[0].station);
+            const shift = k >= 0 ? (tmpl.stops[k].dep - tmpl.stops[0].dep) : 0; // 把這個班型自己的起點時刻，換算成「版型班次起點」的對應時刻，方便跟版型的班次一起排序
+            window.HK.depTimes(H, sv).forEach(t => { const gou = H.gouOf ? H.gouOf(sv, t - t0) : ''; runs.push({ sv, t, gou, vkey: t - shift }); });
+          });
+          runs.sort((a, b) => a.vkey - b.vkey);
+          return { tmpl, runs };
+        }
+        function mergedTable(list) {
+          const { tmpl, runs } = mergedRuns(list), rows = tmpl.stops.filter(s => s.pax !== false);
+          if (!runs.length) { const p = document.createElement('p'); p.className = 'note'; p.textContent = L('本日沒有班次。', '本日の運行はありません。', 'No service today.'); return p; }
+          const hsAt = k => k && Math.floor(runs[k].t / 3600) !== Math.floor(runs[k - 1].t / 3600) ? ' hs' : '';
+          const head = document.createElement('tr'); head.appendChild(document.createElement('th')).textContent = L('車站', '駅', 'Station');
+          runs.forEach((r, k) => { const th = document.createElement('th'); th.className = 'c' + hsAt(k); th.textContent = r.gou || hmOf(r.t); head.appendChild(th); });
+          const tbody = document.createElement('tbody');
+          rows.forEach(s => {
+            const tr = document.createElement('tr'), th = document.createElement('th'); th.scope = 'row';
+            const bd = H.codeBadges(s.station); if (bd) th.appendChild(bd); th.append(document.createTextNode(H.stName(s.station)));
+            tr.appendChild(th);
+            runs.forEach((r, k) => {
+              const td = document.createElement('td'); td.className = 'c' + hsAt(k);
+              const j = r.sv.stops.findIndex(x => x.station === s.station);
+              td.textContent = j >= 0 ? hmOf(r.t + ownOffset(r.sv, j)) : '－';
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+          const table = document.createElement('table'); table.className = 'fulltt';
+          const thead = document.createElement('thead'); thead.appendChild(head);
+          table.append(thead, tbody);
+          const wrap = document.createElement('div'); wrap.className = 'tscroll fulltt-wrap'; wrap.appendChild(table);
+          return wrap;
+        }
         let di = 0;
         const top = document.createElement('div'), mid = document.createElement('div'), bottom = document.createElement('div');
         ttBox.replaceChildren(top, mid, bottom);
         const draw = () => {
-          window.HK.lineBlockTop(H, groups, g, di, top, n => { di = n; draw(); });
-          const sv = g.svs[Math.min(di, g.svs.length - 1)];
+          const list = buckets[di].length ? buckets[di] : buckets[1 - di];
+          top.replaceChildren();
+          if (buckets[0].length && buckets[1].length) {
+            const dirs = document.createElement('div'); dirs.className = 'dirs'; dirs.setAttribute('role', 'group'); dirs.setAttribute('aria-label', L('方向', '方向', 'Direction'));
+            [0, 1].forEach(k => {
+              const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(k === di));
+              b.textContent = window.HK.dirLabel(H, templateOf(buckets[k]));
+              b.onclick = () => { di = k; draw(); };
+              dirs.appendChild(b);
+            });
+            top.appendChild(dirs);
+          }
           const h3 = document.createElement('h3'), p = document.createElement('p');
           h3.className = 'h3'; h3.textContent = L('全日時刻表', '全日時刻表', 'Full-day timetable');
           p.className = 'note';
-          p.textContent = L(`${window.HK.dirLabel(H, sv)}。各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號（沒有編號的種別則顯示發車時刻）。`, `${window.HK.dirLabel(H, sv)}。各駅の発車時刻（終点は到着時刻）、1列＝1本。欄名は列車番号（番号がない種別は発車時刻を表示）。`, `${window.HK.dirLabel(H, sv)}. Departure time at each stop (arrival at the terminus); one column per run, headed by its train number where available.`);
-          mid.replaceChildren(h3, p, window.HK.fullTable(H, sv));
+          const dl = window.HK.dirLabel(H, templateOf(list));
+          p.textContent = L(`${dl}。已合併直通上羽本線的班次並按時間排列；各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號，短程班次對不到的站顯示「－」。`, `${dl}。上羽線直通の列車も合わせて時刻順に表示。各駅の発車時刻（終点は到着時刻）、1列＝1本。欄名は列車番号、短距離の列車が通らない駅は「－」。`, `${dl}. Through-service trains to the Ueha Main Line are merged in and sorted by time. Departure time at each stop (arrival at the terminus); one column per run; "－" marks a stop a shorter run doesn't reach.`);
+          mid.replaceChildren(h3, p, mergedTable(list));
           bottom.replaceChildren();
-          window.HK.lineBlockBottom(H, groups, g, di, bottom);
+          const allT = []; list.forEach(sv => window.HK.depTimes(H, sv).forEach(t => allT.push(t))); allT.sort((a, b) => a - b);
+          const bands = [[L('早晨', '早朝', 'Morning'), 5, 9], [L('日間', '日中', 'Midday'), 9, 16], [L('傍晚', '夕方', 'Evening'), 16, 20], [L('夜間', '夜間', 'Night'), 20, 24], [L('深夜', '深夜', 'Late night'), 0, 5]];
+          const btbl = document.createElement('table'); btbl.className = 'tbl';
+          const bthead = document.createElement('thead'), btr = document.createElement('tr');
+          [L('時段', '時間帯', 'Band'), L('班次', '本数', 'Trains'), L('平均班距', '平均間隔', 'Avg. interval')].forEach(t => { const th = document.createElement('th'); th.textContent = t; btr.appendChild(th); });
+          bthead.appendChild(btr);
+          const bbody = document.createElement('tbody');
+          bands.forEach(([nm, a, b]) => {
+            const n = allT.filter(t => t >= a * 3600 && t < b * 3600).length;
+            const tr = document.createElement('tr'), th = document.createElement('th'); th.scope = 'row'; th.textContent = `${nm}　${a}–${b} ${L('時', '時', 'h')}`;
+            const td1 = document.createElement('td'); td1.textContent = L(`${n} 班`, `${n}本`, String(n));
+            const td2 = document.createElement('td'); td2.textContent = n ? L(`約 ${Math.round((b - a) * 60 / n * 10) / 10} 分一班`, `約${Math.round((b - a) * 60 / n * 10) / 10}分間隔`, `~${Math.round((b - a) * 60 / n * 10) / 10} min`) : '—';
+            tr.append(th, td1, td2); bbody.appendChild(tr);
+          });
+          btbl.append(bthead, bbody);
+          const h3b = document.createElement('h3'); h3b.className = 'h3'; h3b.textContent = L('班距', '運行間隔', 'Frequency');
+          bottom.append(h3b, btbl);
         };
         draw();
       }
