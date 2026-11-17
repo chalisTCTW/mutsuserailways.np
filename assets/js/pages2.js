@@ -10,7 +10,8 @@
     museum: ['博', '#4a5fa0'], kuribashi: ['購', '#c77d2e'], tomise: ['河', '#2f7d6b'],
     heikura: ['紀', '#6b5a8c'], 'tomiya-arena': ['競', '#2f6d3a'], 'kaiei-museum': ['美', '#8c3a6b'],
     'ryusei-tree': ['觀', '#3a7a8c'], 'old-godo-hall': ['建', '#8c6b3a'],
-    customs: ['稅', '#5a6b3a'], farm: ['農', '#7a8c3a'], church: ['堂', '#3a4a6b'], library: ['書', '#2f6d8c']
+    customs: ['稅', '#5a6b3a'], farm: ['農', '#7a8c3a'], church: ['堂', '#3a4a6b'], library: ['書', '#2f6d8c'],
+    'seion-taisha': ['社', '#9c4a2f']
   };
   const q = new URLSearchParams(location.search);
   const pad = n => String(n).padStart(2, '0');
@@ -70,8 +71,10 @@
   };
 
   /* ───────── 路線資訊 ───────── */
-  /** 一個路線群組的詳細（停靠站・班距・停車一覽）。路線資訊與設備服務頁共用。 */
-  function lineBlock(H, groups, g, di, out, setDi) {
+  /** 1.9.4：拆成 Top（車種資訊卡＋方向切換＋停靠站所要時間模板）／Bottom（班距長條圖＋停車一覽），
+   *  讓「設施介紹」「高速鉄道」頁可以在 Top 跟 Bottom 中間插入全日逐班時刻表（含班次號），
+   *  而「路線資訊」頁（viewLines／routes.html）繼續用 lineBlock 原本 Top+Bottom 直接接在一起的順序，不受影響。 */
+  function lineBlockTop(H, groups, g, di, out, setDi) {
       out.replaceChildren();
       const sv = g.svs[Math.min(di, g.svs.length - 1)];
       const st = sv.stops, tt = depTimes(H, sv);
@@ -105,7 +108,12 @@
       });
       out.append(h('h3', { class: 'h3' }, '停靠站與所要時間'), h('div', { class: 'tscroll' }, h('table', { class: 'stoptbl' },
         h('thead', null, h('tr', null, h('th'), h('th', null, '車站'), h('th', null, '可轉乘'), h('th', null, '所要時間'), h('th', null, `首班列車的時刻`))), h('tbody', null, rows))));
+    }
 
+  /** Bottom 一半（班距長條圖＋停車一覽）；沿用跟 lineBlockTop 同一組參數即可（會重算一次 sv／st／tt，計算量很小）。 */
+  function lineBlockBottom(H, groups, g, di, out) {
+      const sv = g.svs[Math.min(di, g.svs.length - 1)];
+      const st = sv.stops, tt = depTimes(H, sv);
       // 班距
       const bands = [['早晨', 5, 9], ['日間', 9, 16], ['傍晚', 16, 20], ['夜間', 20, 24], ['深夜', 0, 5]];
       const brow = bands.map(([nm, a, b]) => { const n = tt.filter(t => t >= a * 3600 && t < b * 3600).length; return h('tr', null, h('th', { scope: 'row' }, `${nm}　${a}–${b} 時`), h('td', null, `${n} 班`), h('td', null, n ? `約 ${Math.round((b - a) * 60 / n * 10) / 10} 分一班` : '—')); });
@@ -124,6 +132,12 @@
         const body = rowSt.map(s => h('tr', null, h('th', { scope: 'row' }, s.station && H.codeBadges(s.station), s.station && H.stName(s.station)), ...cols.map(c => h('td', { class: c.o === g ? 'cur' : null }, c.cover.has(s.station) ? (c.cover.get(s.station) ? '●' : '｜') : ''))));
         out.append(h('h3', { class: 'h3' }, '停車一覽（各種別比較）'), h('div', { class: 'tscroll' }, h('table', { class: 'matrix' }, h('thead', null, hd), h('tbody', null, body))), h('p', { class: 'note' }, '●＝停車，｜＝通過，空白＝不經過。欄名可點選切換路線。'));
       }
+    }
+
+  /** 一個路線群組的詳細（停靠站・班距・停車一覽）。路線資訊頁（viewLines）用這個，Top／Bottom 直接接在一起。 */
+  function lineBlock(H, groups, g, di, out, setDi) {
+      lineBlockTop(H, groups, g, di, out, setDi);
+      lineBlockBottom(H, groups, g, di, out);
     }
 
   function viewLines(H, root) {
@@ -449,5 +463,5 @@
     root.append(h('p', { style: 'margin:30px 0 0' }, h('a', { class: 'btn ghost', href: 'sights.html#stations' }, '回到車站介紹一覽')));
   }
 
-  Object.assign(HK, { lineBlock, relT, dirLabel, stLink, chipLines, dispNote, viewLines, viewSights, viewStationPage, stationData, stationHref, sdEntry, stationPop, pidsBoard, depTimes, groupsOf });
+  Object.assign(HK, { lineBlock, lineBlockTop, lineBlockBottom, relT, dirLabel, stLink, chipLines, dispNote, viewLines, viewSights, viewStationPage, stationData, stationHref, sdEntry, stationPop, pidsBoard, depTimes, groupsOf });
 })(window);

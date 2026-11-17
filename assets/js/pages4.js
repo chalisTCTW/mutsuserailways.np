@@ -35,27 +35,36 @@
     return h('figure', { class: 'sfig', style: 'margin:0' }, main, cap, thumbs);
   }
 
-  /** 全日時刻表：各站的發車（終點站為到達）時刻，一欄是一班車。 */
+  /** 1.9.4：全日時刻表：各站的發車（終點站為到達）時刻，一欄是一班車；欄名優先顯示班次號（H.gouOf，例如「あおさぎ39号」
+   *  「とりさわ5号」），沒有班次號的種別（花川本線特別快速、環狀快速等不是特急的）維持顯示發車時刻，不會變成空白欄名。
+   *  提升到 HK 共用（HK.fullTable），這樣高速鉄道專頁（hs.js）也能用同一份邏輯，不用重寫一次。 */
   function fullTable(H, sv) {
     const st = sv.stops, tt = HK.depTimes(H, sv), t0 = st[0].dep;
     const rows = []; st.forEach((s, i) => { if (s.pax !== false) rows.push([s, i]); });
     if (!tt.length) return h('p', { class: 'note' }, '本日沒有班次。');
     const last = st.length - 1;
-    const head = h('tr', null, h('th', { class: 'stk' }, '車站'), ...tt.map((t, k) => h('th', { class: 'c' + (k && Math.floor(t / 3600) !== Math.floor(tt[k - 1] / 3600) ? ' hs' : '') }, String(Math.floor(t / 3600)) + '時')));
+    const head = h('tr', null, h('th', { class: 'stk' }, '車站'), ...tt.map((t, k) => {
+      const base = t - t0, gou = H.gouOf ? H.gouOf(sv, base) : '';
+      return h('th', { class: 'c' + (k && Math.floor(t / 3600) !== Math.floor(tt[k - 1] / 3600) ? ' hs' : '') }, gou || hm(t));
+    }));
     const body = rows.map(([s, i]) => h('tr', null, h('th', { class: 'stk', scope: 'row' }, H.codeBadges(s.station), H.stName(s.station)),
       ...tt.map((t, k) => { const v = t + (i === last ? s.arr - t0 : s.dep - t0); return h('td', { class: 'c' + (k && Math.floor(t / 3600) !== Math.floor(tt[k - 1] / 3600) ? ' hs' : '') }, hm(v)); })));
     return h('div', { class: 'tscroll fulltt-wrap' }, h('table', { class: 'fulltt' }, h('thead', null, head), h('tbody', null, body)));
   }
 
+  /** 1.9.4：先 Top（車種資訊卡＋停靠站所要時間模板），接著全日逐班時刻表（含班次號——這是前輩要的重點：
+   *  班次、時刻表優先顯示每一班車每一站的時間，不是只看班次密度），最後才是 Bottom（班距長條圖＋停車一覽，移到更後面）。 */
   function groupPanel(H, groups, g) {
     let di = 0;
-    const wrap = h('div', { class: 'svgroup' }), top = h('div'), bottom = h('div');
+    const wrap = h('div', { class: 'svgroup' }), top = h('div'), mid = h('div'), bottom = h('div');
     function draw() {
-      HK.lineBlock(H, groups, g, di, top, k => { di = k; draw(); });
+      HK.lineBlockTop(H, groups, g, di, top, k => { di = k; draw(); });
       const sv = g.svs[Math.min(di, g.svs.length - 1)];
-      bottom.replaceChildren(h('h3', { class: 'h3' }, '全日時刻表'), h('p', { class: 'note' }, `${HK.dirLabel(H, sv)}。各站的發車時刻（終點站為到達時刻），一欄是一班車。`), fullTable(H, sv));
+      mid.replaceChildren(h('h3', { class: 'h3' }, '全日時刻表'), h('p', { class: 'note' }, `${HK.dirLabel(H, sv)}。各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號（沒有編號的種別則顯示發車時刻）。`), fullTable(H, sv));
+      bottom.replaceChildren();
+      HK.lineBlockBottom(H, groups, g, di, bottom);
     }
-    wrap.append(top, bottom); draw(); return wrap;
+    wrap.append(top, mid, bottom); draw(); return wrap;
   }
 
   function viewServices(H, root) {
@@ -84,5 +93,5 @@
     }
     drawChips(); draw();
   }
-  Object.assign(HK, { viewServices });
+  Object.assign(HK, { viewServices, fullTable });
 })();

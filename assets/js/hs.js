@@ -87,10 +87,29 @@
     }
     // 1.9.0：上下行完整時刻表——跟首頁列車卡片同一套視覺語言，直接沿用 HK.lineBlock（路線資訊頁同一份渲染邏輯，
     // 已經有「上行／下行」切換、停靠站時刻、班距，不用再另外寫一份）。
+    // 1.9.4：前輩要求「班次、時刻表優先顯示每一班車每一站的時間（含班次號，例如「とりさわ5号」），長條圖呈現班次
+    // 密度移到更後面」——這項更新先在「設施介紹」頁（pages4.js）做好，高速鉄道這裡也要比照辦理：中間插入
+    // HK.fullTable（全日逐班時刻表，欄名優先顯示 H.gouOf 算出來的班次號），長條圖、停車一覽維持在最後面。
     const ttBox = $('#hs-timetable');
-    if (ttBox && window.HK.groupsOf && window.HK.lineBlock) {
+    if (ttBox && window.HK.groupsOf && window.HK.lineBlockTop && window.HK.lineBlockBottom && window.HK.fullTable) {
       const groups = window.HK.groupsOf(H), g = groups.find(x => /高速鉄道/.test(x.name));
-      if (g) { let di = 0; const setDi = n => { di = n; window.HK.lineBlock(H, groups, g, di, ttBox, setDi); }; window.HK.lineBlock(H, groups, g, di, ttBox, setDi); }
+      if (g) {
+        let di = 0;
+        const top = document.createElement('div'), mid = document.createElement('div'), bottom = document.createElement('div');
+        ttBox.replaceChildren(top, mid, bottom);
+        const draw = () => {
+          window.HK.lineBlockTop(H, groups, g, di, top, n => { di = n; draw(); });
+          const sv = g.svs[Math.min(di, g.svs.length - 1)];
+          const h3 = document.createElement('h3'), p = document.createElement('p');
+          h3.className = 'h3'; h3.textContent = L('全日時刻表', '全日時刻表', 'Full-day timetable');
+          p.className = 'note';
+          p.textContent = L(`${window.HK.dirLabel(H, sv)}。各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號（沒有編號的種別則顯示發車時刻）。`, `${window.HK.dirLabel(H, sv)}。各駅の発車時刻（終点は到着時刻）、1列＝1本。欄名は列車番号（番号がない種別は発車時刻を表示）。`, `${window.HK.dirLabel(H, sv)}. Departure time at each stop (arrival at the terminus); one column per run, headed by its train number where available.`);
+          mid.replaceChildren(h3, p, window.HK.fullTable(H, sv));
+          bottom.replaceChildren();
+          window.HK.lineBlockBottom(H, groups, g, di, bottom);
+        };
+        draw();
+      }
     }
     // 轉乘三站：車站介紹與照片（與「景點與車站」的車站頁共用 data/stations.json，只維護一份）
     try {

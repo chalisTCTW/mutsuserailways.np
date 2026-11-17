@@ -4327,6 +4327,7 @@ window.HK_I18N_DICT = {
 "最近車站：上羽安來": ["最寄り駅：上羽安来", "Nearest station: Kamiba-Yasuki"],
 "農場裡的溫室與畜舍": ["農場内の温室と畜舎", "Greenhouses and animal barns on the farm"],
 "教堂・建築": ["教会・建築", "Church / architecture"],
+"神社・參道商店街": ["神社・参道商店街", "Shrine / approach shopping street"],
 "1864 年由俄羅斯傳道士建立的東正教教堂，歐式外觀搭配大量水晶窗，氣氛莊嚴。": [
 "1864年にロシア人宣教師によって建てられた正教会の教会堂です。欧風の外観と数多くのステンドグラスが特徴で、荘厳な雰囲気があります。",
 "An Eastern Orthodox church built in 1864 by Russian missionaries, with a European exterior and many stained-glass windows, giving it a solemn atmosphere."
@@ -4365,14 +4366,44 @@ window.HK_I18N_DICT = {
 "最近車站：咲海研究学園都市": ["最寄り駅：咲海研究学園都市", "Nearest station: Sakiumi Science City"],
 "挑高的書架與閱覽區": ["吹き抜けの書架と閲覧スペース", "Double-height bookshelves and reading area"],
 "對外開放的一樓空間": ["一般公開されている1階スペース", "The ground-floor space open to the public"],
-"「上羽本線」延伸段的車站，目前還是地圖與時刻表上的預覽資料，實際路線通車後會自動補上完整時刻表。": [
-"「上羽本線」延伸区間の駅で、現在は地図と時刻表上ではプレビューデータの段階です。実際に路線が開業すると、自動的に完全な時刻表が反映されます。",
-"A station on the \"Joba Main Line\" extension. It is currently only preview data on the map and timetable; once the line actually opens, the full timetable will appear automatically."
+"光瀨郡波別町的市中心車站，鄰近度假村與滑雪勝地，是上羽本線沿線的主要據點之一。": [
+"光瀨郡波別町の中心駅で、近くにリゾート地やスキー場があり、上羽本線沿線の主要な拠点のひとつです。",
+"The central station of Namibetsu Town, Hikarise District. Nearby resorts and ski areas make it one of the main hubs along the Kamiha Main Line."
 ],
-"鄰近上羽地區，是新勝守往汐崎方向延伸計畫中的中間站。": [
-"上羽地区の近くに位置し、新勝守から汐崎方面への延伸計画における中間駅です。",
-"Located near the Kamiba area, it is an intermediate station on the planned extension from Shin-Katsumori toward Shiozaki."
+"從新勝守可搭乘高速鉄道一車直達，不需轉乘。": [
+"新勝守からは高速鉄道で乗り換えなしの直通運転です。",
+"A high-speed rail through-service runs directly from Shin-Katsumori, with no transfer required."
 ],
 "上羽神別站的站體設計": ["上羽神別駅の駅舎デザイン", "Kamiba-Kanbetsu Station building design"],
-"上羽神別站・站體設計（": ["上羽神別駅・駅舎デザイン（", "Kamiba-Kanbetsu Station - building design ("]
+"上羽神別站・站體設計（": ["上羽神別駅・駅舎デザイン（", "Kamiba-Kanbetsu Station - building design ("],
+"鄰近清音溫泉的古老神社，相傳供奉著溫泉的守護神，參道兩旁是熱鬧的商店街。": [
+"清音温泉の近くにある古い神社で、温泉の守り神を祀っていると伝えられています。参道の両側には賑やかな商店街が並びます。",
+"An old shrine near Seion Onsen, said to enshrine the guardian deity of the hot spring. A lively shopping street lines both sides of its approach."
+],
+"清音大社是清音溫泉一帶歷史最久的神社，相傳供奉著守護當地溫泉湧泉的神明，吸引不少來泡湯的旅客順道參拜。從清音溫泉車站步行即可抵達參道入口。": [
+"清音大社は清音温泉一帯で最も歴史の古い神社で、地元の温泉の湧出を守る神を祀っていると伝えられており、湯治に訪れる旅行者が立ち寄って参拝することも少なくありません。清音温泉駅から徒歩で参道入口まで行けます。",
+"Seion Grand Shrine is the oldest shrine in the Seion Onsen area, said to enshrine the deity that protects the local hot spring's source. Many visitors to the onsen stop by to pay their respects. The approach entrance is within walking distance of Seion Onsen Station."
+],
+"神社參道兩側是傳統風格的商店街，紅色布簾招牌林立，販售當地特產與小吃，上方懸掛著箭靶造型的裝飾牌樓，是拍照留念的熱門地點；越往裡走，可以看到朱紅色的鳥居矗立在楓紅色調的街景之中，別有一番風情。": [
+"参道の両側には伝統的な雰囲気の商店街があり、赤いのれんの看板が立ち並んで地元の特産品や軽食を売っています。頭上には的（まと）の形をした装飾牌楼が掛かっており、記念撮影の人気スポットです。奥へ進むと、紅葉のような色合いの街並みの中に朱色の鳥居が立つ姿が見え、また違った趣があります。",
+"The shrine's approach is lined with traditional-style shops, their red curtain signs selling local specialties and snacks, with a target-shaped decorative archway overhead that's a popular photo spot. Further in, a vermilion torii gate stands amid streetscape in autumn-leaf tones — a different kind of charm."
+],
+"相傳供奉清音溫泉的守護神": ["温泉の守り神を祀っていると伝えられる", "Said to enshrine the guardian deity of the hot spring"],
+"參道兩側為傳統商店街，紅色布簾林立": ["参道の両側は伝統的な商店街で、赤いのれんが立ち並ぶ", "Traditional shops with red curtain signs line both sides of the approach"],
+"朱紅色鳥居與楓紅色調的街景": ["朱色の鳥居と紅葉色の街並み", "A vermilion torii gate amid an autumn-toned streetscape"],
+"最近車站：清音溫泉": ["最寄り駅：清音温泉", "Nearest station: Seion Onsen"],
+"參道商店街": ["参道商店街", "Shopping street along the approach"],
+"朱紅色鳥居": ["朱色の鳥居", "Vermilion torii gate"],
+"清音大社參道商店街，紅色布簾招牌林立": ["清音大社の参道商店街、赤いのれんの看板が立ち並ぶ", "Seion Grand Shrine's approach shopping street, lined with red curtain signs"],
+"清音大社朱紅色鳥居與楓紅色調街景": ["清音大社の朱色の鳥居と紅葉色の街並み", "Seion Grand Shrine's vermilion torii gate amid an autumn-toned streetscape"],
+"光瀨郡波別町的溫泉鄉車站，鄰近清音大社與傳統參道商店街，是上羽本線沿線相當受歡迎的觀光據點。": [
+"光瀨郡波別町にある温泉街の駅で、清音大社や伝統的な参道商店街に近く、上羽本線沿線で人気の観光拠点です。",
+"A hot-spring-town station in Namibetsu Town, Hikarise District, near Seion Grand Shrine and its traditional approach shopping street — a popular sightseeing hub along the Kamiha Main Line."
+],
+"車站周邊有多間溫泉旅館，適合安排一日來回的泡湯小旅行。": [
+"駅周辺には温泉旅館が多数あり、日帰りの湯治旅行にも向いています。",
+"Several hot-spring inns surround the station, making it well suited to a day trip for a hot-spring soak."
+],
+"清音溫泉站月台與發車看板": ["清音温泉駅のホームと発車案内板", "Seion Onsen Station platform and departure board"],
+"月台與發車看板": ["ホームと発車案内板", "Platform and departure board"]
 };

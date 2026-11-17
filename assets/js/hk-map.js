@@ -55,9 +55,36 @@
    * 高速鉄道只在既有站位之間，另外挑一個貼近實際方位、轉折最少的方向畫線——這樣可以保證「一般鐵路的線形優先」：
    * 不管高速鉄道怎麼繞，都不會回頭去動一般鐵路已經排好的車站位置或線形。
    * 做法跟 layoutOnce 的步驟 1～2 一樣（分歧站分配方向、車站鏈用 Viterbi 選轉折最少的方向），只是跳過步驟 3
-   * 的位置求解（因為站位是「借」一般鐵路的，不能動），直接用 decompose 把兩個既有站位接成折線。 */
+   * 的位置求解（因為站位是「借」一般鐵路的，不能動），直接用 decompose 把兩個既有站位接成折線。
+   * 1.9.4：前輩指出——上羽本線（一般路線，已經在 H.edges／一般拓樸裡）跟高速鉄道上羽線直通車（isHS）現在共用同一段
+   * 實體軌道（新勝守～上羽神別～…～汐崎），兩者都會各畫一條線，變成兩條平行的獨立路線，但實際上是同一段軌道，這樣不對。
+   * 修正：高速鉄道的虛線疊加只畫在「一般拓樸裡還沒有這對站」的路段（例如地圖外延伸段）；只要這對站已經有一般路線的
+   * 實體連線（H.edges），就不再另外疊一條高速鉄道虛線——用同一條線代表兩者共用軌道，車站的「可轉乘」徽章與時刻表
+   * 本來就會正確列出高速鉄道也有停靠，不會漏資訊。 */
+  /** 1.9.4：判斷高速鉄道的一段直通／跳站連線（a→b）是不是「其實是借用一般鐵路已經鋪好的同一段軌道」：
+   *  從 a 出發，只要沿途都是「單純過路站」（在一般拓樸 H.adj 裡分支數 ≤2，不是轉乘樞紐）就能走到 b，
+   *  就代表這整段在一般路網裡本來就是一條沒有分岔的直線——高速鉄道只是在這段track上「不停某些站」，
+   *  不是真的另外一條獨立軌道，所以不用再疊一條高速鉄道虛線，直接讓一般路線的線形代表這一段即可。
+   *  a（起點）本身可以是分岔站（不限制分支數），只有「中間經過的站」才要求是單純過路站。 */
+  function hsChordCovered(adj, a, b, maxHops) {
+    if (a === b) return false;
+    let frontier = [a]; const visited = new Set([a]);
+    for (let hop = 0; hop < (maxHops || 24); hop++) {
+      const next = [];
+      for (const cur of frontier) {
+        for (const nb of (adj.get(cur) || [])) {
+          if (nb.to === b) return true;
+          if (visited.has(nb.to)) continue;
+          if ((adj.get(nb.to) || []).length <= 2) { visited.add(nb.to); next.push(nb.to); }
+        }
+      }
+      if (!next.length) return false;
+      frontier = next;
+    }
+    return false;
+  }
   function layoutHsPaths(H, pos) {
-    const all = (H.hsEdges || []).filter(e => e.a !== e.b && pos.has(e.a) && pos.has(e.b));
+    const all = (H.hsEdges || []).filter(e => e.a !== e.b && pos.has(e.a) && pos.has(e.b) && !hsChordCovered(H.adj, e.a, e.b) && !hsChordCovered(H.adj, e.b, e.a));
     const ids = [...new Set(all.flatMap(e => [e.a, e.b]))];
     const vidx = new Map(ids.map((id, i) => [id, i]));
     const n = ids.length, m = all.length;
