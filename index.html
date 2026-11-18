@@ -6,63 +6,107 @@
 <title>光瀨都市鉄道</title>
 <meta name="description" content="光瀨都市鉄道 公式網站：時刻表、票價、即時列車動態。（Minecraft 架空鐵路）">
 <link rel="icon" type="image/png" href="assets/img/mark-light.png">
-<link rel="stylesheet" href="assets/css/site.css?v=1.9.5">
-<link rel="stylesheet" href="assets/css/theme.css?v=1.9.5">
+<link rel="stylesheet" href="assets/css/site.css?v=2.1.0">
+<link rel="stylesheet" href="assets/css/theme.css?v=2.1.0">
+<link rel="stylesheet" href="assets/css/mint.css?v=2.1.0">
 
 </head>
 <body data-page="home">
-<header class="sh"><div class="sh-in"><a class="sh-brand" href="index.html" aria-label="光瀨都市鉄道 首頁"><img src="assets/img/mark-dark.png" alt="" width="30" height="34"><span>光瀨都市鉄道</span></a><nav class="gnav" id="gnav" aria-label="主要選單"><ul><li class="has-sub"><a href="ride.html">乘車<span class="en">Ride</span></a><ul class="subnav"><li><a href="timetable.html">時刻表・票價<span class="en">Timetable / Fares</span></a></li><li><a href="routes.html">設備與服務介紹<span class="en">Facilities &amp; Services</span></a></li><li><a href="hs.html">高速鉄道<span class="en">High-Speed Rail</span><b class="new">NEW</b></a></li><li><a href="kobana.html">特急こばな<span class="en">Ltd. Exp. Kobana</span></a></li></ul></li><li class="has-sub"><a href="explore.html">出行<span class="en">Explore</span></a><ul class="subnav"><li><a href="sights.html">沿線景點與車站介紹<span class="en">Sights &amp; Stations</span></a></li><li><a href="guide.html">乘車指南・FAQ<span class="en">Guide / FAQ</span></a></li><li><a href="airport.html">機場聯外交通<span class="en">Airport</span></a></li></ul></li><li><a href="booking.html">線上訂票<span class="en">Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li class="admin"><a id="adminlink" href="atos.html">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav><div class="util"><div class="wrap"></div></div><button class="sh-menu" type="button" aria-expanded="false" aria-controls="gnav" aria-label="選單"><span></span></button></div></header>
+<header class="sh"><div class="sh-in"><a class="sh-brand" href="index.html" aria-label="光瀨都市鉄道 首頁"><img src="assets/img/mark-light.png" alt="" width="30" height="34"><span>光瀨都市鉄道</span></a><nav class="gnav" id="gnav" aria-label="主要選單"><ul><li class="has-sub"><a href="ride.html">乘車<span class="en">Ride</span></a><ul class="subnav"><li><a href="timetable.html">時刻表・票價<span class="en">Timetable / Fares</span></a></li><li><a href="routes.html">設備與服務介紹<span class="en">Facilities &amp; Services</span></a></li><li><a href="hs.html">高速鉄道<span class="en">High-Speed Rail</span><b class="new">NEW</b></a></li><li><a href="kobana.html">特急こばな<span class="en">Ltd. Exp. Kobana</span></a></li></ul></li><li class="has-sub"><a href="explore.html">出行<span class="en">Explore</span></a><ul class="subnav"><li><a href="sights.html">沿線景點與車站介紹<span class="en">Sights &amp; Stations</span></a></li><li><a href="guide.html">乘車指南・FAQ<span class="en">Guide / FAQ</span></a></li><li><a href="airport.html">機場聯外交通<span class="en">Airport</span></a></li></ul></li><li><a href="booking.html">線上訂票<span class="en">Booking</span></a></li><li><a href="live.html">即時列車動態<span class="en">Train Locator</span></a></li><li class="admin"><a id="adminlink" href="atos.html">企業管理登入<span class="en">Staff Login (ATOS)</span></a></li></ul></nav><div class="util"><div class="wrap"></div></div><button class="sh-menu" type="button" aria-expanded="false" aria-controls="gnav" aria-label="選單"><span></span></button></div></header>
 <script>(function(){var h=document.querySelector("header.sh");if(!h)return;var b=h.querySelector(".sh-menu");if(!b)return;function set(o){h.classList.toggle("open",o);b.setAttribute("aria-expanded",o?"true":"false")}b.addEventListener("click",function(){set(!h.classList.contains("open"))});h.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".gnav a"))set(false)});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false)});})();</script>
+<div id="svcbar" class="svcbar" role="status" hidden></div>
 <main>
 <section class="hero" id="hero" aria-roledescription="carousel" aria-label="最新資訊">
 <div class="slide on" role="group" aria-roledescription="slide" aria-label="1 / 6"><img src="assets/photo/hs-sunset.webp" alt="万瀨高速鉄道" style="object-position:center bottom"><div class="cap"><span class="tag">2026.11.16　開通</span><h2>万瀨高速鉄道　開通</h2><p>新勝守～新岩沢，一日往返更從容。最高時速 250 公里，全車指定席。</p><a class="more" href="hs.html">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="2 / 6"><img src="assets/photo/ad2.webp" alt="松澤國際機場"><div class="cap"><span class="tag">空港LINER</span><h2>松澤國際機場　一車直達</h2><p>特急・特快直達光瀨市區，最快 11 分鐘。一日券 1,500 円起的優惠套票，可無限次搭乘自由席列車。</p><a class="more" href="airport.html">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="3 / 6"><img src="assets/photo/ad_kobana.webp" alt="特急こばな 新8000形"><div class="cap"><span class="tag">新列車　特急</span><h2>特急こばな　登場</h2><p>勝守、天鳥崎、本磯島　一車直達。新 8000 形，最高時速 160 公里，全車指定席，備有 USB 充電口。</p><a class="more" href="routes.html?s=kobana">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="4 / 6"><img src="assets/photo/ad1.webp" alt="新2100形"><div class="cap"><span class="tag">新型列車</span><h2>新2100形　營運開始</h2><p>2026年10月起投入營運，最高時速 160 公里。連結機場，也行駛名島、勝守、平倉方向，通勤與出遊都更從容。</p><a class="more" href="index.html#n1">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="5 / 6"><img src="assets/photo/ad3.webp" alt="10000系"><div class="cap"><span class="tag">感謝與道別</span><h2>10000系　即將退役</h2><p>陪伴大家 26 年的 10000系，預定於 2026 年底退役。歡迎把握最後的乘車機會。</p><a class="more" href="index.html#n3">詳細</a></div></div><div class="slide" role="group" aria-roledescription="slide" aria-label="6 / 6"><div class="plain" aria-hidden="true"><img src="assets/img/mark-dark.png" alt=""></div><div class="cap"><span class="tag">時刻表・票價</span><h2>時刻表・票價改訂</h2><p>尖峰時段增加班次，等車時間更短。</p><a class="more" href="timetable.html">詳細</a></div></div>
 <div class="hero-ctl"></div>
 </section>
-<div id="svcbar" class="svcbar" role="status" hidden></div>
 
-<div class="wrap">
-  <section class="sec" aria-labelledby="h-find"><h2 id="h-find">時刻表・票價查詢</h2><div class="finder" id="finder"></div></section>
-  <section class="sec" aria-labelledby="h-trains"><h2 id="h-trains">列車陣容<small>Our Trains</small></h2>
-  <div class="traingrid">
-    <a class="traincard" style="--bc:#2f6d8c" href="routes.html?s=aosagi"><span class="lbadge">特</span><img src="assets/photo/n8000k-1.webp" alt="新8000形1000番台・特急あおさぎ" loading="lazy"><h3>特急あおさぎ<small>Limited Express AOSAGI</small></h3><p>新8000形1000番台・主動擺錘振子式傾斜</p></a>
-    <a class="traincard" style="--bc:#8c2f3a" href="routes.html?s=kobana"><span class="lbadge">特</span><img src="assets/photo/kobana1.webp" alt="新8000形0番台・特急こばな" loading="lazy"><h3>特急こばな<small>Limited Express KOBANA</small></h3><p>新8000形0番台・全車指定席（另有立席）</p></a>
-    <a class="traincard" style="--bc:#b8862a" href="routes.html?s=tokkai"><span class="lbadge">快</span><img src="assets/photo/n2100-1.webp" alt="新2100形・花川本線特別快速" loading="lazy"><h3>花川本線特別快速<small>Hanakawa Main Line Special Rapid</small></h3><p>新2100形・含松歲線直通班次</p></a>
-    <a class="traincard" style="--bc:#4f6b3a" href="routes.html?s=kanjo"><span class="lbadge">環</span><img src="assets/photo/h10000-1.webp" alt="10000形／新1150形・環狀快速白藏山線直通" loading="lazy"><h3>環狀快速白藏山線直通<small>Loop Semi-Fast (Shirakura Line)</small></h3><p>10000形・新1150形</p></a>
-    <a class="traincard" style="--bc:#136880" href="hs.html"><span class="lbadge">高</span><img src="assets/photo/hs-viaduct.webp" alt="HR-新01系・万瀨高速鉄道" loading="lazy"><h3>万瀨高速鉄道<small>Manse High-Speed Rail</small></h3><p>HR-新01系・2026.11.16 開通</p></a>
-  </div></section>
-  <section class="sec" aria-labelledby="h-go"><h2 id="h-go">ご案内<small>Guide</small></h2>
-    <div class="tiles"><a href="hs.html"><strong>万瀨高速鉄道</strong><span>2026.11.16 開通；一日往返、路線圖、轉乘方式與車輛介紹</span></a><a href="routes.html"><strong>設備與服務介紹</strong><span>各種別的車型、停靠站、所要時間與全日時刻表</span></a><a href="guide.html"><strong>乘車指南與常見問題</strong><span>種別的差別、指定席與自由席、延誤時怎麼辦</span></a><a href="sights.html"><strong>沿線景點與車站介紹</strong><span>光瀨城、勝守漁港、車站專屬頁面與沿線餐廳</span></a><a href="routes.html?s=kobana"><strong>特急こばな</strong><span>勝守、天鳥崎、本磯島　一車直達</span></a></div></section>
-  <div class="cols">
-    <section class="sec" aria-labelledby="h-st"><h2 id="h-st">運行情報<small>Service Status</small></h2>
-      <table class="tbl" id="status"><thead><tr><th>路線</th><th>運行狀況</th></tr></thead><tbody></tbody></table>
-      <p class="note" id="status-note"></p></section>
-    <section class="sec" aria-labelledby="h-news"><h2 id="h-news">最新消息<small>News</small></h2><dl class="news" id="news"></dl></section>
+<div class="wrap newsbar"><div class="box" id="newsbar" hidden></div></div>
+
+<section class="band" aria-labelledby="h-find">
+  <div class="wrap">
+    <div class="st"><small>Timetable, Fares &amp; Booking</small><h2 id="h-find">時刻表・票價查詢・訂票</h2></div>
+    <div class="finder" id="finder"></div>
   </div>
-  <section class="sec" aria-labelledby="h-spot"><h2 id="h-spot">沿線景點<small>Sights</small></h2>
-    <div class="spots"><a href="sights.html#castle"><img src="assets/photo/castle1.webp" alt="" loading="lazy"><span>光瀨城<small>船井大島</small></span></a><a href="sights.html#port"><img src="assets/photo/port1.webp" alt="" loading="lazy"><span>勝守漁港<small>勝守</small></span></a><a href="sights.html#shrine"><img src="assets/photo/shrine1.webp" alt="" loading="lazy"><span>天鳥崎神社<small>天鳥崎中央</small></span></a><a href="sights.html#museum"><img src="assets/photo/museum1.webp" alt="" loading="lazy"><span>光瀨市立博物館<small>ひがしいち</small></span></a><a href="sights.html#kuribashi"><img src="assets/photo/kuri1.webp" alt="" loading="lazy"><span>九里橋商圈<small>九里橋三丁目</small></span></a><a href="sights.html#tomise"><img src="assets/photo/tomise1.webp" alt="" loading="lazy"><span>多見瀨河濱公園<small>多見瀨</small></span></a><a href="sights.html#heikura"><img src="assets/photo/heikura1.webp" alt="" loading="lazy"><span>平倉市革命紀念公園<small>平倉公園西・東平倉</small></span></a></div></section>
-  <section class="sec" aria-labelledby="h-map"><h2 id="h-map">路線圖<small>Route Map</small></h2><div class="mapbox" id="minimap"></div><p class="note">點選車站，可查看接下來的發車與時刻表；想看列車位置請到「即時列車動態」。</p></section>
-</div>
+</section>
+
+<section class="msec alt" aria-labelledby="h-trains">
+  <div class="wrap">
+    <div class="st"><small>Facilities &amp; Equipment</small><h2 id="h-trains">設備與設施介紹</h2></div>
+    <div class="traingrid">
+      <a class="traincard" style="--bc:#2f6d8c" href="routes.html?s=aosagi"><div class="ph"><img src="assets/photo/n8000k-1.webp" alt="新8000形1000番台・特急あおさぎ" loading="lazy"><span class="lbadge">特</span><div class="tt"><h3>特急あおさぎ<small>Limited Express AOSAGI</small></h3></div></div><p class="dest">松澤國際空港方面</p><p class="spec">新8000形1000番台・主動擺錘振子式傾斜</p><p class="fac">USB 充電座・閱讀燈・大型行李架</p></a>
+      <a class="traincard" style="--bc:#8c2f3a" href="routes.html?s=kobana"><div class="ph"><img src="assets/photo/kobana1.webp" alt="新8000形0番台・特急こばな" loading="lazy"><span class="lbadge">特</span><div class="tt"><h3>特急こばな・スーパーこばな<small>Limited Express KOBANA / Super KOBANA</small></h3></div></div><p class="dest">勝守、天鳥崎、磯島方面</p><p class="spec">新8000形0番台・全車指定席（另有立席）</p><p class="fac">USB 充電座・閱讀燈・大型行李架</p></a>
+      <a class="traincard" style="--bc:#b8862a" href="routes.html?s=tokkai"><div class="ph"><img src="assets/photo/n2100-1.webp" alt="新2100形・花川本線特別快速" loading="lazy"><span class="lbadge">快</span><div class="tt"><h3>花川本線特別快速<small>Hanakawa Main Line Special Rapid</small></h3></div></div><p class="dest">名島港、十万浦、松澤國際空港方面</p><p class="spec">新2100形・含松歲線直通班次</p><p class="fac">部分指定席服務・充電座</p></a>
+      <a class="traincard" style="--bc:#4f6b3a" href="routes.html?s=kanjo"><div class="ph"><img src="assets/photo/h10000-1.webp" alt="10000形／新1150形・環狀快速白藏山線直通" loading="lazy"><span class="lbadge">環</span><div class="tt"><h3>環狀快速白藏山線直通<small>Loop Semi-Fast (Shirakura Line)</small></h3></div></div><p class="dest">白藏山、紫市、勝守方面</p><p class="spec">10000形・新1150形</p></a>
+      <a class="traincard" style="--bc:#136880" href="hs.html"><div class="ph"><img src="assets/photo/hs-viaduct.webp" alt="HR-新01系・万瀨高速鉄道" loading="lazy"><span class="lbadge">高</span><div class="tt"><h3>万瀨高速鉄道<small>Manse High-Speed Rail</small></h3></div></div><p class="dest">新岩澤、勝守、上羽、汐崎方面</p><p class="spec">HR-新01系・2026.11.16 開通</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="msec" aria-labelledby="h-go">
+  <div class="wrap">
+    <div class="st"><small>Guide</small><h2 id="h-go">ご案内</h2></div>
+    <div class="tiles">
+      <a href="hs.html"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 50h48M14 50V30c0-10 8-16 18-16s18 6 18 16v20"/><path d="M22 36h20M32 14v8M24 50l-4 8M40 50l4 8"/></svg><strong>万瀨高速鉄道</strong><span>2026.11.16 開通；一日往返、路線圖、轉乘方式與車輛介紹</span></a>
+      <a href="routes.html"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="14" y="8" width="36" height="40" rx="8"/><path d="M14 30h36M22 56l6-8M42 56l-6-8"/><circle cx="24" cy="39" r="2.4"/><circle cx="40" cy="39" r="2.4"/></svg><strong>設備與服務介紹</strong><span>各種別的車型、停靠站、所要時間與全日時刻表</span></a>
+      <a href="guide.html"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 14h44a4 4 0 014 4v22a4 4 0 01-4 4H30l-12 10V44h-8a4 4 0 01-4-4V18a4 4 0 014-4z"/><path d="M27 25a5 5 0 119 2c-2 2-4 3-4 6M32 38v.5"/></svg><strong>乘車指南與常見問題</strong><span>種別的差別、指定席與自由席、延誤時怎麼辦</span></a>
+      <a href="sights.html"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 58S14 40 14 26a18 18 0 0136 0c0 14-18 32-18 32z"/><circle cx="32" cy="26" r="6"/></svg><strong>沿線景點與車站介紹</strong><span>光瀨城、勝守漁港、車站專屬頁面與沿線餐廳</span></a>
+      <a href="routes.html?s=kobana"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 20h52v9a4 4 0 000 8v9H6v-9a4 4 0 000-8z"/><path d="M42 20v26" stroke-dasharray="3 4"/><path d="M20 30l3 6 6-9"/></svg><strong>特急こばな</strong><span>勝守、天鳥崎、本磯島　一車直達</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="msec" aria-label="運行情報與最新消息">
+  <div class="wrap cols">
+    <div class="card" aria-labelledby="h-st">
+      <h3 id="h-st">運行情報<small>Service Status</small></h3>
+      <table class="tbl" id="status"><thead><tr><th>路線</th><th>運行狀況</th></tr></thead><tbody></tbody></table>
+      <p class="note" id="status-note"></p>
+    </div>
+    <div class="card" aria-labelledby="h-news">
+      <h3 id="h-news">最新消息<small>News</small></h3>
+      <dl class="news" id="news"></dl>
+    </div>
+  </div>
+</section>
+
+<section class="spotbox" aria-labelledby="h-spot">
+  <div class="wrap"><div class="st"><small>Sights</small><h2 id="h-spot">沿線景點</h2></div></div>
+  <div class="wrap">
+    <div class="spots" id="spots"><a href="sights.html#fukiage-keibajo"><img src="assets/photo/sight-fukiage1.webp" alt="" loading="lazy"><span>光瀨吹上競馬場<small>花倉街道</small></span></a><a href="sights.html#castle"><img src="assets/photo/castle1.webp" alt="" loading="lazy"><span>光瀨城<small>船井大島</small></span></a><a href="sights.html#port"><img src="assets/photo/port1.webp" alt="" loading="lazy"><span>勝守漁港<small>勝守</small></span></a><a href="sights.html#shrine"><img src="assets/photo/shrine1.webp" alt="" loading="lazy"><span>天鳥崎神社<small>天鳥崎中央</small></span></a><a href="sights.html#museum"><img src="assets/photo/museum1.webp" alt="" loading="lazy"><span>光瀨市立博物館<small>ひがしいち</small></span></a><a href="sights.html#kuribashi"><img src="assets/photo/kuri1.webp" alt="" loading="lazy"><span>九里橋商圈<small>九里橋三丁目</small></span></a><a href="sights.html#tomise"><img src="assets/photo/tomise1.webp" alt="" loading="lazy"><span>多見瀨河濱公園<small>多見瀨</small></span></a><a href="sights.html#heikura"><img src="assets/photo/heikura1.webp" alt="" loading="lazy"><span>平倉市革命紀念公園<small>平倉公園西・東平倉</small></span></a></div>
+    <div class="sctl"><button type="button" id="sp" aria-label="往前">‹</button><button type="button" id="sn" aria-label="往後">›</button></div>
+  </div>
+</section>
+
+<section class="msec" aria-labelledby="h-map">
+  <div class="wrap">
+    <div class="st"><small>Route Map</small><h2 id="h-map">路線圖</h2></div>
+    <div class="mapbox" id="minimap"></div>
+    <p class="note">點選車站，可查看接下來的發車與時刻表；想看列車位置請到「即時列車動態」。</p>
+  </div>
+</section>
 <div id="app" hidden></div>
 </main>
 <footer>
   <div class="wrap">
-    <img src="assets/img/mark-dark.png" alt="">
+    <img src="assets/img/mark-light.png" alt="">
     <div class="nav"><a href="ride.html">乘車</a><a href="explore.html">出行</a><a href="timetable.html">時刻表與班次/票價查詢</a><a href="hs.html">高速鉄道</a><a href="routes.html">設備與服務介紹</a><a href="live.html">即時列車動態</a><a href="booking.html">線上訂票</a><a href="sights.html">沿線景點與車站介紹</a><a href="guide.html">乘車指南與常見問題</a><a href="airport.html">機場聯外交通</a><a href="routes.html?s=kobana">特急こばな</a></div>
     <div class="copy">© 光瀨都市鉄道　本網站為 Minecraft 架空鐵路「光瀨都市圈」的設定與資訊頁面，內容皆為虛構。</div>
   </div>
 </footer>
-<script src="assets/js/site-config.js?v=1.9.5"></script>
-<script src="assets/js/i18n-dict.js?v=1.9.5"></script>
-<script src="assets/js/i18n.js?v=1.9.5"></script>
-<script src="assets/js/hk-status.js?v=1.9.5"></script>
-<script src="assets/js/atos-model.js?v=1.9.5"></script>
-<script src="assets/js/hk-core.js?v=1.9.5"></script>
-<script src="assets/js/hk-map.js?v=1.9.5"></script>
-<script src="assets/js/layout-seed.js?v=1.9.5"></script>
-<script src="assets/js/hk-ui.js?v=1.9.5"></script>
-<script src="assets/js/booking.js?v=1.9.5"></script>
-<script src="assets/js/pages2.js?v=1.9.5"></script>
-<script src="assets/js/pages3.js?v=1.9.5"></script>
-<script src="assets/js/site.js?v=1.9.5"></script>
+<script src="assets/js/site-config.js?v=2.1.0"></script>
+<script src="assets/js/i18n-dict.js?v=2.1.0"></script>
+<script src="assets/js/i18n.js?v=2.1.0"></script>
+<script src="assets/js/hk-status.js?v=2.1.0"></script>
+<script src="assets/js/atos-model.js?v=2.1.0"></script>
+<script src="assets/js/hk-core.js?v=2.1.0"></script>
+<script src="assets/js/hk-map.js?v=2.1.0"></script>
+<script src="assets/js/layout-seed.js?v=2.1.0"></script>
+<script src="assets/js/hk-ui.js?v=2.1.0"></script>
+<script src="assets/js/booking.js?v=2.1.0"></script>
+<script src="assets/js/pages2.js?v=2.1.0"></script>
+<script src="assets/js/pages3.js?v=2.1.0"></script>
+<script src="assets/js/site.js?v=2.1.0"></script>
+<script>(function(){var sp=document.getElementById("spots");if(!sp)return;function by(d){sp.scrollBy({left:d,behavior:"smooth"})}document.getElementById("sn").addEventListener("click",function(){by(280)});document.getElementById("sp").addEventListener("click",function(){by(-280)});})();</script>
 </body>
 </html>
