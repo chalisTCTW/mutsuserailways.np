@@ -492,3 +492,29 @@ assets/js/pages4.js（fullTable 加班次號、groupPanel 改順序、提升 ful
 更新檔案：assets/css/mint.css（新）、index.html、assets/js/site.js、assets/js/pages2.js、assets/js/i18n.js、assets/js/i18n-dict.js、
 assets/js/hs.js、data/stations.json、data/sights.json、assets/photo/（新增 3 張）、tools/build_i18n.py、所有 *.html（?v=、mint.css）。
 ⚠ 升級時不要覆蓋 data/snapshot.json、data/layout.json（ATOS 自動回傳的資料，本次完全沒動）。
+
+【2.2.0】地方・行政區篩選、地區周遊券、統一訂購流程、住址補齊
+・新增 data/areas.json：regions（地方 6 個：市內／上羽／天鳥／平倉／尾羽川／五原）、districts（行政區 16 個）、
+  stations（車站名→行政區 id，66 站）、transfer（轉乘站 14 站）。「地方」是非官方的大區域，只用於篩選與套票。
+  tools/areas_basis.csv 記錄每個車站歸到哪個行政區的依據（前輩指定／既有餐廳地址／名稱＋最近車站判斷／就近歸類）。
+  之後要改歸屬，只要改 areas.json 的 stations（與必要時 dining.json 的住址），不必改程式。
+・景點頁（sights.html）三個分頁（景點／餐廳／車站介紹）上方多一列「地方」＋一列「行政區」篩選，三個分頁共用同一個狀態，
+  網址帶 ?area=地方id&district=行政區id。餐廳分頁選了地方後，「車站」下拉只列該地方有的車站。景點、餐廳、車站卡片都顯示所在地標籤；
+  車站專屬頁（station.html）多一項「所在地」。（依路線篩選景點尚未做。）
+・data/dining.json：36 → 142 間（新增 r37 起 106 間，皆為虛構）。每個轉乘站至少 5 間，每個地方至少 15 間
+  （市內 58／尾羽川 19／上羽 17／五原 16／天鳥 16／平倉 16）。原有的 5 間「谷山区」住址改為「見沼区」（谷山、浦川歸入見沼區）。
+・data/sights.json：17 個景點全部補上 address／addressEn，景點卡片顯示「住址」。
+・booking.js：新增兩款地區周遊券（PASSES 內 reg:true，資料驅動）：
+    上羽・天鳥三日券 ¥25,900（上羽＋天鳥兩個地方的景點介紹；清音大社標示參觀費用折抵）
+    尾羽川二日券 ¥15,000（尾羽川地方的景點介紹；懷永美術館、舊港務局海關所標示參觀費用折抵）
+  選到券後會顯示完整的 5 項內容與該地方景點（含住址）。機場頁（pages3.js）的套票區仍只列一般 1・3・5・7日券。
+・統一訂購流程（所有套票共用，仍是模擬、不儲存）：1.開始日期 → 2.領取車站（11 站：咲海研究學園都市、東平倉、みつせ、花倉街道、戸宮、
+  松澤國際空港、新光瀨、勝守、新勝守、上羽神別、汐崎）→ 3.提前預約車票（可選；預約使用期間內某一天、從領取車站出發的第一趟車，
+  班次由 H.search 查出）→ 4.按「確認訂購」顯示訂購結果（訂單編號、券種、枚數、期間、領取車站、預約班次、合計、票面，可列印）。
+・i18n-dict.js 以文字附加方式新增約 75 筆（篩選、套票、訂購流程）。⚠ 仍然不要重跑 tools/build_i18n.py。
+  樣板鍵請用一般半形空格（i18n.js 會把全形空格也正規化成半形，鍵內放全形空格會對不上）。
+・所有頁面（board.html 除外）的 ?v= 更新為 2.2.0。
+更新檔案：data/areas.json（新）、data/dining.json、data/sights.json、tools/areas_basis.csv（新）、assets/js/pages2.js、assets/js/booking.js、
+assets/js/pages3.js、assets/js/i18n-dict.js、assets/css/mint.css、assets/css/theme.css、所有 *.html（?v=）。
+⚠ 升級時不要覆蓋 data/snapshot.json、data/layout.json（本次完全沒動，已逐位元比對與上傳的原檔相同）。
+未驗證：真實瀏覽器的字體顯示、手機版版面（只用無頭 Chrome 截圖檢查桌面寬度）。

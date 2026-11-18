@@ -28,7 +28,9 @@
         "alt": "俯瞰光瀨城的屋瓦與迴廊",
         "cap": "層層屋瓦與迴廊"
       }
-    ]
+    ],
+    "address": "光瀨市栗田区城町1-1",
+    "addressEn": "1-1 Shiro-machi, Kurita Ward, Hikarise City"
   },
   {
     "id": "port",
@@ -54,7 +56,9 @@
         "alt": "勝守漁港的漁船與後方的高架車站",
         "cap": "港邊的漁船，後方是高架軌道與車站"
       }
-    ]
+    ],
+    "address": "光瀨郡勝守市勝守港町2-1",
+    "addressEn": "2-1 Katsumori-minato-cho, Katsumori City, Hikarise District"
   },
   {
     "id": "shrine",
@@ -80,7 +84,9 @@
         "alt": "夕陽下染成橘紅色的站房與電車",
         "cap": "夕陽下的天鳥崎一帶"
       }
-    ]
+    ],
+    "address": "光瀨郡天鳥崎町天鳥崎1-1",
+    "addressEn": "1-1 Amatorizaki, Amatorizaki Town, Hikarise District"
   },
   {
     "id": "museum",
@@ -111,7 +117,9 @@
         "alt": "館內大廳",
         "cap": "館內大廳"
       }
-    ]
+    ],
+    "address": "光瀨市見沼区東市1-3-1",
+    "addressEn": "1-3-1 Higashi-ichi, Minuma Ward, Hikarise City"
   },
   {
     "id": "kuribashi",
@@ -142,7 +150,9 @@
         "alt": "商圈大樓與朱紅色牌坊",
         "cap": "大樓之間的朱紅色牌坊"
       }
-    ]
+    ],
+    "address": "光瀨市白藏山区九里橋3-1",
+    "addressEn": "3-1 Kuribashi, Shirakurayama Ward, Hikarise City"
   },
   {
     "id": "tomise",
@@ -168,7 +178,9 @@
         "alt": "夕陽下穿越鐵橋的列車與河面",
         "cap": "夕陽中穿越鐵橋的列車"
       }
-    ]
+    ],
+    "address": "光瀨市見沼区多見瀨河畔1-1",
+    "addressEn": "1-1 Tomise-kahan, Minuma Ward, Hikarise City"
   },
   {
     "id": "heikura",
@@ -198,7 +210,9 @@
         "alt": "飛鳥雕像與行駛中的列車",
         "cap": "飛鳥雕像與鐵道"
       }
-    ]
+    ],
+    "address": "十万浦郡平倉市革命公園1-1",
+    "addressEn": "1-1 Kakumei-koen, Heikura City, Jumanmura District"
   },
   {
     "id": "tomiya-arena",
@@ -233,7 +247,9 @@
         "alt": "競技場內開放作冰宮的白色冰面與看台",
         "cap": "無活動時開放的冰宮"
       }
-    ]
+    ],
+    "address": "光瀨市戸宮区戸宮町6-1",
+    "addressEn": "6-1 Tomiya-cho, Tomiya Ward, Hikarise City"
   },
   {
     "id": "kaiei-museum",
@@ -267,7 +283,9 @@
         "alt": "戲劇會場的座席與舞台",
         "cap": "戲劇會場"
       }
-    ]
+    ],
+    "address": "光瀨郡曲江町曲江3-1",
+    "addressEn": "3-1 Magarie, Magarie Town, Hikarise District"
   },
   {
     "id": "ryusei-tree",
@@ -301,7 +319,9 @@
         "alt": "夜晚亮燈的流星樹",
         "cap": "夜晚的流星樹"
       }
-    ]
+    ],
+    "address": "光瀨市栗田区みつせ町5-1（中央公園内）",
+    "addressEn": "5-1 Mitsuse-cho, Kurita Ward, Hikarise City (in Chuo Park)"
   },
   {
     "id": "old-godo-hall",
@@ -330,7 +350,9 @@
         "alt": "花圃後方的白色歐式建築，舊合同廳舍",
         "cap": "白色的歐式建築"
       }
-    ]
+    ],
+    "address": "光瀨市栗田区みつせ町3-1",
+    "addressEn": "3-1 Mitsuse-cho, Kurita Ward, Hikarise City"
   },
   {
     "id": "customs",
@@ -361,7 +383,9 @@
         "alt": "舊港務局海關所內部的展廳",
         "cap": "開放參觀的昔日展廳"
       }
-    ]
+    ],
+    "address": "光瀨郡名島市名島港町4-1",
+    "addressEn": "4-1 Najima-minato-cho, Najima City, Hikarise District"
   },
   {
     "id": "farm",
@@ -387,7 +411,9 @@
         "alt": "波別觀光農場的溫室與畜舍建築",
         "cap": "農場裡的溫室與畜舍"
       }
-    ]
+    ],
+    "address": "光瀨郡波別町安來高原1-1",
+    "addressEn": "1-1 Yasugi-kogen, Namibetsu Town, Hikarise District"
   },
   {
     "id": "church",
@@ -418,7 +444,9 @@
         "alt": "真跡主教教堂內部的彩色水晶窗與長廊",
         "cap": "彩色水晶窗與莊嚴的長廊"
       }
-    ]
+    ],
+    "address": "光瀨市見沼区北倉間2-3-1",
+    "addressEn": "2-3-1 Kita-Kurama, Minuma Ward, Hikarise City"
   },
   {
     "id": "library",
@@ -450,7 +478,9 @@
         "alt": "佐山教育大學水晶圖書館對外開放的街邊店面",
         "cap": "對外開放的一樓空間"
       }
-    ]
+    ],
+    "address": "十万浦郡平倉市咲海学園都市1-2-1",
+    "addressEn": "1-2-1 Sakiumi-gakuen-toshi, Heikura City, Jumanmura District"
   },
   {
     "id": "seion-taisha",
@@ -481,7 +511,9 @@
         "alt": "清音大社朱紅色鳥居與楓紅色調街景",
         "cap": "朱紅色鳥居"
       }
-    ]
+    ],
+    "address": "光瀨郡波別町清音参道1-1",
+    "addressEn": "1-1 Seion-sando, Namibetsu Town, Hikarise District"
   },
   {
     "id": "fukiage-keibajo",
@@ -512,6 +544,8 @@
         "alt": "光瀨吹上競馬場入口廣場的遮棚與兩側店鋪",
         "cap": "入口廣場的遮棚"
       }
-    ]
+    ],
+    "address": "光瀨市花倉区吹上1-1",
+    "addressEn": "1-1 Fukiage, Hanakura Ward, Hikarise City"
   }
 ]
