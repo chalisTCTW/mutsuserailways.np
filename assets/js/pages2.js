@@ -11,7 +11,7 @@
     heikura: ['紀', '#6b5a8c'], 'tomiya-arena': ['競', '#2f6d3a'], 'kaiei-museum': ['美', '#8c3a6b'],
     'ryusei-tree': ['觀', '#3a7a8c'], 'old-godo-hall': ['建', '#8c6b3a'],
     customs: ['稅', '#5a6b3a'], farm: ['農', '#7a8c3a'], church: ['堂', '#3a4a6b'], library: ['書', '#2f6d8c'],
-    'seion-taisha': ['社', '#9c4a2f']
+    'seion-taisha': ['社', '#9c4a2f'], 'fukiage-keibajo': ['馬', '#a8482f']
   };
   const q = new URLSearchParams(location.search);
   const pad = n => String(n).padStart(2, '0');

@@ -3542,11 +3542,11 @@ window.HK_I18N_DICT = {
 ],
 "万瀨高速鉄道線 獨立票價查詢": [
 "万瀨高速鉄道線　単独運賃検索",
-"Mutsuse High-Speed Rail — Separate Fare Lookup"
+"Manse High-Speed Rail — Separate Fare Lookup"
 ],
 "万瀨高速鉄道線的票價不套用一般鐵路的分區運費制度：每跨越一個收費區加 ${a}，指定席特急券固定 ${b}（不打折、沒有立席特急券）。站名含地圖外的延伸路段（標示「*高速鉄道」），一樣可以在這裡查票價。": [
 "万瀨高速鉄道線の運賃は一般の鉄道の分区制とは異なります：収費区を1つ越えるごとに {0} 加算、指定席特急券は {1} 固定（割引なし、立席特急券もありません）。駅名には地図外の延伸区間（「*高速鉄道」の表示）も含み、こちらで運賃を調べられます。",
-"Mutsuse High-Speed Rail fares don't follow the ordinary zone-fare system: {0} is added for each fare zone crossed, and the reserved-seat express fee is a flat {1} (no discount, no standing-ticket option). The station list includes the extension beyond the current map (marked \"*High-Speed Rail\"), which you can look up here too."
+"Manse High-Speed Rail fares don't follow the ordinary zone-fare system: {0} is added for each fare zone crossed, and the reserved-seat express fee is a flat {1} (no discount, no standing-ticket option). The station list includes the extension beyond the current map (marked \"*High-Speed Rail\"), which you can look up here too."
 ],
 "指定席特急券（全車指定席，沒有立席特急券）": [
 "指定席特急券（全車両指定席、立席特急券なし）",
@@ -3558,15 +3558,15 @@ window.HK_I18N_DICT = {
 ],
 "万瀨高速鉄道線延伸段": [
 "万瀨高速鉄道線　延伸区間",
-"Mutsuse High-Speed Rail — Extension"
+"Manse High-Speed Rail — Extension"
 ],
 "万瀨高速鉄道線的延伸段尚未設定銜接的車站，無法查詢。": [
 "万瀨高速鉄道線の延伸区間は接続駅が未設定のため、検索できません。",
-"The Mutsuse High-Speed Rail Line's extension has no connecting station set, so it can't be searched."
+"The Manse High-Speed Rail Line's extension has no connecting station set, so it can't be searched."
 ],
 "万瀨高速鉄道線的延伸段尚未設定銜接的車站，無法訂票。": [
 "万瀨高速鉄道線の延伸区間は接続駅が未設定のため、予約できません。",
-"The Mutsuse High-Speed Rail Line's extension has no connecting station set, so it can't be booked."
+"The Manse High-Speed Rail Line's extension has no connecting station set, so it can't be booked."
 ],
 "這兩站之間查不到可以合併計算的高速鉄道延伸段票價。": [
 "この2駅間の高速鉄道延伸区間の運賃は見つかりません。",
@@ -4405,5 +4405,59 @@ window.HK_I18N_DICT = {
 "Several hot-spring inns surround the station, making it well suited to a day trip for a hot-spring soak."
 ],
 "清音溫泉站月台與發車看板": ["清音温泉駅のホームと発車案内板", "Seion Onsen Station platform and departure board"],
-"月台與發車看板": ["ホームと発車案内板", "Platform and departure board"]
+"月台與發車看板": ["ホームと発車案内板", "Platform and departure board"],
+/* 2.1.0 新外觀改版・花倉街道・光瀨吹上競馬場 */
+"時刻表・票價查詢・訂票": ["時刻表・運賃検索・予約", "Timetables, Fares & Booking"],
+"搜尋班次並訂票": ["列車を検索して予約", "Search trains and book"],
+"最新情報": ["最新情報", "Latest news"],
+"上一則": ["前の情報", "Previous"],
+"下一則": ["次の情報", "Next"],
+"往前": ["前へ", "Previous"],
+"往後": ["次へ", "Next"],
+"設備與設施介紹": ["設備・施設のご案内", "Facilities & Equipment"],
+"特急こばな・スーパーこばな": ["特急こばな・スーパーこばな", "Limited Express Kobana / Super Kobana"],
+"松澤國際空港方面": ["松沢国際空港方面", "Toward Matsuzawa Airport"],
+"勝守、天鳥崎、磯島方面": ["勝守・天鳥崎・磯島方面", "Toward Katsumori, Amatorizaki and Izoshima"],
+"名島港、十万浦、松澤國際空港方面": ["名島港・十万浦・松沢国際空港方面", "Toward Najima-Minato, Jumanmura and Matsuzawa Airport"],
+"白藏山、紫市、勝守方面": ["白蔵山・紫市・勝守方面", "Toward Shirakurayama, Murasaki-shi and Katsumori"],
+"新岩澤、勝守、上羽、汐崎方面": ["新岩沢・勝守・上羽・汐崎方面", "Toward Shin-Iwasawa, Katsumori, Kamiha and Shiozaki"],
+"USB 充電座・閱讀燈・大型行李架": ["USB充電ポート・読書灯・大型荷物棚", "USB charging ports · Reading lights · Large luggage racks"],
+"部分指定席服務・充電座": ["一部指定席サービス・充電コンセント", "Partial reserved-seat service · Charging outlets"],
+"光瀨吹上競馬場": ["光瀬吹上競馬場", "Hikarise Fukiage Racecourse"],
+"競馬場・觀戰": ["競馬場・観戦", "Racecourse / Spectating"],
+"花倉街道站南口步行 200 公尺，弧形大屋頂的看台圍著紅色跑道與綠色草地。": ["花倉街道駅の南口から徒歩200m。弧を描く大屋根のスタンドが、赤いコースと緑の芝生を囲みます。", "200 m on foot from the south exit of Hanakura-Kaido Station. Grandstands under a sweeping curved roof surround the red track and green infield."],
+"光瀨吹上競馬場是光瀨都市圈的大型競馬場。橢圓形的紅色跑道圍著一片綠色草地，多層的看台由弧形的大屋頂覆蓋，從高處的庭園往下看，整座場地一覽無遺；場邊的斜坡種滿花草，立著一面大型的看板。": ["光瀬吹上競馬場は、光瀬都市圏の大規模な競馬場です。楕円形の赤いコースが緑の芝生を囲み、多層のスタンドは弧を描く大屋根に覆われています。高台の庭園から見下ろすと、場内が一望できます。コース脇の斜面には草花が植えられ、大きな掲示板が立っています。", "Hikarise Fukiage Racecourse is a large racecourse in the Hikarise metropolitan area. An oval red track surrounds a green infield, and the multi-tier grandstand is covered by a sweeping curved roof. From the garden terrace above you can take in the whole course; the slope beside the track is planted with flowers and a large board stands at its edge."],
+"從花倉街道站南口步行約 200 公尺，就會來到有遮棚的入口廣場，兩側是成排的低層建築與店鋪遮簷，正前方可以看到環狀的看台建築。距離車站很近，來回都方便搭電車。": ["花倉街道駅の南口から徒歩約200m。屋根付きの入口広場に出ると、両側に低層の建物と店舗の庇が並び、正面に環状のスタンド棟が見えます。駅から近く、行き帰りも電車で便利です。", "It is about 200 m on foot from the south exit of Hanakura-Kaido Station. You come first to a roofed entrance plaza lined on both sides with low-rise buildings and shop awnings, with the ring-shaped grandstand straight ahead. It is close to the station, so getting there and back by train is easy."],
+"橢圓形的紅色跑道與綠色草地": ["楕円形の赤いコースと緑の芝生", "Oval red track and green infield"],
+"弧形大屋頂覆蓋的多層看台": ["弧を描く大屋根に覆われた多層スタンド", "Multi-tier grandstand under a sweeping curved roof"],
+"入口廣場有遮棚與成排店鋪": ["屋根付きの入口広場と並ぶ店舗", "Roofed entrance plaza with rows of shops"],
+"最近車站：花倉街道（南口步行約 200 公尺）": ["最寄り駅：花倉街道（南口から徒歩約200m）", "Nearest station: Hanakura-Kaido (about 200 m from the south exit)"],
+"光瀨吹上競馬場的紅色跑道、綠色草地與弧形大屋頂看台": ["光瀬吹上競馬場の赤いコース、緑の芝生、弧を描く大屋根のスタンド", "Hikarise Fukiage Racecourse: red track, green infield and the curved-roof grandstand"],
+"跑道與弧形屋頂的看台": ["コースと弧を描く屋根のスタンド", "The track and the curved-roof grandstand"],
+"光瀨吹上競馬場入口廣場的遮棚與兩側店鋪": ["光瀬吹上競馬場の入口広場の屋根と両側の店舗", "The canopy of the Hikarise Fukiage Racecourse entrance plaza and the shops on both sides"],
+"入口廣場的遮棚": ["入口広場の屋根", "The entrance plaza canopy"],
+"站房為三層樓，外牆是細長的垂直格柵與大片玻璃，前方是寬敞的石磚廣場。南口步行約 200 公尺就是光瀨吹上競馬場。": ["駅舎は3階建てで、外壁は細長い縦格子と大きなガラス面。前には広い石畳の広場があります。南口から徒歩約200mで光瀬吹上競馬場です。", "The station building has three floors, with slender vertical fins and large glass walls on its facade, and a wide paved plaza in front. Hikarise Fukiage Racecourse is about 200 m from the south exit."],
+"光瀨吹上競馬場方面（步行約 200 公尺）": ["光瀬吹上競馬場方面（徒歩約200m）", "Toward Hikarise Fukiage Racecourse (about 200 m on foot)"],
+"花倉街道站三層樓的站房外觀，有垂直格柵與玻璃帷幕": ["花倉街道駅の3階建て駅舎の外観。縦格子とガラスのカーテンウォール", "Exterior of the three-storey Hanakura-Kaido station building, with vertical fins and a glass curtain wall"],
+"格柵與玻璃的站房外觀": ["格子とガラスの駅舎外観", "Station building with fins and glass"],
+"${n} 種": ["{0}種別", "{0} types"],
+"${n} 個月台": ["{0}面のホーム", "{0} platforms"],
+"首班 ${a}／末班 ${b}": ["始発 {0}／終電 {1}", "First {0} / Last {1}"],
+"運行情報與最新消息": ["運行情報と最新のお知らせ", "Service status and latest news"],
+"南口": ["南口", "South exit"],
+"万瀨高速鉄道線": ["万瀬高速鉄道線", "Manse High-Speed Rail Line"],
+"万瀨高速鉄道線上羽線直通": ["万瀬高速鉄道線上羽線直通", "Manse High-Speed Rail Line through service to the Kamiha Line"],
+"${HK.dirLabel(H, sv)}。各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號（沒有編號的種別則顯示發車時刻）。": ["{0}。各駅の発車時刻（終点駅は到着時刻）。1列は1本の列車で、列の見出しは列車番号です（番号のない種別は発車時刻を表示）。", "{0}. Departure times at each station (arrival time at the terminus); each column is one train, headed by its train number (for types without numbers, the departure time)."],
+"舊港務局海關所": ["旧港務局税関所", "Old Harbor Customs House"],
+"波別觀光農場": ["波別観光農場", "Namibetsu Tourist Farm"],
+"真跡主教教堂": ["真跡主教教会", "Shinseki Cathedral"],
+"佐山教育大學水晶圖書館": ["佐山教育大学水晶図書館", "Sayama University of Education Crystal Library"],
+"清音大社": ["清音大社", "Seion Grand Shrine"],
+"舊港務局海關所的歐式巴洛克建築外觀": ["旧港務局税関所のヨーロッパ風バロック建築の外観", "Exterior of the European Baroque-style Old Harbor Customs House"],
+"舊港務局海關所內部的展廳": ["旧港務局税関所の館内の展示ホール", "The exhibition hall inside the Old Harbor Customs House"],
+"波別觀光農場的溫室與畜舍建築": ["波別観光農場の温室と畜舎の建物", "Greenhouses and livestock barns at Namibetsu Tourist Farm"],
+"真跡主教教堂的歐式石造外觀與鐘塔": ["真跡主教教会のヨーロッパ風石造の外観と鐘塔", "The European-style stone exterior and bell tower of Shinseki Cathedral"],
+"真跡主教教堂內部的彩色水晶窗與長廊": ["真跡主教教会の内部、色とりどりのクリスタルの窓と回廊", "Inside Shinseki Cathedral: colored crystal windows and a long corridor"],
+"佐山教育大學水晶圖書館內的書架與閱覽區": ["佐山教育大学水晶図書館内の書架と閲覧スペース", "Bookshelves and reading area inside the Sayama University of Education Crystal Library"],
+"佐山教育大學水晶圖書館對外開放的街邊店面": ["佐山教育大学水晶図書館の、一般に開放された通り沿いの店舗", "The street-side shopfront of the Sayama University of Education Crystal Library, open to the public"]
 };

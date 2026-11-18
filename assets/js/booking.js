@@ -128,8 +128,13 @@
       if (from === to) { out.append(h('p', { class: 'lead' }, '請選擇不同的出發站與抵達站。')); return; }
       if (P.n < 1 || P.n > 6) { out.append(h('p', { class: 'lead' }, '旅客人數請設定為 1～6 位。')); return; }
       const fVirtual = isV(from), tVirtual = isV(to);
-      // 1.1.1：起訖站有一端是万瀨高速鉄道線的延伸站——先換成實際的銜接站（東平倉）去查真正的班次，延伸段的票價另外合併進來。
-      const anchor = (fVirtual || tVirtual) ? H.hsExtAnchorSt() : null;
+      // 1.1.1：起訖站有一端是万瀨高速鉄道線的延伸站——先換成實際的銜接站去查真正的班次，延伸段的票價另外合併進來。
+      // 2.0.0：改用 H.bestHSAnchorSt 動態選距離目的地最近的轉乘點，而非固定東平倉。
+      // bestHSAnchorSt 需要傳「一般鐵路側的真實站 id」才能計算距離；假想站不是真實站，要用另一端（非假想的那端）。
+      // 若兩端都是假想站則走下方 realFrom===realTo 的 branch，不到這裡。
+      const anchor = (fVirtual || tVirtual)
+        ? H.bestHSAnchorSt(fVirtual ? to : from)
+        : null;
       if ((fVirtual || tVirtual) && !anchor) { out.append(h('p', { class: 'lead' }, '万瀨高速鉄道線的延伸段尚未設定銜接的車站，無法訂票。')); return; }
       const realFrom = fVirtual ? anchor.id : from, realTo = tVirtual ? anchor.id : to;
       const fLabel = labelOf(from), tLabel = labelOf(to);
@@ -151,8 +156,9 @@
         // 1.1.0：票價改成每個候選行程各自算（可能含高速鐵路，票價公式不同，不能共用一個 from→to 的一般票價）
         list = H.searchEx(realFrom, realTo, t0, 10, { via: vSel.value || null, allowHighSpeed: useHS.checked || fVirtual || tVirtual }).map(j => ({ j, legs: j.legs.map(l => legInfo(l, dIn.value)), tf: H.ticketFaresFor(j.legs) }));
         if (!list.length) { out.append(h('p', { class: 'lead' }, '查不到兩站之間的路徑。')); return; }
-        list = list.filter(x => x.tf && x.j.dep < DAY + t0 && x.legs.some(l => l.ri));
-        if (!list.length) { out.append(h('p', { class: 'lead' }, '這個時間之後沒有含特急／特快／高速鐵路（可預約）的行程。可改用「時刻表與班次」查詢一般班次。'), h('p', null, h('a', { class: 'btn ghost', href: `timetable.html?tab=route&from=${realFrom}&to=${realTo}&t=${tIn.value}` }, '查詢所有班次（含轉乘）'))); return; }
+        // 2.0.0：移除舊的「沒有可預約段就整個不顯示」限制——所有行程都列出；
+        // 有可預約段的行程可選座位、發行指定席券；沒有的行程只發乗車券，說明文字另外提示。
+        list = list.filter(x => x.tf && x.j.dep < DAY + t0);
         // 1.1.2：延伸段接在真實路段之後（或之前）——已經通車，直接合成一段真正可以選位的 leg 併進候選行程，
         // 不是只顯示票價試算；延伸段延續的「○号」優先沿用銜接站旁那一段真正高速鉄道班次的号碼（同一班車開過去）。
         const vZh = fVirtual ? fLabel : (tVirtual ? tLabel : null), anchorZh = anchor ? anchor.zh : null;

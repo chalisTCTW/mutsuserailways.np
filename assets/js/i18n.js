@@ -120,7 +120,14 @@
     let n; while ((n = w.nextNode())) { if (n.nodeType === 3) fixText(n); else fixAttrs(n); }
   }
   function fixHead() {
-    const t = lookup(norm(document.title)); if (t != null) document.title = t;
+    let t = lookup(norm(document.title));
+    // 「頁名｜站名」這種標題：整句沒有翻譯時，逐段翻譯（車站頁的標題是程式依車站動態組出來的）
+    if (t == null && document.title.includes('｜')) {
+      const ps = document.title.split('｜').map(x => lookup(norm(x)));
+      if (ps.some(x => x != null)) t = document.title.split('｜').map((x, i) => ps[i] != null ? ps[i] : x).join(lang === 'en' ? ' | ' : '｜');
+    }
+    if (t != null && lang === 'en') t = t.replace(/\u3000/g, ' ');
+    if (t != null && t !== document.title) document.title = t;   // 內容沒變就不要寫回（避免觸發 <title> 的監看造成無限迴圈）
     const m = document.querySelector('meta[name="description"]'); if (m) { const v = lookup(norm(m.content)); if (v != null) m.content = v; }
   }
   function startObserver() {
@@ -152,6 +159,8 @@
     box.append(sw);
   }
   window.HK_I18N = { lang, t: tr, names: addNames, scan, has: s => lookup(norm(s)) != null };
-  function init() { addSwitch(); if (lang === 'zh') return; scan(document.body); fixHead(); startObserver(); }
+  function init() { addSwitch(); if (lang === 'zh') return; scan(document.body); fixHead(); startObserver();
+    // 車站頁等會在載入後才改 <title>：改了就再翻一次
+    const tt = document.querySelector('title'); if (tt) new MutationObserver(fixHead).observe(tt, { childList: true, characterData: true, subtree: true }); }
   if (document.body) init(); else document.addEventListener('DOMContentLoaded', init);
 })();

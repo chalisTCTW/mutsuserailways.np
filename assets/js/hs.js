@@ -163,7 +163,9 @@
           h3.className = 'h3'; h3.textContent = L('全日時刻表', '全日時刻表', 'Full-day timetable');
           p.className = 'note';
           const dl = window.HK.dirLabel(H, templateOf(list));
-          p.textContent = L(`${dl}。已合併直通上羽本線的班次並按時間排列；各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號，短程班次對不到的站顯示「－」。`, `${dl}。上羽線直通の列車も合わせて時刻順に表示。各駅の発車時刻（終点は到着時刻）、1列＝1本。欄名は列車番号、短距離の列車が通らない駅は「－」。`, `${dl}. Through-service trains to the Ueha Main Line are merged in and sorted by time. Departure time at each stop (arrival at the terminus); one column per run; "－" marks a stop a shorter run doesn't reach.`);
+          // 起訖站名先逐一查表再放進句子（句子本身的英文是寫死的，不會再被整句翻譯）
+          const dlT = (window.HK_I18N && window.HK_I18N.t) ? dl.split(' → ').map(x => window.HK_I18N.t(x.trim())).join(' → ') : dl;
+          p.textContent = L(`${dlT}。已合併直通上羽本線的班次並按時間排列；各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號，短程班次對不到的站顯示「－」。`, `${dlT}。上羽線直通の列車も合わせて時刻順に表示。各駅の発車時刻（終点は到着時刻）、1列＝1本。欄名は列車番号、短距離の列車が通らない駅は「－」。`, `${dlT}. Through-service trains to the Ueha Main Line are merged in and sorted by time. Departure time at each stop (arrival at the terminus); one column per run; "－" marks a stop a shorter run doesn't reach.`);
           mid.replaceChildren(h3, p, mergedTable(list));
           bottom.replaceChildren();
           const allT = []; list.forEach(sv => window.HK.depTimes(H, sv).forEach(t => allT.push(t))); allT.sort((a, b) => a - b);

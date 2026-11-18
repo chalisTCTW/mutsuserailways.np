@@ -22,7 +22,7 @@
     hsColor: '#136880',            // 1.1.0：高速鉄道在票價查詢・車站時刻表・乘車轉乘查詢三個頁面的識別色
     hsExt: null,                   // 1.1.0：地圖外的假想延伸設定（見 site-config.js 的 hsExt；這裡預設沒有）
     childRatio: 0.5, seniorRatio: 0.5,   // 乘車券折扣：12 歲以下、60 歲以上（指定席費用不打折）
-    maxTransfers: 2, maxWaitSec: 1800,   // 轉乘搜尋：最多轉乘次數、單次轉乘等待上限
+    maxTransfers: 4, maxWaitSec: 1800,   // 轉乘搜尋：最多轉乘次數、單次轉乘等待上限
     // 可步行轉乘的車站（粗估 250–350 m）。a／b 為車站中文名稱的開頭；sec＝步行加緩衝所需時間
     // 1.1.0：幸村／新光瀨＝万瀨高速鐵路線的站外轉乘（前輩指定的案例）。sec 先沿用既有案例的 360 秒，
     // 實際步行距離若不同，請改這個數字（這組連線同時用在查詢規劃路線，也用在路線圖判斷「轉乘站」畫法）。
@@ -409,8 +409,9 @@
       const o = sIdx.get(fromId), d = sIdx.get(toId), v = opt.via && opt.via !== fromId && opt.via !== toId ? sIdx.get(opt.via) : null;
       count = count || 4;
       if (o == null || d == null || o === d) return [];
-      // 1.1.3：先比 count 多蒐集一些候選（底下 (4)(5) 兩條 post-filter／排序要從裡面挑，剔除繞路方案後才不會湊不滿 count 筆）。
-      const wantRaw = count * 3, raw = [];
+      // 1.1.3：先比 count 多蒐集一些候選（底下 post-filter／排序要從裡面挑，剔除繞路方案後才不會湊不滿 count 筆）。
+      // 2.0.0：maxTransfers 提高到 4 後合法路徑增多，wantRaw 也跟著擴大到 count*6，確保篩後夠用。
+      const wantRaw = count * 6, raw = [];
       let t = t0;
       for (let tries = 0; raw.length < wantRaw && tries < wantRaw * 4; tries++) {
         const j = v != null ? viaJourney(o, v, d, t, opt) : bestFrom(o, d, t, opt);
@@ -420,14 +421,36 @@
         if (!raw.length || j.dep > raw[raw.length - 1].dep) raw.push(j);
       }
       if (!opt.allowHighSpeed) return raw.slice(0, count);   // 沒勾選高速鐵路時，searchOnce 早就把所有 HS 班次濾掉了，(4)(5) 不會有候選可挑
-      // (4) 盡量不要建議「高速鐵路→一般鐵路→高速鐵路」來回的路徑：先把這種來回模式的候選剔除；
-      //     剔除後若一個方案都不剩，還是把原本的候選還回去，不要讓玩家完全查不到路線。
-      const hsRailHsBack = legs => {
-        let sawHS = false, leftHS = false;
-        for (const lg of legs) { const isHS = !!lg.sv.isHS; if (isHS) { if (leftHS) return true; sawHS = true; } else if (sawHS) leftHS = true; }
+      // (4) 2.0.0：移除舊的「高速鐵路→一般鐵路→高速鐵路」硬性剔除；改用兩條後處理過濾折返跑：
+      //   noBacktrack：同路線（route.id）同一對車站之間重複行走（不分方向）→ 無意義折返，剔除。
+      //   noRevisitStation：整段行程中同一個站 id 出現兩次 → 有繞回去的嫌疑，剔除。
+      //   兩條都剔完若一個方案都不剩，退到只用 noBacktrack；若還是空，退回 raw 全部。
+      const noBacktrack = legs => {
+        const seen = new Set();
+        for (const lg of legs) {
+          if (lg.walk) continue;
+          const rid = (lg.sv && lg.sv.route && lg.sv.route.id) || (lg.sv && lg.sv.idx);
+          for (let i = 1; i < lg.stops.length; i++) {
+            const a = lg.stops[i - 1].station, b = lg.stops[i].station;
+            const key = rid + '|' + (a < b ? a + '|' + b : b + '|' + a);
+            if (seen.has(key)) return true;
+            seen.add(key);
+          }
+        }
         return false;
       };
-      let pool = raw.filter(j => !hsRailHsBack(j.legs));
+      const noRevisitStation = legs => {
+        const visited = new Set();
+        for (const lg of legs) {
+          for (const s of lg.stops) {
+            if (visited.has(s.station)) return true;
+            visited.add(s.station);
+          }
+        }
+        return false;
+      };
+      let pool = raw.filter(j => !noBacktrack(j.legs) && !noRevisitStation(j.legs));
+      if (!pool.length) pool = raw.filter(j => !noBacktrack(j.legs));
       if (!pool.length) pool = raw;
       // (5) 不可避免要在高速鐵路／一般鐵路之間轉乘（這段行程同時含 HS 與非 HS 的 leg）時，到達時間跟目前最早的
       //     方案相近的候選裡，優先選「一般鐵路時間最短、高速鐵路時間最長」的方案。
@@ -539,6 +562,23 @@
     H.hsExtAnchorSt = function () {
       const ext = CFG.hsExt; if (!ext || !ext.afterZh) return null;
       return stations.find(s => s.zh === ext.afterZh) || null;
+    };
+    /** 2.0.0：多轉乘點版本——從 CFG.hsTransferStations（站名陣列）或預設的銜接站中，
+     *  選出「對目標車站 targetId 的一般鐵路路徑距離（km）最短」的那個作為高速鐵路銜接點。
+     *  targetId 為一般鐵路側的真實站 id（已換算掉假想站）；若 CFG.hsTransferStations 未設定，
+     *  退回 H.hsExtAnchorSt() 的預設行為（維持向後相容）。 */
+    H.bestHSAnchorSt = function (targetId) {
+      const defaults = CFG.hsTransferStations;
+      if (!defaults || !defaults.length) return H.hsExtAnchorSt();
+      let best = null, bestKm = Infinity;
+      for (const zh of defaults) {
+        const st = stations.find(s => s.zh === zh); if (!st) continue;
+        if (st.id === targetId) return st;   // 目的地本身就是轉乘站，直接用
+        const fp = H.farePath(st.id, targetId);
+        if (!fp) continue;
+        if (fp.km < bestKm) { bestKm = fp.km; best = st; }
+      }
+      return best || H.hsExtAnchorSt();   // farePath 全部失敗時 fallback
     };
     /* 1.9.0：新勝守這一端的「上羽本線」延伸（CFG.hsExt2，見 site-config.js）——跟上面的 hsExt 是同一套寫法，
      * 差別只在於這段算一般鐵路票價（fareBase／fareStep），不是高速鉄道獨立票價。純粹是預覽用的設定，

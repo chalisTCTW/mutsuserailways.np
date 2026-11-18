@@ -42,7 +42,7 @@
     carousel();
     // 快速查詢
     const fin = $('#finder');
-    const tabs = [['st', '車站時刻表'], ['rt', '乘車・轉乘・票價查詢']];
+    const tabs = [['st', '車站時刻表'], ['rt', '乘車・轉乘・票價查詢'], ['bk', '線上訂票']];
     let cur = 'st';
     const bodySt = h('form', { action: 'timetable.html', method: 'get' }, h('input', { type: 'hidden', name: 'tab', value: 'station' }),
       field('車站', Object.assign(stationSelect(H, null, '車站'), { name: 's' })), h('span'), h('button', { class: 'btn', type: 'submit' }, '查詢時刻表'));
@@ -51,9 +51,14 @@
     if (H.stations.length > 1) toSel.selectedIndex = Math.min(H.stations.length - 1, 1);
     const bodyRt = h('form', { action: 'timetable.html', method: 'get', class: 'v2' }, h('input', { type: 'hidden', name: 'tab', value: 'route' }),
       field('出發站', fromSel), field('抵達站', toSel), field('出發時刻', h('input', { type: 'time', name: 't', value: nowStr })), h('button', { class: 'btn', type: 'submit' }, '查詢'));
+    // 線上訂票：把起訖站與出發時刻帶到 booking.html（booking.js 讀 from／to／t，兩站都有就直接搜尋）
+    const bkFrom = Object.assign(stationSelect(H, null, '出發站'), { name: 'from' }), bkTo = Object.assign(stationSelect(H, null, '抵達站'), { name: 'to' });
+    if (H.stations.length > 1) bkTo.selectedIndex = Math.min(H.stations.length - 1, 1);
+    const bodyBk = h('form', { action: 'booking.html', method: 'get', class: 'v2' },
+      field('出發站', bkFrom), field('抵達站', bkTo), field('出發時刻', h('input', { type: 'time', name: 't', value: nowStr })), h('button', { class: 'btn', type: 'submit' }, '搜尋班次並訂票'));
     const tabBar = h('div', { class: 'tabs', role: 'tablist' });
-    const bodies = { st: bodySt, rt: bodyRt };
-    function draw() { tabBar.replaceChildren(...tabs.map(([k, l]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === cur), onclick: () => { cur = k; draw(); } }, l))); fin.classList.toggle('v2', cur === 'rt'); fin.querySelector('form')?.remove(); fin.append(bodies[cur]); }
+    const bodies = { st: bodySt, rt: bodyRt, bk: bodyBk };
+    function draw() { tabBar.replaceChildren(...tabs.map(([k, l]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === cur), onclick: () => { cur = k; draw(); } }, l))); fin.classList.toggle('v2', cur !== 'st'); fin.querySelector('form')?.remove(); fin.append(bodies[cur]); }
     fin.replaceChildren(tabBar); draw();
 
     // 運行情報：以路線（線名）為單位。整修中的路線標示為暫停運轉。
@@ -67,6 +72,17 @@
     const news = await HKc.getJSON('data/news.json', true);
     const dl = $('#news');
     (news || []).forEach(n => dl.append(h('div', { class: 'row', id: n.id || null }, h('dt', null, n.date), h('dd', null, h('span', { class: 'cat' }, n.tag)), h('dd', null, n.href ? h('a', { href: n.href }, n.title) : n.title))));
+    // 首頁最上方的「最新情報」列：顯示最新一則，可用 ‹ › 切換（資料與下方「最新消息」同一份）
+    const nb = $('#newsbar');
+    if (nb && news && news.length) {
+      let k = 0;
+      const tm = h('time'), ln = h('a', { href: '#' });
+      const draw = () => { const n = news[k]; tm.textContent = n.date || ''; ln.textContent = n.title || ''; ln.setAttribute('href', n.href || (n.id ? '#' + n.id : '#h-news')); };
+      const step = d => { k = (k + d + news.length) % news.length; draw(); };
+      nb.append(h('span', { class: 'lab' }, '最新情報'), tm, ln,
+        news.length > 1 ? h('span', { class: 'ctl' }, h('button', { type: 'button', 'aria-label': '上一則', onclick: () => step(-1) }, '‹'), h('button', { type: 'button', 'aria-label': '下一則', onclick: () => step(1) }, '›')) : null);
+      draw(); nb.hidden = false;
+    }
 
     // 簡易路線圖
     const L = computeLayout(H), box = $('#minimap');
