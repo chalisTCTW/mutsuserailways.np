@@ -1,0 +1,230 @@
+@import url("https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@200..900&family=Huninn&family=Noto+Sans+JP:wght@400;500;700&display=swap");
+/* 光瀨市交通局（Hikarise Monorail）
+ *
+ * 外觀：沿用入口網站 mint.css 的做法——粉圓（Huninn）圓體、白底、明亮 UI、白色圓角卡片、
+ * 「上方小字＋大標＋細長漸層底線」的標題，只是把薄荷綠換成單軌的淺藍→深藍漸層。
+ * Huninn 只有一種字重，所以和本站一樣全站不用粗體，層次靠大小與顏色（font-weight 一律 400）。
+ *
+ * 版面結構：日本的市營交通局官網（札幌市交通局）那一套——最上方細長工具列（文字大小・語言）、
+ * 橫向主選單、首頁的「早引きインデックス」圖示磚、有日期的公告清單、兩個下拉的運賃檢索。
+ */
+:root {
+  --mb-font: "Huninn", "Chiron GoRound TC", "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", "Yu Gothic", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  --mb0: #0a2b59;          /* 最深：標誌・強調 */
+  --mb1: #15559c;          /* 主藍：連結・按鈕 */
+  --mb2: #4f9ae0;          /* 中間藍 */
+  --mb3: #e4f0fc;          /* 淺藍底 */
+  --mb4: #f5fAff;
+  --mb-ink: #1d2733;
+  --mb-mut: #5f7085;
+  --mb-line: #dceaf7;
+  --mb-warn: #c0491c;
+  --mb-ok: #1a7a4f;
+  --mb-bar: linear-gradient(90deg, #eaf4ff 0%, #dcecfb 38%, #bcdcf7 100%);
+  --mb-band: linear-gradient(100deg, #f0f7ff 0%, #e2eefc 45%, #c6e0f8 100%);
+  --mb-ul: linear-gradient(90deg, #bcdcf7, #4f9ae0 60%, #15559c);
+  --mb-shadow: 0 10px 30px rgba(10, 43, 89, .10);
+  --mb-r: 14px;
+}
+html { scroll-behavior: smooth; }
+.mb-body { margin: 0; background: #fffffe; color: var(--mb-ink); font-family: var(--mb-font);
+  font-size: 16px; line-height: 1.7; letter-spacing: .02em; font-synthesis: none; }
+/* Huninn 只有一種字重：和本站一樣，粗體一律用正常字重 */
+.mb-body :not(.tk):not(.tk *) { font-weight: 400 !important; }
+.mb-body a { color: var(--mb1); }
+.mb-wrap { max-width: 1040px; margin: 0 auto; padding: 0 18px; }
+.mb-body :focus-visible { outline: 3px solid var(--mb2); outline-offset: 2px; border-radius: 6px; }
+
+/* ── 工具列（文字大小・語言） ── */
+.mb-util { background: var(--mb-bar); border-bottom: 1px solid var(--mb-line); font-size: 13px; color: var(--mb-mut); }
+.mb-util .mb-wrap { display: flex; align-items: center; gap: 10px; padding-top: 6px; padding-bottom: 6px; flex-wrap: wrap; }
+.mb-util .sp { margin-left: auto; }
+.mb-util .util { display: inline-flex; align-items: center; gap: 6px; }
+.mb-util button, .mb-util .langsw button { appearance: none; border: 1px solid var(--mb-line); background: #fff;
+  color: var(--mb-mut); font-family: var(--mb-font); font-size: 13px; border-radius: 999px; padding: 4px 12px;
+  cursor: pointer; line-height: 1.4; }
+.mb-util button:hover, .mb-util .langsw button:hover { background: var(--mb4); color: var(--mb1); border-color: var(--mb2); }
+.mb-util button[aria-pressed="true"], .mb-util .langsw button[aria-pressed="true"] { background: var(--mb1); color: #fff; border-color: var(--mb1); }
+.mb-util .langsw { display: inline-flex; gap: 6px; }
+
+/* ── 頁首 ── */
+.mb-head { background: #fff; border-bottom: 1px solid var(--mb-line); }
+.mb-head .mb-wrap { display: flex; align-items: center; gap: 14px; padding-top: 16px; padding-bottom: 16px; flex-wrap: wrap; }
+.mb-logo { display: flex; align-items: center; gap: 13px; text-decoration: none; color: var(--mb0); }
+.mb-logo img { height: 42px; width: auto; display: block; }
+.mb-logo b { display: block; font-size: 23px; letter-spacing: .09em; }
+.mb-logo span { display: block; font-size: 10px; line-height: 1.3; letter-spacing: .22em; color: var(--mb-mut); margin-top: 3px; }
+.mb-head .back { margin-left: auto; font-size: 13px; text-decoration: none; color: var(--mb-mut);
+  border: 1px solid var(--mb-line); border-radius: 999px; padding: 7px 15px; white-space: nowrap; background: #fff; }
+.mb-head .back:hover { background: var(--mb4); color: var(--mb1); border-color: var(--mb2); }
+
+/* ── 主選單 ── */
+.mb-tabs { background: #fff; border-bottom: 1px solid var(--mb-line); position: sticky; top: 0; z-index: 20; }
+.mb-tabs .mb-wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding-top: 4px; }
+.mb-tabs .mb-wrap::-webkit-scrollbar { display: none; }
+.mb-tab { appearance: none; border: 0; background: none; cursor: pointer; white-space: nowrap; font-family: var(--mb-font);
+  padding: 10px 16px 9px; font-size: 15px; color: var(--mb-mut); border-radius: 999px 999px 0 0; border-bottom: 3px solid transparent; }
+.mb-tab:hover { color: var(--mb1); background: var(--mb4); }
+.mb-tab[aria-selected="true"] { color: var(--mb0); background: var(--mb4); border-bottom-color: var(--mb2); }
+.mb-tab .en { display: block; font-size: 10px; letter-spacing: .1em; color: var(--mb-mut); }
+
+.mb-panel { padding: 22px 0 52px; }
+.mb-panel[hidden] { display: none; }
+
+/* ── 卡片與標題（上方小字＋大標＋細長漸層底線） ── */
+.mb-card { background: #fff; border: 1px solid var(--mb-line); border-radius: var(--mb-r);
+  padding: 18px 20px; margin-bottom: 16px; box-shadow: var(--mb-shadow); }
+.mb-card > h2 { margin: 0 0 14px; font-size: 20px; letter-spacing: .04em; color: var(--mb0); position: relative; padding-bottom: 10px; }
+.mb-card > h2 .en { display: block; font-size: 10.5px; letter-spacing: .2em; color: var(--mb-mut); margin-bottom: 2px; }
+.mb-card > h2::after { content: ""; position: absolute; left: 0; bottom: 0; width: 72px; height: 3px;
+  border-radius: 2px; background: var(--mb-ul); }
+.mb-card > p.lead { margin: -4px 0 14px; color: var(--mb-mut); font-size: 14px; }
+.mb-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+
+/* ── 標題橫幅（沿革・再出發） ── */
+/* 2.6.1：頁首大照片＋文字。照片在上、說明在下的「主視覺」排法。 */
+.mb-hero { background: var(--mb-band); border-radius: var(--mb-r); margin-bottom: 16px;
+  border: 1px solid var(--mb-line); overflow: hidden; }
+.mb-hero .pic { position: relative; line-height: 0; }
+.mb-hero .pic img { display: block; width: 100%; height: auto; }
+.mb-hero .pic .ov { position: absolute; left: 0; right: 0; bottom: 0; padding: 46px 24px 16px; line-height: 1.5;
+  background: linear-gradient(to top, rgba(6,28,58,.80), rgba(6,28,58,.42) 55%, rgba(6,28,58,0)); }
+.mb-hero .pic .sm { font-size: 11px; letter-spacing: .2em; color: #cfe4fb; }
+.mb-hero .pic h1 { margin: 3px 0 0; font-size: 27px; letter-spacing: .05em; color: #fff;
+  text-shadow: 0 1px 12px rgba(0,0,0,.4); }
+.mb-hero .txt { padding: 17px 24px 20px; }
+.mb-hero p { margin: 0; color: var(--mb-ink); font-size: 14.5px; max-width: 62ch; }
+.mb-hero .meta { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.mb-hero .chip { background: #fff; border: 1px solid var(--mb-line); border-radius: 999px; padding: 4px 13px; font-size: 13px; color: var(--mb1); }
+
+/* 2.6.1：分頁開頭的寬幅照片（說明壓在照片下緣） */
+.mb-photo { margin: 0 0 16px; position: relative; border-radius: var(--mb-r); overflow: hidden;
+  border: 1px solid var(--mb-line); line-height: 0; }
+.mb-photo img { display: block; width: 100%; height: auto; }
+.mb-photo figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 34px 16px 11px; line-height: 1.5;
+  color: #eaf3fd; font-size: 12.5px; background: linear-gradient(to top, rgba(6,28,58,.76), rgba(6,28,58,0)); }
+
+/* 轉乘一覽（駅案內） */
+.mb-xfer { list-style: none; margin: 7px 0 0; padding: 0; }
+.mb-xfer li { padding: 4px 0; font-size: 13.5px; }
+.mb-xfer .nm { color: var(--mb0); }
+.mb-xfer .ln { color: var(--mb-mut); margin-left: 9px; font-size: 12.5px; }
+
+/* ── 早引きインデックス ── */
+.mb-idx { display: grid; gap: 11px; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); }
+.mb-idx button { appearance: none; cursor: pointer; font-family: var(--mb-font); font-size: 14.5px;
+  background: #fff; border: 1px solid var(--mb-line); border-radius: var(--mb-r); color: var(--mb-ink);
+  padding: 15px 8px 13px; display: grid; gap: 7px; justify-items: center; line-height: 1.4; }
+.mb-idx button:hover { border-color: var(--mb2); color: var(--mb1); background: var(--mb4); box-shadow: var(--mb-shadow); }
+.mb-idx .ico { width: 44px; height: 44px; border-radius: 50%; background: var(--mb-band); color: var(--mb0);
+  display: grid; place-items: center; font-size: 20px; }
+.mb-idx .en { font-size: 10px; letter-spacing: .08em; color: var(--mb-mut); }
+
+/* ── 運行狀況 ── */
+.mb-status { display: flex; align-items: center; gap: 13px; }
+.mb-status .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--mb-ok); flex: 0 0 auto;
+  box-shadow: 0 0 0 5px rgba(26,122,79,.13); }
+.mb-status.warn .dot { background: var(--mb-warn); box-shadow: 0 0 0 5px rgba(192,73,28,.13); }
+.mb-status b { font-size: 19px; color: var(--mb0); }
+.mb-status .sub { color: var(--mb-mut); font-size: 13.5px; }
+.mb-now { font-size: 30px; letter-spacing: .06em; color: var(--mb0); font-variant-numeric: tabular-nums; }
+
+/* ── 表格 ── */
+.mb-tb { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.mb-tb th, .mb-tb td { padding: 9px 11px; border-bottom: 1px solid var(--mb-line); text-align: left; vertical-align: top; }
+.mb-tb th { background: var(--mb4); font-size: 13.5px; color: var(--mb0); white-space: nowrap; }
+.mb-tb td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mb-tb tr:last-child td { border-bottom: 0; }
+.mb-scroll { overflow-x: auto; }
+
+/* ── 時刻表 ── */
+.mb-hour { display: grid; grid-template-columns: 56px 1fr; border-bottom: 1px solid var(--mb-line); }
+.mb-hour:last-child { border-bottom: 0; }
+.mb-hour > b { background: var(--mb4); color: var(--mb0); display: grid; place-items: center;
+  font-size: 17px; font-variant-numeric: tabular-nums; }
+.mb-hour > div { padding: 8px; display: flex; flex-wrap: wrap; gap: 7px; }
+.mb-min { font-size: 14.5px; font-variant-numeric: tabular-nums; background: #fff;
+  border: 1px solid var(--mb-line); border-radius: 8px; padding: 2px 9px; }
+.mb-min.last { border-color: var(--mb-warn); color: var(--mb-warn); }
+
+/* ── 路線縱向圖 ── */
+.mb-line { list-style: none; margin: 0; padding: 4px 0 4px 4px; }
+.mb-line li { position: relative; padding: 0 0 0 38px; min-height: 50px; }
+.mb-line li::before { content: ""; position: absolute; left: 12px; top: 0; bottom: 0; width: 8px;
+  background: linear-gradient(180deg, var(--mb2), var(--mb1)); }
+.mb-line li:first-child::before { top: 23px; border-radius: 4px 4px 0 0; }
+.mb-line li:last-child::before { bottom: auto; height: 23px; border-radius: 0 0 4px 4px; }
+.mb-line li .pin { position: absolute; left: 7px; top: 17px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; border: 4px solid var(--mb1); box-sizing: border-box; }
+.mb-line li.xfer .pin { width: 24px; height: 24px; left: 4px; top: 14px; border-width: 5px; border-color: var(--mb0); }
+.mb-line .nm { font-size: 16px; color: var(--mb-ink); }
+.mb-line .en { color: var(--mb-mut); font-size: 11.5px; letter-spacing: .06em; margin-left: 8px; }
+.mb-line .sub { color: var(--mb-mut); font-size: 13px; }
+.mb-code { display: inline-block; font-size: 11.5px; background: var(--mb0); color: #fff;
+  border-radius: 6px; padding: 1px 7px; margin-right: 7px; vertical-align: 1px; letter-spacing: .05em; }
+
+/* ── 表單 ── */
+.mb-f { display: flex; flex-wrap: wrap; gap: 11px; align-items: flex-end; margin-bottom: 15px; }
+.mb-f label { display: block; font-size: 12.5px; color: var(--mb-mut); margin-bottom: 4px; }
+.mb-f select, .mb-f button { font: inherit; font-family: var(--mb-font); padding: 9px 13px;
+  border: 1px solid var(--mb-line); border-radius: 10px; background: #fff; color: inherit; }
+.mb-f .arrow { color: var(--mb2); padding-bottom: 9px; font-size: 18px; }
+.mb-seg { display: inline-flex; border: 1px solid var(--mb-line); border-radius: 999px; overflow: hidden; background: #fff; }
+.mb-seg button { appearance: none; border: 0; background: none; font-family: var(--mb-font); font-size: 14.5px;
+  padding: 9px 16px; cursor: pointer; color: var(--mb-mut); }
+.mb-seg button[aria-pressed="true"] { background: var(--mb1); color: #fff; }
+
+/* ── 運賃結果 ── */
+.mb-result { border: 1px solid var(--mb-line); border-radius: var(--mb-r); padding: 16px 18px; background: var(--mb-band); }
+.mb-result .big { font-size: 34px; color: var(--mb0); letter-spacing: .02em; }
+.mb-result .sub { font-size: 13.5px; color: var(--mb-mut); }
+
+/* ── 照片 ── */
+.mb-shots { display: grid; gap: 13px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.mb-shot { margin: 0; }
+.mb-shot img { width: 100%; height: auto; border-radius: var(--mb-r); display: block; border: 1px solid var(--mb-line); }
+.mb-shot.big { margin: 0 0 14px; }
+.mb-shot figcaption { font-size: 13px; color: var(--mb-mut); padding-top: 7px; }
+
+.mb-note { background: var(--mb4); border-left: 4px solid var(--mb2); border-radius: 0 10px 10px 0;
+  padding: 11px 15px; font-size: 14px; }
+.mb-news { list-style: none; margin: 0; padding: 0; }
+.mb-news li { display: flex; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--mb-line); font-size: 14.5px; align-items: flex-start; }
+.mb-news li:last-child { border-bottom: 0; }
+.mb-news time { font-size: 13px; color: var(--mb-mut); white-space: nowrap; padding-top: 2px; font-variant-numeric: tabular-nums; }
+.mb-news .tag { font-size: 11.5px; background: var(--mb-band); color: var(--mb0); border: 1px solid var(--mb-line);
+  border-radius: 999px; padding: 1px 10px; white-space: nowrap; margin-top: 3px; }
+
+/* ── 沿革年表 ── */
+.mb-hist { list-style: none; margin: 0; padding: 0; }
+.mb-hist li { display: flex; gap: 14px; padding: 9px 0; border-bottom: 1px dashed var(--mb-line); font-size: 14.5px; }
+.mb-hist li:last-child { border-bottom: 0; }
+.mb-hist time { color: var(--mb1); white-space: nowrap; min-width: 7.5em; font-variant-numeric: tabular-nums; }
+.mb-hist li.on time { color: var(--mb0); }
+.mb-hist li.on { background: var(--mb4); border-radius: 10px; padding-left: 10px; padding-right: 10px; }
+
+.mb-foot { background: var(--mb-bar); border-top: 1px solid var(--mb-line); color: var(--mb-mut); font-size: 13px; }
+.mb-foot .mb-wrap { padding: 20px 18px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+.mb-foot a { color: var(--mb0); }
+.mb-foot .links { display: flex; gap: 14px; flex-wrap: wrap; }
+.mb-empty { color: var(--mb-mut); font-size: 14px; padding: 10px 0; }
+
+/* 文字大小 */
+html[data-size="l"] .mb-body { font-size: 18px; }
+html[data-size="s"] .mb-body { font-size: 14.5px; }
+
+@media (max-width: 560px) {
+  .mb-logo b { font-size: 18px; }
+  .mb-logo img { height: 34px; }
+  .mb-now { font-size: 25px; }
+  .mb-hero .pic h1 { font-size: 20px; }
+  .mb-hero .pic .ov { padding: 36px 16px 12px; }
+  .mb-hero .txt { padding: 14px 16px 17px; }
+  .mb-tab { padding: 9px 12px 8px; font-size: 14px; }
+  .mb-idx { grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); }
+}
+
+/* 英語表示のときは、見出しの上に出る小さな英字（＝同じ内容）を隠す */
+html[lang="en"] .mb-tab .en,
+html[lang="en"] .mb-card > h2 .en,
+html[lang="en"] .mb-idx .en { display: none; }

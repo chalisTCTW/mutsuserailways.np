@@ -1,0 +1,315 @@
+@import url("https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@200..900&family=Huninn&family=Noto+Sans+JP:wght@400;500;700&display=swap");
+/* 光瀨都市鉄道 入口網站 ── 2.1.0 新外觀（mint.css）
+ * 方向：白底＋薄荷綠漸層（帶一點粉）、粉圓（Huninn）圓體、白色圓角卡片、
+ *       「上方小字＋大標＋細長漸層底線」的標題、運行情報放在最上方（西武式的版面優先順序）。
+ * 在 site.css → theme.css（→ hs.css）之後載入，只改外觀，不動功能與資料。
+ * 想回到舊外觀：把各頁 <head> 裡這一行 mint.css 的 <link> 刪掉即可（首頁的 HTML 結構有微調，舊外觀也看得到）。
+ * 字體：Huninn 只有一種字重，所以全站不再用粗體，層次靠大小與顏色；沒有網路時退回 Noto Sans。 */
+
+:root, html[lang="ja"], html[lang="zh-Hant"], html[lang="en"] {
+  --font: "Huninn", "Chiron GoRound TC", "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", "Yu Gothic", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  --serif: var(--font);
+  /* 舊變數改成薄荷系，讓沒有逐頁改過的元件自動跟著換色 */
+  --g0: #15604a;           /* 最深：按鈕 hover、深色文字 */
+  --g1: #17805f;           /* 主綠：連結・按鈕（白底對比 5:1 以上） */
+  --g2: #35b58a;
+  --g3: #e3f6ec;
+  --g4: #f4fbf7;
+  --ink: #1f2c28;
+  --muted: #5b6d66;
+  --line: #dcebe3;
+  --hair: #dcebe3;
+  --warm: #f4fbf7;
+  --sand: #5b6d66;
+  --brand: #186850;        /* 標誌鶴的綠 */
+  --mint0: #f4fbf7; --mint1: #e3f6ec; --mint2: #c8ecda;
+  --bar: linear-gradient(90deg, #fbe9ee 0%, #eef7ef 38%, #cdeedd 100%);
+  --band: linear-gradient(100deg, #fdf0f3 0%, #eaf7ef 45%, #c8ecd9 100%);
+  --ul: linear-gradient(90deg, #f3b9c9, #6cc9a3 60%, #1f9d7a);
+  --shadow: 0 10px 30px rgba(24, 80, 60, .12);
+}
+html { scroll-behavior: smooth; }
+body { background: #fffffe; color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.7; letter-spacing: .02em; font-synthesis: none; }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #1f9d7a; outline-offset: 2px; border-radius: 6px; }
+
+/* Huninn 只有一種字重：粗體一律用正常字重（車票版面除外，車票維持原本的黑體階層） */
+body :not(.tk):not(.tk *) { font-weight: 400 !important; }
+.tk:not(.tkC), .tk:not(.tkC) * { font-family: "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif; font-synthesis: weight style; }
+
+/* ════════ 標頭 ════════ */
+header.sh, body[data-page="home"] header.sh { position: relative; z-index: 30; background: #fff; color: var(--ink); border-bottom: 1px solid var(--line); }
+.sh-brand, .sh-brand:hover { color: var(--brand); }
+.sh-brand img { height: 38px; }
+.sh-brand span { font-size: 22px; letter-spacing: .08em; }
+.sh-brand span::after { content: "HIKARISE RAILWAYS"; display: block; font-size: 10px; line-height: 1.2; letter-spacing: .24em; color: var(--muted); margin-top: 3px; }
+header.sh .util { color: var(--ink); }
+header.sh .langsw { gap: 6px; }
+header.sh .langsw button { color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; margin: 0; font-size: 13px; line-height: 1; white-space: nowrap; }
+header.sh .langsw button:hover { background: var(--mint0); color: var(--brand); }
+header.sh .langsw button[aria-pressed="true"] { background: var(--mint1); color: var(--brand); border-color: #b6e3cd; }
+header.sh .gnav a { color: var(--ink); opacity: 1; }
+header.sh .gnav .new { background: #ffd21f; color: #123f31; }
+.sh-menu { border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.sh-menu span, .sh-menu span::before, .sh-menu span::after { background: var(--brand); }
+.sh-menu:focus-visible { outline-color: #1f9d7a; }
+
+@media (min-width: 1421px) {
+  header.sh, body[data-page="home"] header.sh { background: linear-gradient(180deg, #fff 0 64px, transparent 64px), var(--bar); border-bottom: 0; }
+  header.sh .gnav { grid-area: 2 / 1 / 3 / 3; }
+  header.sh .gnav ul { justify-content: flex-start; flex-wrap: nowrap; gap: 0; }
+  header.sh .gnav > ul > li { position: relative; }
+  header.sh .gnav > ul > li:not(.admin) + li:not(.admin)::before { content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; width: 1px; background: rgba(24, 104, 80, .22); }
+  header.sh .gnav > ul > li > a { flex-direction: row; justify-content: center; min-height: 56px; padding: 0 22px; font-size: 16px; letter-spacing: .04em; gap: 6px; }
+  header.sh .gnav > ul > li > a .en { display: none; }
+  header.sh .gnav > ul > li > a:hover { background: rgba(255, 255, 255, .55); color: var(--brand); }
+  header.sh .gnav > ul > li > a::after { left: 22px; right: 22px; bottom: 0; background: var(--ul); border-radius: 2px; }
+  header.sh .gnav > ul > li > a[aria-current="page"] { color: var(--brand); }
+  header.sh .gnav li.admin { margin-left: auto; align-self: center; }
+  header.sh .gnav li.admin a { min-height: 0; padding: 7px 16px; font-size: 13px; color: var(--muted); border: 1px solid rgba(24, 104, 80, .35); border-radius: 999px; background: rgba(255, 255, 255, .5); }
+  header.sh .gnav li.admin a:hover { background: #fff; color: var(--brand); }
+  header.sh .gnav .subnav { border-radius: 12px; border-color: var(--line); box-shadow: var(--shadow); overflow: hidden; }
+  header.sh .gnav .subnav a { color: var(--ink); }
+  header.sh .gnav .subnav a:hover, header.sh .gnav .subnav a[aria-current="page"] { background: var(--mint0); color: var(--brand); }
+  header.sh .gnav .subnav .en { opacity: .6; }
+}
+@media (max-width: 1420px) {
+  header.sh .gnav { background: #fff; border-top: 1px solid var(--line); box-shadow: 0 14px 24px rgba(24, 80, 60, .14); }
+  header.sh .gnav a { color: var(--ink); border-bottom: 1px solid var(--line); }
+  header.sh .gnav a:hover { background: var(--mint0); }
+  header.sh .gnav a[aria-current="page"] { box-shadow: inset 3px 0 #1f9d7a; color: var(--brand); }
+  header.sh .gnav .subnav { background: var(--mint0); }
+  header.sh .gnav li.admin a { border: 1px solid rgba(24, 104, 80, .35); border-radius: 999px; color: var(--muted); background: #fff; }
+  header.sh .gnav .en { color: var(--muted); opacity: .8; }
+  html[lang="en"] header.sh .gnav { background: #fff; }
+}
+
+/* ════════ 運行情報（最上方一條） ════════ */
+.svcbar, .svcbar.ok, .svcbar.idle, .svcbar.unknown { background: #fff; color: var(--ink); border: 0; border-bottom: 1px solid var(--line); }
+.svcbar.delay { background: #fff8e6; border-bottom-color: #ecd9a3; color: var(--ink); }
+.svcbar.stop { background: #fdecea; border-bottom-color: #ecc2bb; color: var(--ink); }
+.svcbar .wrap { gap: 4px 14px; padding-top: 12px; padding-bottom: 12px; }
+.svcbar .svc-badge, .svcbar.ok .svc-badge, .svcbar.idle .svc-badge, .svcbar.unknown .svc-badge, .svcbar.delay .svc-badge, .svcbar.stop .svc-badge { background: none; color: var(--ink); padding: 0; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; letter-spacing: .04em; }
+.svc-badge::before { content: ""; width: 20px; height: 20px; border-radius: 50%; border: 4px solid #35b58a; flex: none; }
+.svcbar.idle .svc-badge::before, .svcbar.unknown .svc-badge::before { border-color: #b7c4be; }
+.svcbar.delay .svc-badge::before { border-color: #e0b100; }
+.svcbar.stop .svc-badge::before { border-color: #e8503f; }
+.svcbar .svc-main, .svcbar .svc-item b { color: var(--ink); font-size: 14px; }
+.svcbar a, .svcbar .svc-more-link { color: var(--g1); background: var(--mint0); border-radius: 999px; padding: 6px 16px; font-size: 13px; text-decoration: none; white-space: nowrap; }
+.svcbar a:hover { background: var(--mint1); }
+.svcbar .svc-at { color: var(--muted); }
+
+/* ════════ 主視覺 ════════ */
+.hero { height: clamp(340px, 44vw, 520px); background: #cfd8d4; }
+.slide::after { left: 0; right: 0; width: 100%; height: 100%; -webkit-mask-image: none; mask-image: none; background: linear-gradient(180deg, rgba(6, 26, 20, .10) 0, rgba(6, 26, 20, .28) 45%, rgba(6, 26, 20, .55) 100%); }
+.slide .plain { background: linear-gradient(120deg, #17805f, #35b58a); }
+.cap { inset: 0; width: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 64px 36px; text-shadow: 0 2px 18px rgba(0, 0, 0, .35); }
+.cap .tag { padding: 5px 16px; border-radius: 999px; background: rgba(255, 255, 255, .88); color: var(--brand); text-shadow: none; font-size: 13px; letter-spacing: .06em; line-height: 1.6; text-transform: none; margin-bottom: 14px; border: 0; }
+.cap .tag::before { display: none; }
+.cap h2 { font-size: clamp(28px, 5vw, 54px); line-height: 1.25; letter-spacing: .06em; margin: 0; color: #fff; text-wrap: balance; }
+.cap p { margin: 12px 0 0; max-width: 40em; font-size: clamp(14px, 1.5vw, 17px); line-height: 1.8; text-wrap: balance; -webkit-line-clamp: 2; }
+.cap a.more, .cap a.more:hover { margin-top: 20px; padding: 9px 26px; border: 1.5px solid rgba(255, 255, 255, .9); border-radius: 999px; font-size: 14px; letter-spacing: .08em; text-shadow: none; color: #fff; background: rgba(255, 255, 255, .12); backdrop-filter: blur(4px); }
+.cap a.more::after { display: none; }
+.cap a.more:hover { background: rgba(255, 255, 255, .3); }
+.hero-ctl { left: 0; right: 0; bottom: 16px; justify-content: center; align-items: center; gap: 8px; }
+.hero-ctl button { font-size: 0; width: 38px; height: 4px; border: 0; border-radius: 2px; background: rgba(255, 255, 255, .55); }
+.hero-ctl button:hover { background: rgba(255, 255, 255, .85); transform: none; }
+.hero-ctl button[aria-current="true"], .hero-ctl button[aria-current="true"]:hover { background: #fff; }
+.hero-ctl button:last-child { font-size: 11px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, .85); color: var(--brand); margin-left: 6px; }
+@media (max-width: 820px) {
+  .hero { height: clamp(380px, 62svh, 520px); }
+  .cap { padding: 0 24px 40px; }
+  .hero-ctl { position: absolute; left: 0; right: 0; padding: 0; background: none; }
+}
+
+/* ════════ 最新情報（細長的圓角列） ════════ */
+.newsbar { margin-top: 28px; }
+.newsbar .box { display: flex; align-items: center; gap: 18px; padding: 14px 24px; border: 2px solid #9edcc0; border-radius: 40px; background: #fff; box-shadow: var(--shadow); }
+.newsbar .box[hidden] { display: none; }
+.newsbar .lab { color: var(--g1); white-space: nowrap; }
+.newsbar time { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.newsbar a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); text-decoration: none; }
+.newsbar a:hover { color: var(--g1); text-decoration: underline; }
+.newsbar .ctl { display: flex; gap: 6px; }
+.newsbar .ctl button { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid var(--line); background: #fff; color: var(--muted); cursor: pointer; font-size: 14px; line-height: 1; }
+.newsbar .ctl button:hover { background: var(--mint1); color: var(--brand); }
+
+/* ════════ 節標題：上方小字＋大標＋細長漸層底線 ════════ */
+.msec { padding: 72px 0 8px; margin: 0; animation: none; }
+.msec.alt { background: var(--mint0); padding-bottom: 64px; }
+.st { text-align: center; margin-bottom: 36px; }
+.st small { display: block; font-size: 14px; color: var(--muted); letter-spacing: .12em; }
+.st h2 { display: inline-block; margin: 2px 0 0; padding: 0 0 12px; border: 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.3; letter-spacing: .08em; position: relative; }
+.st h2::after { content: ""; position: absolute; left: 6%; right: 6%; bottom: 0; height: 3px; border-radius: 2px; background: var(--ul); }
+
+/* 帶狀標題區（西武「電車に乗る」式）：查詢卡片放在漸層帶上 */
+.band { position: relative; margin-top: 72px; padding: 56px 0 0; background: var(--band); overflow: hidden; }
+.band::before { content: ""; position: absolute; inset: 0; background: url(../photo/n2100-1.webp) center 35% / cover; opacity: .16; filter: blur(2px) saturate(.6); mix-blend-mode: multiply; }
+.band .st { position: relative; margin-bottom: 30px; }
+.band .wrap { position: relative; }
+.band .finder { border-radius: 16px 16px 0 0; padding-bottom: 8px; }
+
+/* ════════ 查詢卡片・表單・按鈕（全站共通） ════════ */
+.finder, .finder.v2 { background: #fff; border: 0; border-radius: 16px; box-shadow: var(--shadow); padding: 22px 28px 22px; }
+.finder .tabs, .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; border: 0; background: none; }
+.tabs button { padding: 10px 20px; margin: 0; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font-size: 14px; line-height: 1; }
+.tabs button[aria-selected="true"] { background: var(--g1); color: #fff; border-color: var(--g1); }
+.tabs button:hover:not([aria-selected="true"]) { background: var(--mint0); color: var(--brand); }
+.finder form, .finder.v2 form { padding: 0 0 14px; gap: 12px 14px; }
+label.f { color: var(--muted); font-size: 13px; letter-spacing: .04em; }
+select, input[type=time], input[type=text], input[type=date], input[type=number], input[type=search] { height: 46px; padding: 0 14px; border: 1px solid #c3dfd2; border-radius: 10px; background-color: #fff; color: var(--ink); font-size: 16px; }
+select:hover, input:hover { border-color: #6cc9a3; }
+select:focus, input:focus { border-color: #1f9d7a; box-shadow: 0 0 0 3px rgba(31, 157, 122, .2); }
+.btn { height: 46px; line-height: 44px; padding: 0 30px; border-radius: 999px; background: var(--g1); border: 1px solid var(--g1); color: #fff; font-size: 16px; letter-spacing: .06em; box-shadow: 0 6px 16px rgba(23, 128, 95, .26); }
+.btn:hover { background: var(--g0); border-color: var(--g0); color: #fff; box-shadow: 0 8px 20px rgba(23, 128, 95, .32); }
+.btn.ghost { background: #fff; color: var(--g1); border-color: #9edcc0; box-shadow: none; }
+.btn.ghost:hover { background: var(--mint1); color: var(--brand); }
+.btn.sm { height: 32px; line-height: 30px; padding: 0 16px; font-size: 13px; box-shadow: none; }
+
+/* ════════ 設備與設施介紹（列車卡片） ════════ */
+.traingrid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; margin-top: 0; }
+.traingrid .traincard { padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: var(--shadow); display: flex; flex-direction: column; color: var(--ink); transition: transform .25s, box-shadow .25s; }
+.traingrid .traincard:hover { border: 0; transform: translateY(-4px); box-shadow: 0 16px 36px rgba(24, 80, 60, .18); }
+.traincard .ph { position: relative; aspect-ratio: 4 / 3.2; }
+.traingrid .traincard .ph img { width: 100%; height: 100%; margin: 0; aspect-ratio: auto; object-fit: cover; }
+.traincard .ph::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 28, 22, 0) 45%, rgba(8, 28, 22, .82)); }
+.traingrid .traincard .lbadge { top: 10px; left: 10px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; font-size: 14px; z-index: 2; }
+.traincard .tt { position: absolute; z-index: 2; left: 14px; right: 14px; bottom: 12px; color: #fff; }
+.traingrid .traincard .tt h3 { margin: 0; display: flex; flex-direction: column-reverse; font-size: 17px; line-height: 1.35; color: #fff; }
+.traingrid .traincard .tt h3 small { display: block; font-size: 11px; line-height: 1.3; color: #fff; opacity: .9; letter-spacing: .04em; margin-bottom: 2px; }
+.traingrid .traincard p { margin: 0; background: color-mix(in srgb, var(--bc) 14%, #fff); color: var(--ink); line-height: 1.55; }
+.traincard .dest { padding: 12px 14px 2px; font-size: 15px; color: var(--ink); }
+.traincard .dest::before { content: "▶"; font-size: 10px; color: var(--bc); margin-right: 6px; vertical-align: 1px; }
+.traincard .spec { padding: 0 14px; font-size: 12.5px; color: var(--muted); }
+.traincard .fac { padding: 6px 14px 0; font-size: 12.5px; color: var(--ink); }
+.traincard .fac::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 7px 1px 0; border-radius: 50%; background: var(--bc); }
+.traingrid .traincard p:last-child { flex: 1; padding-bottom: 14px; }
+
+/* ════════ ご案內（圖示卡片） ════════ */
+.tiles { counter-reset: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; background: #fff; border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.tiles a, .tiles a:hover { counter-increment: none; display: block; position: static; padding: 28px 18px 26px; text-align: center; border: 0; border-left: 1px solid var(--line); background: none; color: var(--ink); text-decoration: none; }
+.tiles a:first-child { border-left: 0; }
+.tiles a:hover { background: var(--mint0); }
+.tiles a::before, .tiles a::after { content: none; }
+.tiles svg { width: 54px; height: 54px; margin: 0 auto 14px; display: block; stroke: #1f9d7a; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tiles strong { display: block; font-size: 16px; line-height: 1.45; color: var(--ink); }
+.tiles a:hover strong { color: var(--g1); }
+.tiles span { display: block; margin-top: 8px; font-size: 12.5px; line-height: 1.65; color: var(--muted); }
+@media (min-width: 1001px) { .msec .tiles { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+/* ════════ 運行情報＋最新消息（卡片） ════════ */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.card { background: #fff; border-radius: 16px; box-shadow: var(--shadow); padding: 24px 26px 18px; }
+.card h3 { margin: 0 0 10px; display: flex; align-items: baseline; gap: 10px; font-size: 22px; line-height: 1.4; letter-spacing: .06em; }
+.card h3 small { font-size: 12px; color: var(--muted); letter-spacing: .1em; }
+.card table.tbl { border-top: 0; }
+.tbl th, .tbl td { border-bottom: 1px solid var(--line); }
+.tbl thead th { background: none; color: var(--muted); font-size: 12px; letter-spacing: .1em; border-bottom: 1px solid var(--line); }
+.tbl tbody tr:hover td { background: var(--mint0); }
+#status td:first-child::before { width: 6px; height: 22px; border-radius: 3px; }
+#status td.ok { color: var(--brand); }
+#status td.stop { color: #a8381d; }
+.ok::before { background: #35b58a; }
+.card dl.news { border-top: 0; }
+dl.news .row { border-bottom: 1px solid var(--line); padding: 13px 4px; }
+dl.news .row:hover { background: var(--mint0); }
+dl.news dt { color: var(--muted); font-weight: 400; }
+dl.news .cat { background: var(--mint1); color: var(--brand); border: 0; border-radius: 999px; min-width: 0; padding: 2px 12px; font-size: 12px; letter-spacing: .04em; }
+dl.news dd a { color: var(--ink); }
+dl.news dd a:hover { color: var(--g1); }
+.note { color: var(--muted); font-size: 13px; }
+
+/* ════════ 沿線景點（薄荷底的橫向卡片） ════════ */
+.spotbox { position: relative; margin-top: 72px; padding: 0 0 56px; background: var(--band); }
+.spotbox .st { padding-top: 52px; margin-bottom: 26px; }
+.spots { display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 6px 4px 34px; scrollbar-width: thin; scrollbar-color: #8fd3b4 transparent; }
+.spots a { flex: 0 0 min(260px, 70%); scroll-snap-align: start; display: block; background: #fff; border: 0; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); text-decoration: none; color: var(--ink); }
+.spots a:hover { border: 0; }
+.spots img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.spots span { display: block; padding: 12px 16px 14px; font-size: 15px; line-height: 1.4; }
+.spots small { display: block; margin-top: 2px; font-size: 12px; color: var(--muted); }
+.sctl { display: flex; justify-content: center; gap: 14px; }
+.sctl button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: #fff; box-shadow: var(--shadow); color: var(--brand); font-size: 18px; cursor: pointer; }
+.sctl button:hover { background: var(--mint1); }
+
+/* ════════ 路線圖・頁尾 ════════ */
+.mapbox { border: 0; border-radius: 16px; box-shadow: var(--shadow); background: #fff; }
+body[data-page="home"] .mapbox { padding: 18px; }
+body[data-page="home"] .note { text-align: center; margin-top: 14px; }
+footer { margin-top: 80px; background: var(--bar); color: var(--ink); }
+footer .wrap { flex-direction: column; align-items: center; gap: 18px; padding-top: 40px; padding-bottom: 30px; text-align: center; }
+footer img { width: 40px; }
+footer a { color: var(--ink); }
+footer a:hover { color: var(--g1); }
+footer .nav { flex: none; justify-content: center; gap: 8px 26px; font-size: 14px; }
+footer .nav a::after { background: var(--g1); }
+footer .copy { border-top: 0; padding-top: 0; max-width: 46em; color: var(--muted); opacity: 1; }
+body[data-page="home"] main { padding-bottom: 0; }
+
+/* ════════ 內頁共通（標題・麵包屑・分類頁籤・卡片） ════════ */
+.pagehead { border-bottom: 0; position: relative; padding-bottom: 16px; }
+.pagehead::after { content: ""; position: absolute; left: 0; bottom: 0; width: min(420px, 100%); height: 3px; border-radius: 2px; background: var(--ul); }
+.pagehead h1 { font-size: 30px; letter-spacing: .06em; color: var(--ink); }
+.pagehead p, .crumb, .crumb a { color: var(--muted); }
+.sec > h2, .gsec > h2 { width: fit-content; max-width: 100%; position: relative; padding-bottom: 12px; border: 0; font-size: 26px; letter-spacing: .06em; }
+.sec > h2::after, .gsec > h2::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 2px; background: var(--ul); }
+.sec > h2 small, .gsec > h2 small, .h2 small { color: var(--muted); letter-spacing: .12em; text-transform: none; font-size: 13px; }
+.sec > h2 small::before, .gsec > h2 small::before, .h2 small::before { content: none; }
+.h2, .h3 { color: var(--ink); }
+.catnav { background: var(--mint0); border-bottom: 1px solid var(--line); }
+.catnav a:hover { color: var(--g1); background: #fff; }
+.catnav a[aria-current="page"] { color: var(--brand); border-bottom-color: #1f9d7a; background: #fff; }
+.catnav li.catnav-top a { color: var(--brand); }
+.stcard, .gcard, .dcard, .sight, .bk-trip { border-radius: 12px; }
+.stcard, .gcard, .dcard { border-color: var(--line); overflow: hidden; }
+.stcard:hover, .gcard:hover, .dcard:hover { box-shadow: var(--shadow); }
+.stag { border-radius: 999px; padding: 3px 12px; }
+.stag .bic { border-radius: 50%; }
+.lchipbtn { border-radius: 999px; }
+.bk-tabs { border-bottom: 2px solid #9edcc0; }
+.bk-tab[aria-selected="true"] { background: var(--g1); }
+.catnav, .crumb, .pagehead, main { font-size: inherit; }
+
+/* ════════ 手機 ════════ */
+@media (max-width: 1000px) {
+  .traingrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tiles a { border-top: 1px solid var(--line); }
+  .cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .traingrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .traincard .dest { font-size: 13.5px; padding: 10px 10px 2px; }
+  .traincard .spec, .traincard .fac { padding-left: 10px; padding-right: 10px; font-size: 12px; }
+  .traingrid .traincard .tt h3 { font-size: 15px; }
+  .traingrid .traincard .tt h3 small { display: none; }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .newsbar .box { border-radius: 22px; flex-wrap: wrap; gap: 4px 12px; padding: 12px 18px; }
+  .newsbar a { flex-basis: 100%; white-space: normal; }
+  .newsbar .ctl { display: none; }
+  .sh-brand span { font-size: 18px; }
+  .sh-brand span::after { font-size: 9px; letter-spacing: .18em; }
+  .svcbar .svc-at { display: none; }
+  header.sh .langsw button { padding: 7px 10px; font-size: 12px; }
+  .finder, .finder.v2 { padding: 18px 16px 12px; }
+  .card { padding: 20px 18px 14px; }
+  .msec { padding-top: 52px; }
+  .band { margin-top: 52px; padding-top: 40px; }
+}
+@media (max-width: 420px) { .sh-brand span::after { display: none; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media print { .band::before { display: none; } }
+
+/* ───── 2.2.0：地方・行政區篩選、所在地標籤、景點住址 ───── */
+.afilter { margin: 12px 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255, 255, 255, .72); display: grid; gap: 8px; }
+.afilter .arow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 7px; }
+.afilter .alab { flex: none; min-width: 3.6em; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--g1); }
+.afilter .lchipbtn .cn { font-style: normal; font-size: 11px; font-weight: 700; opacity: .65; margin-left: 2px; }
+.afilter .lchipbtn[aria-pressed="true"] .cn { opacity: .9; }
+.atag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #5d6b66; }
+.atag b { font-weight: 800; color: var(--g1); background: rgba(120, 200, 170, .18); border-radius: 999px; padding: 1px 9px; }
+.sarea { margin: 2px 0 6px; }
+.dcard .sarea { margin: -2px 0 4px; }
+.saddr { margin: 10px 0 0; font-size: 13px; color: #5d6b66; }
+.saddr strong { margin-right: 10px; color: var(--g1); }
+@media (max-width: 520px) { .afilter .alab { min-width: 100%; } }
+.afilter.afail { border-color: #d9a441; background: #fff8e6; }
+footer .copy .ver { opacity: .6; font-size: .92em; white-space: nowrap; }
