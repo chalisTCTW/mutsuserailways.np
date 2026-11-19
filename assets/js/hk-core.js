@@ -20,6 +20,12 @@
     // 指定席特急券固定 hsSeatFee（不打折）；8 輛編組，1・8 号車（車頭／車尾）各只有 hsEdgeCarSeats 席，其餘每節 seatsPerCar 席。
     hsFareStep: 800, hsSeatFee: 800, hsCars: 8, hsEdgeCarSeats: 8,
     hsColor: '#136880',            // 1.1.0：高速鉄道在票價查詢・車站時刻表・乘車轉乘查詢三個頁面的識別色
+    /* 2.3.0：輕軌（MTR 路線類型 LIGHT_RAIL）。跟高速鉄道不一樣——輕軌是一般路網的一份子：
+     * 照常進拓樸（H.edges／H.adj）、照常算一般分區票價、照常參與轉乘查詢，只有「路線圖上的畫法」不同：
+     * 藍色、比其他路線細。顏色與粗細可在 site-config.js 覆寫。 */
+    lrtColor: '#1f6fd0',
+    lrtWidth: 3.6,                 // 一般路線是 7
+    lrtRouteNames: [],             // 補強用：遊戲裡來不及改成 LIGHT_RAIL 的路線，把中文名稱列在這裡也會當成輕軌
     hsExt: null,                   // 1.1.0：地圖外的假想延伸設定（見 site-config.js 的 hsExt；這裡預設沒有）
     childRatio: 0.5, seniorRatio: 0.5,   // 乘車券折扣：12 歲以下、60 歲以上（指定席費用不打折）
     maxTransfers: 4, maxWaitSec: 1800,   // 轉乘搜尋：最多轉乘次數、單次轉乘等待上限
@@ -204,6 +210,7 @@
     const zoneOf = new Map();
     (dump && dump.stations || []).forEach(s => { zoneOf.set(String(s.id), [s.zone1 | 0, s.zone2 | 0, s.zone3 | 0].filter(z => z !== 0)); });
 
+    const lrtNames = new Set((CFG.lrtRouteNames || []).map(x => String(x)));
     const routesByKey = {}; net.routes.forEach(r => routesByKey[r.key] = r);
     const depotsById = {}; net.depots.forEach(d => depotsById[d.id] = { ...d, departures: d.departures.map(shiftDay).sort((a, b) => a - b) });
     const stById = {}; net.stations.forEach(s => stById[s.id] = s);
@@ -219,11 +226,21 @@
       // 這是前輩明確要求的雙重判斷：現有特急あおさぎ／特急LINER以前誤設過 routeType=HIGH_SPEED（前輩已改回 NORMAL），
       // 名稱比對是多一層安全網，萬一哪天又被誤設成 HIGH_SPEED，只要名稱裡沒有「高速鉄道」就不會被誤判。
       const isHS = route.rtype === 'HIGH_SPEED' && /高速鉄道/.test(route.zh || route.displayZh || '');
+      /* 2.3.0：輕軌＝MTR 路線類型設成 LIGHT_RAIL（或在 CFG.lrtRouteNames 裡指名）。
+       * 不像高速鉄道要加「名稱也要對」的雙重判斷——LIGHT_RAIL 不會被誤設成別的用途，而且輕軌只影響畫法，
+       * 不影響票價與路徑搜尋，萬一設錯也只是線畫細了，不會算錯錢。 */
+      const isLRT = !isHS && (route.rtype === 'LIGHT_RAIL'
+        || lrtNames.has(route.displayZh || '') || lrtNames.has(route.zh || '') || lrtNames.has(nm.line || ''));
       // 1.1.0：高速鉄道的 tcls 固定給 'hs'（不是一般的 ltd／exp／loc），這樣共用的 .ttag／.mk 樣式才會套到專屬的識別色，
       // 不會被誤判成各停（loc）而顯示成灰框。
-      svcs.push({ idx, stops: s.stops.filter(x => !x.op),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
+      svcs.push({ idx, isLRT, stops: s.stops.filter(x => !x.op),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
     });
     H.svcs = svcs;
+    /* 2.3.0：H.edges／L.paths 裡的 svcs 存的是 net.services 的索引（sv.idx），不是 H.svcs 的陣列位置。
+     * 路線圖要判斷「這一段是不是只有輕軌在走」，需要用索引回查班次，所以這裡建一份對照表。 */
+    H.svcByIdx = new Map(svcs.map(sv => [sv.idx, sv]));
+    /** 2.3.0：這一段（H.edges／L.paths 的一條）是不是只有輕軌在走——跟一般路線共用的路段仍照一般路線畫（粗線優先）。 */
+    H.isLrtEdge = e => { const ids = (e && e.svcs) || []; return ids.length > 0 && ids.every(i => { const sv = H.svcByIdx.get(i); return sv && sv.isLRT; }); };
 
     const served = new Set(); svcs.forEach(sv => sv.stops.forEach(s => { if (s.pax !== false) served.add(s.station); }));
     const stations = net.stations.filter(s => served.has(s.id)).map(s => ({ ...s, zones: zonesFor(s) }));

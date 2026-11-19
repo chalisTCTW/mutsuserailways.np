@@ -130,6 +130,11 @@ dl.news .row:target { background: var(--g3); }
 .mapbox .rmap { width: 100%; height: auto; display: block; max-height: 78vh; }
 .rmap .e-casing { fill: none; stroke: #fff; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
 .rmap .e-line { fill: none; stroke: var(--g1); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+/* 2.3.0：輕軌（MTR 路線類型 LIGHT_RAIL）——在拓樸裡、站位照排，只是畫成藍色細線，
+ * 跟一般路線（var(--g1)，綠色，7px）明顯區分。顏色／粗細由 JS 依 CFG.lrtColor／lrtWidth 設成變數。
+ * 只有「整段都只有輕軌在走」的路段才會套用；跟一般路線共用的路段仍畫成一般路線（粗線優先）。 */
+.rmap .e-line.lrt { stroke: var(--lrt-color, #1f6fd0); stroke-width: var(--lrt-width, 3.6px); }
+.rmap .e-casing.lrt { stroke-width: calc(var(--lrt-width, 3.6px) + 4.5px); }
 /* 1.1.0：高速鐵路不計入拓樸，只用虛線連接轉乘站（含幸村↔新光瀨這類站外轉乘）。
  * 1.1.2：改用自己的識別色（--hs-color，由 JS 設成 CFG.hsColor，跟票價查詢・車站時刻表・乘車轉乘查詢三頁一致），
  *        跟一般鐵路（var(--g1)，綠色）明顯區分；--hs-color 沒設定時退回跟 hk-core.js CFG.hsColor 相同的預設值。 */
@@ -151,6 +156,7 @@ dl.news .row:target { background: var(--g3); }
 .rmap .st[tabindex]:hover .st-name { fill: var(--g1); font-weight: 700; }
 .rmap.dim .e-line { stroke: #c8d3ce; }
 .rmap.dim .e-line.on { stroke: var(--g1); }
+.rmap.dim .e-line.lrt.on { stroke: var(--lrt-color, #1f6fd0); }   /* 2.3.0：輕軌被點亮時回到藍色，不是綠色 */
 .rmap.dim .e-casing.on { stroke: #fff; }
 .rmap.dim .st { opacity: .4; }
 .rmap.dim .st.on { opacity: 1; }

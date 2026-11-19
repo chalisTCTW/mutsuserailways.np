@@ -95,10 +95,15 @@
     const linesAt = new Map(); H.stations.forEach(st => linesAt.set(st.id, new Set()));
     H.svcs.forEach(sv => sv.stops.forEach(x => { if (x.pax !== false && linesAt.has(x.station)) linesAt.get(x.station).add(sv.line); }));
 
+    /* 2.3.0：輕軌（LIGHT_RAIL）——跟高速鉄道不同，它在拓樸裡，站位與連線都照一般路線排；
+     * 只有「只有輕軌在走」的路段改用藍色細線（跟一般路線共用的路段仍畫成一般路線）。 */
+    gEdge.style.setProperty('--lrt-color', (HK.CFG && HK.CFG.lrtColor) || '#1f6fd0');
+    gEdge.style.setProperty('--lrt-width', (((HK.CFG && HK.CFG.lrtWidth) || 3.6) + 'px'));   // 要帶 px：白色外框用 calc(... + 4.5px) 算，無單位數字沒辦法相加
     const edgeEls = [];
     L.paths.forEach(p => {
       const d = 'M' + p.pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L');
-      const casing = s('path', { d, class: 'e-casing' }), line = s('path', { d, class: 'e-line' });
+      const lrt = H.isLrtEdge ? H.isLrtEdge(p) : false;
+      const casing = s('path', { d, class: 'e-casing' + (lrt ? ' lrt' : '') }), line = s('path', { d, class: 'e-line' + (lrt ? ' lrt' : '') });
       gEdge.append(casing, line); edgeEls.push({ p, line, casing });
     });
 
