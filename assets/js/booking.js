@@ -427,7 +427,7 @@
       name: T3('上羽・天鳥三日券', '上羽・天鳥3日券', 'Kamiha–Tentori 3-Day Pass'),
       who: T3('清音溫泉的住宿，加上港町與神社的三天兩夜旅行', '清音温泉の宿泊と、港町・神社をめぐる2泊3日の旅', 'A three-day trip with an onsen stay, harbour towns and shrines'),
       side: ['上羽・天鳥', '周遊券'], sideEn: 'KAMIHA · TENTORI',
-      tk: [['汐崎・本磯島〜勝守　乗り放題', 'Unlimited: Shiozaki / Hon-Izoshima–Katsumori'], ['新勝守〜汐崎　高速直通　乗り放題', 'Unlimited HSR through trains'], ['温泉宿2泊・大社内苑割引つき', '2 nights + shrine discount', 1]],
+      tk: [['汐崎・本磯島〜勝守　乗り放題', 'Unlimited: Shiozaki / Hon-Izoshima–Katsumori'], ['新勝守〜汐崎　高速直通　乗り放題', 'Unlimited HSR through trains'], ['温泉宿2泊・大社内苑割引つき', '2 nights + shrine discount', 1], ['光瀬都市単軌　乗り放題', 'Monorail unlimited', 1]],
       perks: [
         { k: '∞', ...T3('無限次搭乘 汐崎－勝守、本磯島－勝守 全區間的各停列車與優等列車', '汐崎〜勝守・本磯島〜勝守の全区間で、各駅停車と優等列車に乗り放題', 'Unlimited rides on local and express trains across the full Shiozaki–Katsumori and Hon-Izoshima–Katsumori sections') },
         { k: '∞', ...T3('無限次搭乘 新勝守－汐崎 的高速鉄道直通班次', '新勝守〜汐崎間の高速鉄道直通列車に乗り放題', 'Unlimited rides on through high-speed services between Shin-Katsumori and Shiozaki') },
@@ -440,7 +440,7 @@
       name: T3('尾羽川二日券', '尾羽川2日券', 'Ohanegawa 2-Day Pass'),
       who: T3('美術館與舊港口，一晚兩天的尾羽川小旅行', '美術館と旧港をめぐる、1泊2日の尾羽川の小旅行', 'A short two-day trip to the museum and the old harbour of Ohanegawa'),
       side: ['尾羽川', '周遊券'], sideEn: 'OHANEGAWA',
-      tk: [['十万浦市〜花倉街道　乗り放題', 'Unlimited: Jumanmura–Hanakura-kaido'], ['花倉街道〜みつせ　各停乗り放題', 'Unlimited local trains to Mitsuse'], ['NAJIMAプリンス1泊・入館割引つき', '1 night + admission discounts', 1]],
+      tk: [['十万浦市〜花倉街道　乗り放題', 'Unlimited: Jumanmura–Hanakura-kaido'], ['花倉街道〜みつせ　各停乗り放題', 'Unlimited local trains to Mitsuse'], ['NAJIMAプリンス1泊・入館割引つき', '1 night + admission discounts', 1], ['光瀬都市単軌　乗り放題', 'Monorail unlimited', 1]],
       perks: [
         { k: '∞', ...T3('無限次搭乘 十万浦市－花倉街道 全區間的各停列車與優等列車', '十万浦市〜花倉街道の全区間で、各駅停車と優等列車に乗り放題', 'Unlimited rides on local and express trains across the full Jumanmura–Hanakura-kaido section') },
         { k: '∞', ...T3('無限次搭乘 花倉街道－みつせ 的各停列車班次', '花倉街道〜みつせ間の各駅停車に乗り放題', 'Unlimited rides on local trains between Hanakura-kaido and Mitsuse') },
@@ -453,9 +453,12 @@
   const passName = p => p.reg ? tri(p.name) : `${p.n} 日券`;
   function passCard(p, o) {
     o = o || {}; const sf = o.seatFee || 500, no = o.no || (p.reg ? p.id.toUpperCase().slice(0, 2) + String(p.n).padStart(2, '0') : String(p.n).padStart(4, '0')), HSC = '#136880';
+    /* 2.6.0：優惠票券全部含「光瀨都市單軌（市交通局）無限搭乘」。單軌本身是均一 290 円，
+     * 票券持有者不另外收費——這一行放在票面上，所以紙本票券也看得出來含單軌。 */
+    const MONO = ['光瀬都市単軌　乗り放題', 'Monorail unlimited', 1];
     const lines = p.reg ? p.tk : p.seatFree
-      ? [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['指定席　座席料金込み', 'Reserved seats included', 1], ['高速鉄道　2往復無料', '2 round trips on HSR free', 1]]
-      : [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['各停・快速・環状快速・特快', 'Local / Rapid / Loop / Limited Exp.'], [`指定席は別途 ¥${sf.toLocaleString('en-US')}`, 'Seat fee extra']];
+      ? [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['指定席　座席料金込み', 'Reserved seats included', 1], MONO, ['高速鉄道　2往復無料', '2 round trips on HSR free', 1]]
+      : [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['各停・快速・環状快速・特快', 'Local / Rapid / Loop / Limited Exp.'], MONO, [`指定席は別途 ¥${sf.toLocaleString('en-US')}`, 'Seat fee extra']];
     const validJa = o.range ? o.range : (p.n === 1 ? '当日限り' : `連続${p.n}日間`), validEn = o.rangeEn || (p.n === 1 ? 'Valid on the day' : `Valid ${p.n} days`);
     return h('article', { class: 'tk tkP' + (p.seatFree ? ' tkP-hs' : '') + (p.reg ? ' tkP-r' : ''), 'data-i18n-off': '', style: `--tk:${p.col}` },
       h('div', { class: 'tkA-side' }, h('b', { lang: 'ja' }, p.n + '日券'), h('em', { lang: 'en' }, p.reg ? p.sideEn : p.n + ' DAY PASS'), h('small', { lang: 'ja' }, ...(p.reg ? [p.side[0], h('br'), p.side[1]] : ['光瀬都市鉄道', h('br'), 'フリーパス']))),

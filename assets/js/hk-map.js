@@ -359,8 +359,320 @@
   }
 
   /** 版面。recipe＝{ prm, dirs }：直接重現（不搜尋）。否則：固定參數組各算一次，再對最好的一組做「逐條線改方向」的區域搜尋，降低交叉、過近與轉折。 */
+
+  /* ════════════════════════════════════════════════════════════════════════
+   * 2.4.0 新排版（v3）。舊排版（layoutOnce／COMBOS／區域搜尋）整個保留，
+   * 在 site-config.js 把 mapAlgo 設成 'legacy' 就會切回去。
+   *
+   * 舊排版的兩個問題（前輩回報「加入單軌後地圖整個變形」「中央戸宮被放到很奇怪的地方」）：
+   *   (1) 所有車站丟進一組全域最小平方法一次解完，而「沒有直接連線的兩站」之間沒有任何約束，
+   *       所以中央戸宮與戸宮（分屬不同線）的相對方位完全沒人管，實測方位差到 147°。
+   *   (2) 多一條線就改變整個方程組，加上會試數十組參數挑最低分，常常跳到形狀完全不同的另一組解。
+   *       實測加一條線後 64 站有 54 站位置大幅改變。
+   *
+   * v3 改成兩階段：
+   *   階段一 爬山法：從真實座標出發，每個車站只在附近格點微調，只有總成本下降才移動。
+   *     成本＝八方向貼合＋邊長一致＋相對位置保持（對地理上最近的鄰居，方位不可以跑掉）
+   *           ＋站距＋壓線＋交叉＋轉折＋站外轉乘錨定（CFG.walkLinks 的兩站鎖成固定距離）。
+   *     因為每一步都是局部移動，加新線只會擾動附近——實測位移大的站從 54 降到 7。
+   *   階段二 最小平方法：用階段一的結果決定方向，再解一次讓每段剛好是 45°／90°。
+   *     牽引目標是階段一排好的位置，而且只解一次、不做參數搜尋。
+   *
+   * 轉彎規則（前輩指定）：車站不可以是轉角，線經過車站必須筆直穿過；方向要改變時，
+   * 轉折點落在兩站之間「等比例」的位置。做法是給每個車站一個通過方向，一段 A→B 離開 A 走 u、
+   * 抵達 B 走 w；要讓轉折剛好在正中間（兩段等長）＝ B−A 必須平行於 u+w，這條直接寫進最小平方法，
+   * 解出來的站位自然滿足。u、w 夾 45° 時弦指向 22.5°，但真正畫出來的兩段仍嚴格是 45°／90°。
+   * ════════════════════════════════════════════════════════════════════════ */
+
+  const V3_DEF = {
+    iters: 14, radius: 3, target: 70, sep: 4.6, wSep: 60,
+    wOcti: 1.6, wLen: 0.9, wRel: 2.6, wOccl: 2.2, wBend: 0.7, wCross: 90,
+    wOsi: 26, osiGap: 1.9, wn: 6, wl: 1.0, lam: 0.9
+  };
+  const V3_COMBOS = [
+    {}, { target: 76, sep: 5.0, wSep: 80 }, { target: 76, sep: 5.0, wSep: 80, radius: 4, iters: 20 },
+    { wRel: 3.4 }, { target: 66, sep: 4.2, wSep: 50, wRel: 2.2 },
+    { target: 82, sep: 5.4, wSep: 100, radius: 4, iters: 20 }
+  ];
+
+  /** 階段一：爬山法。回傳格點座標（單位＝GRID）。 */
+  function v3Hill(H, opts, P) {
+    const st = H.stations, n = st.length, idx = new Map(st.map((s, i) => [s.id, i]));
+    const E = [];
+    H.edges.forEach(e => { const i = idx.get(e.a), j = idx.get(e.b); if (i != null && j != null && i !== j) E.push({ i, j, e }); });
+    const adj = Array.from({ length: n }, () => []);
+    E.forEach((e, k) => { adj[e.i].push({ to: e.j, k }); adj[e.j].push({ to: e.i, k }); });
+
+    let minx = Infinity, minz = Infinity;
+    st.forEach(s => { minx = Math.min(minx, s.x); minz = Math.min(minz, s.z); });
+    const rl = E.map(e => Math.hypot(st[e.j].x - st[e.i].x, st[e.j].z - st[e.i].z)).filter(v => v > 0).sort((a, b) => a - b);
+    const sc = P.target / Math.max(1, rl.length ? rl[rl.length >> 1] : 1);
+    const pos = st.map(s => [Math.round((s.x - minx) * sc / GRID), Math.round((s.z - minz) * sc / GRID)]);
+    const geoDir = E.map(e => angIdx(st[e.j].x - st[e.i].x, st[e.j].z - st[e.i].z));
+
+    const fixed = new Set(), ov = opts.override || {};
+    st.forEach((s, i) => { if (ov[s.zh]) { pos[i] = [ov[s.zh][0], ov[s.zh][1]]; fixed.add(i); } });
+
+    // 地理上最近的鄰居（相對位置保持的對象）
+    const K = 6, nb = [];
+    for (let i = 0; i < n; i++) {
+      const ds = [];
+      for (let j = 0; j < n; j++) if (j !== i) ds.push([Math.hypot(st[j].x - st[i].x, st[j].z - st[i].z), j]);
+      ds.sort((a, b) => a[0] - b[0]);
+      nb.push(ds.slice(0, K).map(d => ({ j: d[1], ang: angIdx(st[d[1]].x - st[i].x, st[d[1]].z - st[i].z) })));
+    }
+    // 站外轉乘錨定
+    const osiOf = Array.from({ length: n }, () => []);
+    (H.walkLinks || []).forEach(w => {
+      const i = idx.get(w.a), j = idx.get(w.b);
+      if (i == null || j == null || i === j) return;
+      const a = angIdx(st[j].x - st[i].x, st[j].z - st[i].z);
+      osiOf[i].push({ to: j, ang: a }); osiOf[j].push({ to: i, ang: (a + 4) % 8 });
+    });
+
+    function costAt(i, px, py) {
+      let c = 0;
+      for (const a of adj[i]) {
+        const q = pos[a.to], dx = q[0] - px, dy = q[1] - py, L = Math.hypot(dx, dy);
+        if (L < 1e-6) return 1e9;
+        const ai = angIdx(dx, dy);
+        c += P.wOcti * Math.pow(Math.abs(ai - Math.round(ai)), 2) * 8;
+        const want = P.target / GRID;
+        c += P.wLen * Math.pow((L - want) / want, 2);
+        const g = (E[a.k].i === i) ? geoDir[a.k] : (geoDir[a.k] + 4) % 8;
+        c += P.wRel * Math.pow(cdiff(g, ai), 2);
+      }
+      for (const b of nb[i]) {
+        const q = pos[b.j], dx = q[0] - px, dy = q[1] - py;
+        if (Math.hypot(dx, dy) < 1e-6) return 1e9;
+        c += P.wRel * 0.8 * Math.pow(cdiff(b.ang, angIdx(dx, dy)), 2);
+      }
+      for (const o of osiOf[i]) {
+        const q = pos[o.to], dx = q[0] - px, dy = q[1] - py, L = Math.hypot(dx, dy);
+        if (L < 1e-6) return 1e9;
+        c += P.wOsi * Math.pow(L - P.osiGap, 2) + P.wOsi * 0.5 * Math.pow(cdiff(o.ang, angIdx(dx, dy)), 2);
+      }
+      for (let j = 0; j < n; j++) {
+        if (j === i || osiOf[i].some(o => o.to === j)) continue;
+        const q = pos[j], dx = q[0] - px, dy = q[1] - py;
+        if (Math.abs(dx) > P.sep || Math.abs(dy) > P.sep) continue;
+        const L = Math.hypot(dx, dy);
+        if (L < 1e-6) return 1e9;
+        if (L < P.sep) c += P.wSep * Math.pow(P.sep - L, 2);
+      }
+      for (let k = 0; k < E.length; k++) {
+        const e2 = E[k];
+        if (e2.i === i || e2.j === i) continue;
+        const r1 = pos[e2.i], r2 = pos[e2.j];
+        if (Math.min(r1[0], r2[0]) - P.sep > px || Math.max(r1[0], r2[0]) + P.sep < px
+          || Math.min(r1[1], r2[1]) - P.sep > py || Math.max(r1[1], r2[1]) + P.sep < py) continue;
+        const vx = r2[0] - r1[0], vy = r2[1] - r1[1], l2 = vx * vx + vy * vy;
+        let t = l2 ? ((px - r1[0]) * vx + (py - r1[1]) * vy) / l2 : 0;
+        t = Math.max(0, Math.min(1, t));
+        const dd = Math.hypot(px - (r1[0] + t * vx), py - (r1[1] + t * vy));
+        if (dd < P.sep * 0.8) c += P.wOccl * Math.pow(P.sep * 0.8 - dd, 2);
+      }
+      for (const a of adj[i]) {
+        const q = pos[a.to];
+        for (let k = 0; k < E.length; k++) {
+          if (k === a.k) continue;
+          const e2 = E[k];
+          if (e2.i === i || e2.j === i || e2.i === a.to || e2.j === a.to) continue;
+          const r1 = pos[e2.i], r2 = pos[e2.j];
+          if (Math.min(px, q[0]) > Math.max(r1[0], r2[0]) || Math.max(px, q[0]) < Math.min(r1[0], r2[0])
+            || Math.min(py, q[1]) > Math.max(r1[1], r2[1]) || Math.max(py, q[1]) < Math.min(r1[1], r2[1])) continue;
+          const cw = (A, B, C) => (C[1] - A[1]) * (B[0] - A[0]) - (B[1] - A[1]) * (C[0] - A[0]);
+          const p1 = [px, py];
+          if (cw(p1, r1, r2) * cw(q, r1, r2) < 0 && cw(p1, q, r1) * cw(p1, q, r2) < 0) c += P.wCross;
+        }
+      }
+      if (adj[i].length === 2) {
+        const q1 = pos[adj[i][0].to], q2 = pos[adj[i][1].to];
+        c += P.wBend * Math.pow(4 - cdiff(angIdx(q1[0] - px, q1[1] - py), angIdx(q2[0] - px, q2[1] - py)), 2);
+      }
+      return c;
+    }
+
+    const order = [...Array(n).keys()].sort((a, b) => adj[b].length - adj[a].length);
+    for (let it = 0; it < P.iters; it++) {
+      const r = Math.max(1, P.radius - Math.floor(it / 5));
+      let moved = 0;
+      for (const i of order) {
+        if (fixed.has(i) || !adj[i].length) continue;
+        const cx = pos[i][0], cy = pos[i][1];
+        let best = costAt(i, cx, cy), bx = cx, by = cy;
+        for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+          if (!dx && !dy) continue;
+          const c = costAt(i, cx + dx, cy + dy);
+          if (c < best - 1e-9) { best = c; bx = cx + dx; by = cy + dy; }
+        }
+        if (bx !== cx || by !== cy) { pos[i] = [bx, by]; moved++; }
+      }
+      if (!moved) break;
+    }
+    return { pos, E, adj, idx };
+  }
+
+  /** 階段二：方向決定＋最小平方法，轉折落在兩站正中間。 */
+  function layoutV3(H, opts, prm) {
+    const P = Object.assign({}, V3_DEF, prm || {});
+    const st = H.stations, n = st.length;
+    const { pos, E, adj } = v3Hill(H, opts, P);
+    const hp = pos.map(q => [q[0] * GRID, q[1] * GRID]);
+    const m = E.length;
+
+    // 每條邊兩端的方向：度數 2 的站取一條軸（線筆直穿過），其餘每條邊各自取最近方向且不重複
+    const dirI = new Array(m).fill(-1), dirJ = new Array(m).fill(-1);
+    const DOT = (d, dx, dy) => DIRS8[d][0] * dx + DIRS8[d][1] * dy;
+    for (let v = 0; v < n; v++) {
+      const a = adj[v]; if (!a.length) continue;
+      if (a.length === 2) {
+        const p1 = hp[a[0].to], p2 = hp[a[1].to];
+        const ax = Math.round(angIdx(p2[0] - p1[0], p2[1] - p1[1])) % 8;
+        for (const x of a) {
+          const q = hp[x.to];
+          const d = DOT(ax, q[0] - hp[v][0], q[1] - hp[v][1]) >= 0 ? ax : (ax + 4) % 8;
+          if (E[x.k].i === v) dirI[x.k] = d; else dirJ[x.k] = (d + 4) % 8;
+        }
+      } else {
+        const used = new Set();
+        for (const x of a) {
+          const q = hp[x.to];
+          let d = Math.round(angIdx(q[0] - hp[v][0], q[1] - hp[v][1])) % 8;
+          if (used.has(d)) for (let off = 1; off <= 4; off++) {
+            const c1 = (d + off) % 8, c2 = (d + 8 - off) % 8;
+            if (!used.has(c1)) { d = c1; break; }
+            if (!used.has(c2)) { d = c2; break; }
+          }
+          used.add(d);
+          if (E[x.k].i === v) dirI[x.k] = d; else dirJ[x.k] = (d + 4) % 8;
+        }
+      }
+    }
+    const chord = E.map((e, k) => {
+      let u = dirI[k] < 0 ? Math.round(angIdx(hp[e.j][0] - hp[e.i][0], hp[e.j][1] - hp[e.i][1])) % 8 : dirI[k];
+      let w = dirJ[k] < 0 ? u : dirJ[k];
+      if (cdiff(u, w) >= 3) w = u;                        // 夾角 ≥135°：不彎，整段走 u
+      let cx = DIRS8[u][0] + DIRS8[w][0], cy = DIRS8[u][1] + DIRS8[w][1];
+      const L = Math.hypot(cx, cy);
+      if (L < 1e-6) { cx = DIRS8[u][0]; cy = DIRS8[u][1]; } else { cx /= L; cy /= L; }
+      return { u, w, cx, cy, straight: u === w };
+    });
+
+    const Lt = E.map((e, k) => Math.max(P.target * 0.55, Math.hypot(hp[e.j][0] - hp[e.i][0], hp[e.j][1] - hp[e.i][1])));
+    const ov = opts.override || {}, fx = new Map();
+    st.forEach((s, i) => { if (ov[s.zh]) fx.set(i, [ov[s.zh][0] * GRID, ov[s.zh][1] * GRID]); });
+    const N = Array.from({ length: 2 * n }, () => new Float64Array(2 * n)), b = new Float64Array(2 * n);
+    const add = (cols, coef, rhs, w) => {
+      for (let a = 0; a < cols.length; a++) { b[cols[a]] += w * w * coef[a] * rhs; for (let c = 0; c < cols.length; c++) N[cols[a]][cols[c]] += w * w * coef[a] * coef[c]; }
+    };
+    E.forEach((e, k) => {
+      const c = chord[k], nx = -c.cy, ny = c.cx;
+      add([2 * e.j, 2 * e.j + 1, 2 * e.i, 2 * e.i + 1], [nx, ny, -nx, -ny], 0, P.wn);
+      add([2 * e.j, 2 * e.j + 1, 2 * e.i, 2 * e.i + 1], [c.cx, c.cy, -c.cx, -c.cy], Lt[k], P.wl);
+    });
+    for (let i = 0; i < n; i++) {
+      const f = fx.get(i), w = f ? 30 : P.lam, tg = f || hp[i];
+      add([2 * i], [1], tg[0], w); add([2 * i + 1], [1], tg[1], w);
+    }
+    const sol = solve(N, b);
+    const pos0 = st.map((s, i) => [sol[2 * i], sol[2 * i + 1]]);
+    const polys = E.map((e, k) => {
+      const A = pos0[e.i], B = pos0[e.j], c = chord[k];
+      if (c.straight) return [A, B];
+      const u = DIRS8[c.u], w = DIRS8[c.w];
+      const det = u[0] * w[1] - u[1] * w[0];
+      const vx = B[0] - A[0], vy = B[1] - A[1];
+      if (Math.abs(det) < 1e-6 || Math.hypot(vx, vy) < 1) return [A, B];
+      const s2 = (vx * w[1] - vy * w[0]) / det;
+      if (!(s2 > 0.5)) return [A, B];
+      const bend = [A[0] + u[0] * s2, A[1] + u[1] * s2];
+      if (Math.hypot(B[0] - bend[0], B[1] - bend[1]) < 0.5) return [A, B];
+      return [A, bend, B];
+    });
+
+    const PAD = 90;
+    let gx = Infinity, gy = Infinity;
+    pos0.forEach(q => { gx = Math.min(gx, q[0]); gy = Math.min(gy, q[1]); });
+    polys.forEach(pl => pl.forEach(q => { gx = Math.min(gx, q[0]); gy = Math.min(gy, q[1]); }));
+    const ox = PAD - gx, oy = PAD - gy;
+    const posMap = new Map();
+    st.forEach((s, i) => posMap.set(s.id, { x: pos0[i][0] + ox, y: pos0[i][1] + oy, i }));
+    st.forEach((s, i) => { if (!adj[i].length) posMap.set(s.id, { x: hp[i][0] + ox, y: hp[i][1] + oy, i }); });
+    const paths = E.map((e, k) => ({ a: st[e.i].id, b: st[e.j].id, pts: polys[k].map(q => [q[0] + ox, q[1] + oy]), svcs: e.e.svcs, len: e.e.len }));
+    let maxX = 0, maxY = 0;
+    posMap.forEach(v => { maxX = Math.max(maxX, v.x); maxY = Math.max(maxY, v.y); });
+    paths.forEach(p => p.pts.forEach(q => { maxX = Math.max(maxX, q[0]); maxY = Math.max(maxY, q[1]); }));
+    const hsPaths = layoutHsPaths(H, posMap);
+    hsPaths.forEach(hp2 => hp2.pts.forEach(q => { maxX = Math.max(maxX, q[0]); maxY = Math.max(maxY, q[1]); }));
+    const R = { pos: posMap, paths, hsPaths, width: maxX + PAD, height: maxY + PAD, grid: GRID, v3: true };
+    return Object.assign(R, v3Diag(H, R));
+  }
+
+  /** v3 的診斷值：交叉、過近、壓線、車站轉角（前輩要求這個要 0）、偏離實際方位。 */
+  function v3Diag(H, R) {
+    const st = H.stations;
+    const segs = R.paths.flatMap((p, k) => p.pts.slice(1).map((q, i) => [k, p.pts[i], q]));
+    const ccw = (A, B, C) => (C[1] - A[1]) * (B[0] - A[0]) - (B[1] - A[1]) * (C[0] - A[0]);
+    let crossings = 0;
+    for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+      if (segs[i][0] === segs[j][0]) continue;
+      const [, a, b2] = segs[i], [, c, d] = segs[j];
+      if ([a, b2].some(u => [c, d].some(v => Math.abs(u[0] - v[0]) < 0.6 && Math.abs(u[1] - v[1]) < 0.6))) continue;
+      if (ccw(a, c, d) * ccw(b2, c, d) < 0 && ccw(a, b2, c) * ccw(a, b2, d) < 0) crossings++;
+    }
+    const at = new Map(); st.forEach(s => at.set(s.id, []));
+    R.paths.forEach(p => {
+      const t = p.pts.length - 1;
+      if (at.has(p.a)) at.get(p.a).push(angIdx(p.pts[1][0] - p.pts[0][0], p.pts[1][1] - p.pts[0][1]));
+      if (at.has(p.b)) at.get(p.b).push(angIdx(p.pts[t - 1][0] - p.pts[t][0], p.pts[t - 1][1] - p.pts[t][1]));
+    });
+    let corner = 0;
+    at.forEach(ds => { if (ds.length === 2 && cdiff(ds[0], (ds[1] + 4) % 8) > 0.15) corner++; });
+    let near = 0, touch = 0;
+    for (let i = 0; i < st.length; i++) for (let j = i + 1; j < st.length; j++) {
+      const a = R.pos.get(st[i].id), b2 = R.pos.get(st[j].id);
+      if (!a || !b2) continue;
+      const dd = Math.hypot(a.x - b2.x, a.y - b2.y);
+      if (dd < 24) near += 3; else if (dd < 44) near++;
+    }
+    for (let i = 0; i < st.length; i++) {
+      const q = R.pos.get(st[i].id); if (!q) continue;
+      for (const p of R.paths) {
+        if (p.a === st[i].id || p.b === st[i].id) continue;
+        for (let t = 1; t < p.pts.length; t++) {
+          const sd = segDist(q.x, q.y, p.pts[t - 1][0], p.pts[t - 1][1], p.pts[t][0], p.pts[t][1]);
+          if (sd.d < 9) touch++; else if (sd.d < 16) near++;
+        }
+      }
+    }
+    let bends = 0, offGrid = 0;
+    R.paths.forEach(p => { bends += Math.max(0, p.pts.length - 2); });
+    return { crossings, bends, offGrid, near, touch, corner, dev: 0, disp: 0 };
+  }
+
+  const v3Score = r => r.corner * 400 + r.crossings * 1000 + r.near * 60 + r.touch * 150
+    + Math.max(0, Math.max(r.width, r.height) - 1900) * 0.5;
+
+  function bestV3(H, opts) {
+    let best = null;
+    for (const prm of V3_COMBOS) {
+      let r; try { r = layoutV3(H, opts, prm); } catch (e) { continue; }
+      r.score = v3Score(r); r.prm = prm;
+      if (!best || r.score < best.score) best = r;
+    }
+    if (!best) best = layoutOnce(H, opts, COMBOS[0]);
+    best.recipe = { v3: true };
+    return best;
+  }
+
   function layout(H, opts) {
     opts = opts || {};
+    /* 2.4.0：預設走新排版 v3；site-config.js 的 mapAlgo 設成 'legacy' 可切回舊排版。
+     * v3 是確定性的、約 1 秒，所以不吃 recipe／seed 快取（重算一次就好，而且路網變了也不會沿用舊形狀）。 */
+    const CFGX = (root.HK && root.HK.CFG) || root.HK_CONFIG || {};
+    const algo = opts.algo || CFGX.mapAlgo || 'v3';
+    if (algo !== 'legacy') return bestV3(H, opts);
     const withDirs = (prm, dirs) => Object.assign({}, prm, { dirs });
     if (opts.seed && !opts.recipe) { const r = layoutSeeded(H, opts, opts.seedPrm || COMBOS[4], opts.seed); r.seeded = true; return r; }
     if (opts.recipe) { const r = layoutOnce(H, opts, withDirs(opts.recipe.prm || opts.recipe, opts.recipe.dirs)); r.recipe = opts.recipe; r.score = scoreOf(r); return r; }

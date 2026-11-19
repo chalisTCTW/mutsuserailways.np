@@ -25,6 +25,10 @@
      * 藍色、比其他路線細。顏色與粗細可在 site-config.js 覆寫。 */
     lrtColor: '#1f6fd0',
     lrtWidth: 3.6,                 // 一般路線是 7
+    /* 2.6.0 單軌（光瀨市交通局）：和光瀨都市鉄道是不同的經營者，票價制度也不同——
+     * 全線均一 monoFlatFare 円，不照分區制。行程裡含單軌路段時，單軌那一段按均一價另計。 */
+    monoFlatFare: 290,
+    monoDayPass: 800,
     lrtRouteNames: [],             // 補強用：遊戲裡來不及改成 LIGHT_RAIL 的路線，把中文名稱列在這裡也會當成輕軌
     hsExt: null,                   // 1.1.0：地圖外的假想延伸設定（見 site-config.js 的 hsExt；這裡預設沒有）
     childRatio: 0.5, seniorRatio: 0.5,   // 乘車券折扣：12 歲以下、60 歲以上（指定席費用不打折）
@@ -32,7 +36,9 @@
     // 可步行轉乘的車站（粗估 250–350 m）。a／b 為車站中文名稱的開頭；sec＝步行加緩衝所需時間
     // 1.1.0：幸村／新光瀨＝万瀨高速鐵路線的站外轉乘（前輩指定的案例）。sec 先沿用既有案例的 360 秒，
     // 實際步行距離若不同，請改這個數字（這組連線同時用在查詢規劃路線，也用在路線圖判斷「轉乘站」畫法）。
-    walkLinks: [{ a: '中央戸宮', b: '大學前', sec: 360 }, { a: '幸村', b: '新光瀨', sec: 360 }],
+    walkLinks: [{ a: '中央戸宮', b: '大學前', sec: 360 }, { a: '幸村', b: '新光瀨', sec: 360 },
+      /* 2.6.0 單軌的站外轉乘。紫市是同一座車站（鉄道與單軌共用），不需要列在這裡。 */
+      { a: 'スカイツリー公園', b: 'みつせ', sec: 300 }, { a: '船井大島城跡前', b: '船井大島', sec: 300 }],
     minTransferSec: 120,           // 轉乘最短時間（快照有值時以快照為準）
     zoneOverride: {},              // { "車站中文名": 分區編號 }：遊戲內沒設分區時，可在這裡補
     typeMarks: {},                 // 時刻表格子裡的種別略稱；沒寫的種別用種別名稱的第一個字。例：{ '環状快速': '環' }
@@ -239,6 +245,14 @@
     /* 2.3.0：H.edges／L.paths 裡的 svcs 存的是 net.services 的索引（sv.idx），不是 H.svcs 的陣列位置。
      * 路線圖要判斷「這一段是不是只有輕軌在走」，需要用索引回查班次，所以這裡建一份對照表。 */
     H.svcByIdx = new Map(svcs.map(sv => [sv.idx, sv]));
+    /* 2.6.0 單軌的車站集合。
+     *   monoStationIds＝有單軌停靠的站（含紫市這種鉄道共用站）
+     *   monoOnlyIds   ＝只有單軌停靠的站（紫市工業団地・栗田・船井大島城跡前・病院前・スカイツリー公園）
+     * 「這趟行程算不算用到單軌」「要不要給單軌選項」都看 monoOnlyIds，因為共用站本身不代表用到單軌。 */
+    H.monoStationIds = new Set();
+    const nonMonoIds = new Set();
+    svcs.forEach(sv => sv.stops.forEach(x => (sv.isLRT ? H.monoStationIds : nonMonoIds).add(x.station)));
+    H.monoOnlyIds = new Set([...H.monoStationIds].filter(id => !nonMonoIds.has(id)));
     /** 2.3.0：這一段（H.edges／L.paths 的一條）是不是只有輕軌在走——跟一般路線共用的路段仍照一般路線畫（粗線優先）。 */
     H.isLrtEdge = e => { const ids = (e && e.svcs) || []; return ids.length > 0 && ids.every(i => { const sv = H.svcByIdx.get(i); return sv && sv.isLRT; }); };
 
@@ -360,6 +374,10 @@
     const svMustReserve = sv => { const ri = H.reserveInfo(sv); return !!(ri && ri.mode === 'all'); };
     function lowerBound(arr, t) { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m].dep < t) lo = m + 1; else hi = m; } return lo; }
     function searchOnce(o, d, t0, opt) {
+      /* 2.6.0：起點與終點都不是「單軌專用站」時，整趟不給單軌選項。
+       * 例：東平倉→花倉街道（兩端都是鉄道站）不會出現單軌；病院前（單軌專用站）才會。
+       * 紫市是鉄道與單軌共用站，本身不算單軌專用站，所以「紫市→東平倉」也不會繞去單軌。 */
+      const allowMono = H.monoOnlyIds.has(stations[o] && stations[o].id) || H.monoOnlyIds.has(stations[d] && stations[d].id);
       const n = stations.length, arrive = new Float64Array(n).fill(Infinity), inConn = new Int32Array(n).fill(-1);
       const ready = new Float64Array(n).fill(Infinity), readySrc = new Int32Array(n).fill(-1);
       const boarded = new Map(); arrive[o] = t0; ready[o] = t0; readySrc[o] = o;
@@ -373,6 +391,7 @@
         }
         // 1.1.0：高速鐵路預設不納入查詢結果，要玩家勾選「使用高速鐵路」（opt.allowHighSpeed）才會出現在轉乘搜尋裡。
         if (!(opt && opt.allowHighSpeed) && trips[c.trip].sv.isHS) continue;
+        if (!allowMono && trips[c.trip].sv.isLRT) continue;   // 2.6.0 單軌：見 searchOnce 開頭的說明
         let b = boarded.get(c.trip);
         if (!b && ready[c.from] <= c.dep && (ready[c.from] === t0 && readySrc[c.from] === o || c.dep - ready[c.from] <= CFG.maxWaitSec + minTransfer || c.from === o)) {
           b = { k, src: readySrc[c.from] }; boarded.set(c.trip, b);
@@ -804,9 +823,32 @@
     /** 票價明細：{ base, step, crossed, zoneFee, seat, total, path, bounds, km } */
     H.fare = function (fromId, toId, opt) {
       const r = H.farePath(fromId, toId); if (!r) return null;
-      const seat = opt && opt.seat ? CFG.seatFee : 0, base = fromId === toId ? 0 : CFG.fareBase, zoneFee = fromId === toId ? 0 : CFG.fareStep * r.crossed;
+      const seat = opt && opt.seat ? CFG.seatFee : 0;
+      /* 2.6.0：路徑上有「單軌專用站」＝這趟用到單軌。單軌是市交通局的均一運賃，不進分區制；
+       * 其餘的鉄道區間照原本的分區制算，兩者相加。單軌只有一條線、只在紫市與鉄道相接，
+       * 所以均一運賃只會加一次。 */
+      const path = r.path || [];
+      const monoUsed = path.some(id => H.monoOnlyIds.has(id));
+      if (monoUsed) {
+        const railPath = path.filter(id => !H.monoOnlyIds.has(id));
+        let railYen = 0, railCrossed = 0;
+        if (railPath.length >= 2) {
+          const rr = H.farePath(railPath[0], railPath[railPath.length - 1]);
+          if (rr) { railCrossed = rr.crossed; railYen = CFG.fareBase + CFG.fareStep * rr.crossed; }
+        }
+        const total = railYen + CFG.monoFlatFare + seat;
+        return { yen: railYen + CFG.monoFlatFare, base: CFG.fareBase, step: CFG.fareStep, crossed: railCrossed, zones: railCrossed,
+          zoneFee: railYen ? railYen - CFG.fareBase : 0, mono: CFG.monoFlatFare, rail: railYen, seat, total, path, bounds: r.bounds, km: r.km };
+      }
+      const base = fromId === toId ? 0 : CFG.fareBase, zoneFee = fromId === toId ? 0 : CFG.fareStep * r.crossed;
       const total = base + zoneFee + seat;
-      return { yen: base + zoneFee, base, step: CFG.fareStep, crossed: r.crossed, zones: r.crossed, zoneFee, seat, total, path: r.path, bounds: r.bounds, km: r.km };
+      return { yen: base + zoneFee, base, step: CFG.fareStep, crossed: r.crossed, zones: r.crossed, zoneFee, mono: 0, rail: base + zoneFee, seat, total, path: r.path, bounds: r.bounds, km: r.km };
+    };
+    /** 2.6.0 單軌的均一運賃（給 journeyFare 的單軌區間用）。 */
+    H.monoFare = function (stops) {
+      return { yen: CFG.monoFlatFare, base: CFG.monoFlatFare, step: 0, crossed: 0, zones: 0, zoneFee: 0,
+        mono: CFG.monoFlatFare, rail: 0, seat: 0, total: CFG.monoFlatFare,
+        path: stops.map(x => x.station), bounds: [], km: 0, flat: true };
     };
     /** 1.1.0：高速鐵路的乘車券票價——不走一般鐵路的分區路徑搜尋（高速鐵路已經不在 H.adj 裡），
      *  而是沿著這一段「實際搭乘」的停靠站序列（stops，來自已經決定好的班次／行程），用同一套「有沒有共同收費區」
@@ -837,13 +879,15 @@
       const runs = []; let cur = null;
       legs.forEach(leg => {
         const isHS = !!leg.sv.isHS;
-        if (!cur || cur.isHS !== isHS) { cur = { isHS, stops: [] }; runs.push(cur); }
+        const kind = isHS ? 'hs' : leg.sv.isLRT ? 'lrt' : 'n';   // 2.6.0：單軌是第三種（均一運賃）
+        if (!cur || cur.kind !== kind) { cur = { isHS, kind, stops: [] }; runs.push(cur); }
         const add = leg.stops.slice(cur.stops.length ? 1 : 0);   // 避免轉乘站重複計入
         cur.stops.push(...add);
       });
       let yenSum = 0, crossedSum = 0, kmSum = 0; const path = [], bounds = [];
       for (const r of runs) {
-        const f = r.isHS ? H.hsFare(r.stops) : H.fare(r.stops[0].station, r.stops[r.stops.length - 1].station);
+        const f = r.kind === 'hs' ? H.hsFare(r.stops) : r.kind === 'lrt' ? H.monoFare(r.stops)
+          : H.fare(r.stops[0].station, r.stops[r.stops.length - 1].station);
         if (!f) return null;
         yenSum += f.yen; crossedSum += f.crossed; kmSum += f.km;
         (f.path || []).forEach(id => { if (path[path.length - 1] !== id) path.push(id); });

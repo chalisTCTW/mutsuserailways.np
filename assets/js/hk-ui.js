@@ -72,10 +72,32 @@
   /* ───────── 路線圖 ───────── */
   function textW(str, px) { let w = 0; for (const ch of String(str)) w += ch.charCodeAt(0) > 255 ? px : px * 0.56; return w; }
 
+  /** 2.4.0：折線轉成 SVG 路徑，每個轉折點做成半徑 r 的圓角（JR 路線圖的轉彎都是圓的）。
+   *  不是用 stroke-linejoin: round——那個只把線寬的外緣磨圓（半徑＝線寬一半），看起來還是尖的；
+   *  這裡是真的在幾何上退回 r 再用二次貝茲接起來，轉角兩側各退 r，r 會自動被兩段長度的一半夾住。 */
+  function roundPath(pts, r) {
+    const f = v => v.toFixed(1);
+    if (!pts || pts.length < 2) return '';
+    if (pts.length < 3 || !(r > 0)) return 'M' + pts.map(q => f(q[0]) + ' ' + f(q[1])).join('L');
+    let d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+    for (let i = 1; i < pts.length - 1; i++) {
+      const a = pts[i - 1], b = pts[i], c = pts[i + 1];
+      const l1 = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, l2 = Math.hypot(c[0] - b[0], c[1] - b[1]) || 1;
+      const rr = Math.min(r, l1 / 2, l2 / 2);
+      const p1 = [b[0] + (a[0] - b[0]) / l1 * rr, b[1] + (a[1] - b[1]) / l1 * rr];
+      const p2 = [b[0] + (c[0] - b[0]) / l2 * rr, b[1] + (c[1] - b[1]) / l2 * rr];
+      d += 'L' + f(p1[0]) + ' ' + f(p1[1]) + 'Q' + f(b[0]) + ' ' + f(b[1]) + ' ' + f(p2[0]) + ' ' + f(p2[1]);
+    }
+    const e = pts[pts.length - 1];
+    return d + 'L' + f(e[0]) + ' ' + f(e[1]);
+  }
+
   /** 在 container 畫路線圖。回傳控制器 { svg, highlight(set), setTrains(list), onStation(fn) }。 */
   function renderMap(container, H, L, opts) {
     opts = opts || {};
     const W = L.width, HT = L.height, FS = opts.fontSize || 13;
+    const CFGX = (root.HK && root.HK.CFG) || root.HK_CONFIG || {};
+    const CR = opts.cornerRadius != null ? opts.cornerRadius : (CFGX.mapCornerRadius != null ? CFGX.mapCornerRadius : 10);   // 2.4.0 轉角圓角半徑
     const svg = s('svg', { viewBox: `0 0 ${W} ${HT}`, class: 'rmap', role: 'img', 'aria-label': '光瀨都市鉄道 路線圖', preserveAspectRatio: 'xMidYMid meet' });
     const gEdge = s('g', { class: 'edges' }), gHs = s('g', { class: 'hs-edges' }), gSt = s('g', { class: 'stations' }), gLab = s('g', { class: 'labels' }), gTr = s('g', { class: 'trains' });
     svg.append(gEdge, gHs, gSt, gLab, gTr);
@@ -86,7 +108,7 @@
     gHs.style.setProperty('--hs-color', (HK.CFG && HK.CFG.hsColor) || '#136880');
     (L.hsPaths || H.hsEdges || []).forEach(e => {
       const cls = 'hs-line' + (e.walk ? ' hs-walk' : '');
-      if (e.pts) { gHs.append(s('path', { d: 'M' + e.pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L'), class: cls })); return; }
+      if (e.pts) { gHs.append(s('path', { d: roundPath(e.pts, CR), class: cls })); return; }
       const a = L.pos.get(e.a), b = L.pos.get(e.b); if (!a || !b) return;
       gHs.append(s('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: cls }));
     });
@@ -101,7 +123,7 @@
     gEdge.style.setProperty('--lrt-width', (((HK.CFG && HK.CFG.lrtWidth) || 3.6) + 'px'));   // 要帶 px：白色外框用 calc(... + 4.5px) 算，無單位數字沒辦法相加
     const edgeEls = [];
     L.paths.forEach(p => {
-      const d = 'M' + p.pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L');
+      const d = roundPath(p.pts, CR);
       const lrt = H.isLrtEdge ? H.isLrtEdge(p) : false;
       const casing = s('path', { d, class: 'e-casing' + (lrt ? ' lrt' : '') }), line = s('path', { d, class: 'e-line' + (lrt ? ' lrt' : '') });
       gEdge.append(casing, line); edgeEls.push({ p, line, casing });
@@ -119,29 +141,57 @@
       return false;
     };
     const overlap = (a, b) => !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+    /* 2.4.0：站名之間的碰撞判定多留 LM 的空隙。實測貼齊時真正畫出來的字還是會疊到 1～2px
+     * （估計的方框和瀏覽器實際排出來的字框不會完全一樣），留白之後就不會擦邊。 */
+    const LM = 3;
+    const overlapPad = (a, b) => !(a.x + a.w + LM <= b.x || b.x + b.w + LM <= a.x || a.y + a.h + LM <= b.y || b.y + b.h + LM <= a.y);
     const order = [...H.stations].sort((a, b) => (H.adj.get(b.id).length - H.adj.get(a.id).length));
     const labelPos = new Map();
     for (const st of order) {
-      const q = L.pos.get(st.id), cstr = H.codeText ? H.codeText(st.id) : '', w = textW(st.zh, FS) + (cstr ? textW(cstr, FS - 3) + 5 : 0), hgt = FS + 2, r = linesAt.get(st.id).size > 1 ? 11 : 8, gap = r + 3;
-      const cands = [
-        { dx: gap, dy: hgt / 2 - 3, a: 'start', box: { x: q.x + gap, y: q.y - hgt / 2 - 1, w, h: hgt } },
-        { dx: -gap, dy: hgt / 2 - 3, a: 'end', box: { x: q.x - gap - w, y: q.y - hgt / 2 - 1, w, h: hgt } },
-        { dx: 0, dy: -gap - 3, a: 'middle', box: { x: q.x - w / 2, y: q.y - gap - hgt, w, h: hgt } },
-        { dx: 0, dy: gap + hgt - 2, a: 'middle', box: { x: q.x - w / 2, y: q.y + gap, w, h: hgt } },
-        { dx: gap - 2, dy: -gap + 2, a: 'start', box: { x: q.x + gap - 2, y: q.y - gap - hgt + 4, w, h: hgt } },
-        { dx: -gap + 2, dy: -gap + 2, a: 'end', box: { x: q.x - gap + 2 - w, y: q.y - gap - hgt + 4, w, h: hgt } },
-        { dx: gap - 2, dy: gap + hgt - 6, a: 'start', box: { x: q.x + gap - 2, y: q.y + gap - 4, w, h: hgt } },
-        { dx: -gap + 2, dy: gap + hgt - 6, a: 'end', box: { x: q.x - gap + 2 - w, y: q.y + gap - 4, w, h: hgt } },
+      const q = L.pos.get(st.id), cstr = H.codeText ? H.codeText(st.id) : '',
+        /* 2.4.0：站名寬度要抓寬一點。車站編號那一段是等寬字體（比 textW 的 0.56em 估計值寬），
+         * 估太窄會讓避讓誤以為放得下，實測就是「M01/L08/KU10戸宮」這種長編號的站名疊到別人。 */
+        w = (textW(st.zh, FS) + (cstr ? textW(cstr, FS - 3) * 1.18 + 6 : 0)) + 5, hgt = FS + 3, r = linesAt.get(st.id).size > 1 ? 11 : 8, gap = r + 3;
+      /* 2.4.0：候選位置從 8 個擴成「兩圈 × 8 方向」＝16 個（外圈再退 11px）。
+       * 站名互相疊是前輩明確要求要解決的，所以重疊的罰分拉到絕對壓倒性（1200），
+       * 寧可把站名放到比較遠、比較醜的位置，也不要兩個站名疊在一起。 */
+      const ring = g2 => [
+        { dx: g2, dy: hgt / 2 - 3, a: 'start', box: { x: q.x + g2, y: q.y - hgt / 2 - 1, w, h: hgt } },
+        { dx: -g2, dy: hgt / 2 - 3, a: 'end', box: { x: q.x - g2 - w, y: q.y - hgt / 2 - 1, w, h: hgt } },
+        { dx: 0, dy: -g2 - 3, a: 'middle', box: { x: q.x - w / 2, y: q.y - g2 - hgt, w, h: hgt } },
+        { dx: 0, dy: g2 + hgt - 2, a: 'middle', box: { x: q.x - w / 2, y: q.y + g2, w, h: hgt } },
+        { dx: g2 - 2, dy: -g2 + 2, a: 'start', box: { x: q.x + g2 - 2, y: q.y - g2 - hgt + 4, w, h: hgt } },
+        { dx: -g2 + 2, dy: -g2 + 2, a: 'end', box: { x: q.x - g2 + 2 - w, y: q.y - g2 - hgt + 4, w, h: hgt } },
+        { dx: g2 - 2, dy: g2 + hgt - 6, a: 'start', box: { x: q.x + g2 - 2, y: q.y + g2 - 4, w, h: hgt } },
+        { dx: -g2 + 2, dy: g2 + hgt - 6, a: 'end', box: { x: q.x - g2 + 2 - w, y: q.y + g2 - 4, w, h: hgt } },
       ];
+      const cands = ring(gap).concat(ring(gap + 11));
       let best = null;
       cands.forEach((c, k) => {
         let pen = k * 0.6;
-        boxes.forEach(b => { if (overlap(c.box, b)) pen += 100; });
+        boxes.forEach(b => { if (overlapPad(c.box, b)) pen += 1200; });   // 2.4.0：站名重疊是最不能接受的，罰分壓倒其他項
         pts.forEach(pt => { if (pt[0] > c.box.x - 7 && pt[0] < c.box.x + c.box.w + 7 && pt[1] > c.box.y - 7 && pt[1] < c.box.y + c.box.h + 7) pen += 60; });
         segs.forEach(sg => { if (rectHitSeg({ x: c.box.x - 2, y: c.box.y - 1, w: c.box.w + 4, h: c.box.h + 2 }, sg[0], sg[1])) pen += 25; });
         if (c.box.x < 2 || c.box.x + c.box.w > W - 2 || c.box.y < 2 || c.box.y + c.box.h > HT - 2) pen += 80;
         if (!best || pen < best.pen) best = { ...c, pen };
       });
+      /* 16 個位置全都卡住時（市區最密的地方會發生）：沿著「離開最近的那個站名」的方向，
+       * 以 4px 為一步往外推，最多推 9 步（36px），直到不再重疊為止。推完仍重疊才放棄。 */
+      if (boxes.some(b => overlapPad(best.box, b))) {
+        const dirs8 = [[1, 0], [0.7, -0.7], [0, -1], [-0.7, -0.7], [-1, 0], [-0.7, 0.7], [0, 1], [0.7, 0.7]];
+        let fixedCand = null;
+        for (let step = 1; step <= 14 && !fixedCand; step++) {
+          for (const u of dirs8) {
+            const ox = u[0] * step * 4, oy = u[1] * step * 4;
+            const nb2 = { x: best.box.x + ox, y: best.box.y + oy, w: best.box.w, h: best.box.h };
+            if (nb2.x < 2 || nb2.x + nb2.w > W - 2 || nb2.y < 2 || nb2.y + nb2.h > HT - 2) continue;
+            if (boxes.some(b => overlapPad(nb2, b))) continue;
+            fixedCand = { dx: best.dx + ox, dy: best.dy + oy, a: best.a, box: nb2 };
+            break;
+          }
+        }
+        if (fixedCand) best = fixedCand;
+      }
       boxes.push(best.box); labelPos.set(st.id, best);
     }
 
