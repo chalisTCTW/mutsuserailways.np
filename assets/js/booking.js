@@ -403,7 +403,7 @@
     }
     const pp = passPanel(H); pp.hidden = true;
     const tabBtn = (id, label) => h('button', { type: 'button', role: 'tab', class: 'bk-tab', id: 'bkt-' + id, 'aria-selected': 'false', onclick: () => show(id) }, label);
-    const tRoute = tabBtn('route', '乗車券・特急券'), tPass = tabBtn('pass', '優惠套票（1・3・5・7日券）');
+    const tRoute = tabBtn('route', '乗車券・特急券'), tPass = tabBtn('pass', '優惠套票（含地區周遊券）');
     function show(id) { const isP = id === 'pass'; pp.hidden = !isP; root.hidden = isP; tRoute.setAttribute('aria-selected', String(!isP)); tPass.setAttribute('aria-selected', String(isP)); try { history.replaceState(null, '', isP ? '#pass' : location.pathname + location.search); } catch (e) {} }
     realRoot.append(h('div', { class: 'bk-tabs', role: 'tablist' }, tRoute, tPass), root, pp);
     show(location.hash === '#pass' || q.get('tab') === 'pass' ? 'pass' : 'route');
@@ -417,55 +417,190 @@
     { n: 5, price: 7000, col: '#a87a1f', img: 'assets/photo/pass-5.webp', pos: '50% 50%', alt: '霧中高架橋上的列車', who: '長假與慢遊' },
     { n: 7, price: 9600, col: '#136880', img: 'assets/photo/hs-viaduct.webp', pos: '50% 50%', alt: '通過高架橋的高速鉄道', who: '一週完整旅行・含指定席與高速鉄道', seatFree: true, hs: 2 }
   ];
+  /* ───── 2.2.0 地區周遊券：依景點所在的「地方」推出，含無限搭乘區間、往復乘車、參觀費折抵與住宿 ───── */
+  const Lg = () => (window.HK_I18N && window.HK_I18N.lang) || 'ja';
+  const tri = o => (o && (o[Lg()] || o.zh)) || '';
+  const T3 = (zh, ja, en) => ({ zh, ja, en });
+  PASSES.push(
+    { id: 'kt3', reg: true, n: 3, price: 25900, col: '#8f3a2e', img: 'assets/photo/sight-seionshrine1.webp', pos: '50% 50%', alt: '清音大社',
+      regions: ['kamiha', 'tentori'], credit: ['seion-taisha'],
+      name: T3('上羽・天鳥三日券', '上羽・天鳥3日券', 'Kamiha–Tentori 3-Day Pass'),
+      who: T3('清音溫泉的住宿，加上港町與神社的三天兩夜旅行', '清音温泉の宿泊と、港町・神社をめぐる2泊3日の旅', 'A three-day trip with an onsen stay, harbour towns and shrines'),
+      side: ['上羽・天鳥', '周遊券'], sideEn: 'KAMIHA · TENTORI',
+      tk: [['汐崎・本磯島〜勝守　乗り放題', 'Unlimited: Shiozaki / Hon-Izoshima–Katsumori'], ['新勝守〜汐崎　高速直通　乗り放題', 'Unlimited HSR through trains'], ['温泉宿2泊・大社内苑割引つき', '2 nights + shrine discount', 1]],
+      perks: [
+        { k: '∞', ...T3('無限次搭乘 汐崎－勝守、本磯島－勝守 全區間的各停列車與優等列車', '汐崎〜勝守・本磯島〜勝守の全区間で、各駅停車と優等列車に乗り放題', 'Unlimited rides on local and express trains across the full Shiozaki–Katsumori and Hon-Izoshima–Katsumori sections') },
+        { k: '∞', ...T3('無限次搭乘 新勝守－汐崎 的高速鉄道直通班次', '新勝守〜汐崎間の高速鉄道直通列車に乗り放題', 'Unlimited rides on through high-speed services between Shin-Katsumori and Shiozaki') },
+        { k: '⇄', ...T3('汐崎－新勝守 出發、前往任一車站的高速鉄道直通班次，可搭乘 1 往復', '汐崎〜新勝守から任意の駅へ向かう高速鉄道直通列車に、1往復乗車できます', 'One round trip on a through high-speed service from the Shiozaki–Shin-Katsumori section to any station') },
+        { k: '⇄', ...T3('本磯島－新勝守 出發、前往任一車站的特急列車班次，可搭乘 1 往復', '本磯島〜新勝守から任意の駅へ向かう特急列車に、1往復乗車できます', 'One round trip on a limited express from the Hon-Izoshima–Shin-Katsumori section to any station') },
+        { k: '★', ...T3('清音大社內苑參觀費用折抵；清音溫泉風宿飯店住宿 2 晚', '清音大社内苑の拝観料割引、清音温泉風宿ホテル 2泊付き', 'Discount on Seion Taisha inner-precinct admission, plus 2 nights at the Seion Onsen Kazeyado Hotel') }
+      ] },
+    { id: 'ob2', reg: true, n: 2, price: 15000, col: '#3d5a99', img: 'assets/photo/kaiei1.webp', pos: '50% 50%', alt: '懷永美術館',
+      regions: ['obagawa'], credit: ['kaiei-museum', 'customs'],
+      name: T3('尾羽川二日券', '尾羽川2日券', 'Ohanegawa 2-Day Pass'),
+      who: T3('美術館與舊港口，一晚兩天的尾羽川小旅行', '美術館と旧港をめぐる、1泊2日の尾羽川の小旅行', 'A short two-day trip to the museum and the old harbour of Ohanegawa'),
+      side: ['尾羽川', '周遊券'], sideEn: 'OHANEGAWA',
+      tk: [['十万浦市〜花倉街道　乗り放題', 'Unlimited: Jumanmura–Hanakura-kaido'], ['花倉街道〜みつせ　各停乗り放題', 'Unlimited local trains to Mitsuse'], ['NAJIMAプリンス1泊・入館割引つき', '1 night + admission discounts', 1]],
+      perks: [
+        { k: '∞', ...T3('無限次搭乘 十万浦市－花倉街道 全區間的各停列車與優等列車', '十万浦市〜花倉街道の全区間で、各駅停車と優等列車に乗り放題', 'Unlimited rides on local and express trains across the full Jumanmura–Hanakura-kaido section') },
+        { k: '∞', ...T3('無限次搭乘 花倉街道－みつせ 的各停列車班次', '花倉街道〜みつせ間の各駅停車に乗り放題', 'Unlimited rides on local trains between Hanakura-kaido and Mitsuse') },
+        { k: '⇄', ...T3('新光瀨 出發、前往任一車站的高速鉄道直通班次，可搭乘 1 往復', '新光瀬から任意の駅へ向かう高速鉄道直通列車に、1往復乗車できます', 'One round trip on a through high-speed service from Shin-Hikarise to any station') },
+        { k: '⇄', ...T3('前往松沢国際空港的特急列車班次，可搭乘 1 往復', '松沢国際空港行きの特急列車に、1往復乗車できます', 'One round trip on a limited express to Matsuzawa International Airport') },
+        { k: '★', ...T3('懷永美術館、舊港務局海關所參觀費用折抵；NAJIMA王子住宿 1 晚', '懐永美術館・旧港務局税関所の入館料割引、NAJIMAプリンス 1泊付き', 'Discounts on admission to the Kaiei Museum and the Former Port Authority Customs House, plus 1 night at the NAJIMA Prince') }
+      ] }
+  );
   const passPerDay = p => Math.round(p.price / p.n);
+  const passName = p => p.reg ? tri(p.name) : `${p.n} 日券`;
   function passCard(p, o) {
-    o = o || {}; const sf = o.seatFee || 500, no = o.no || String(p.n).padStart(4, '0'), HSC = '#136880';
-    const lines = p.seatFree
+    o = o || {}; const sf = o.seatFee || 500, no = o.no || (p.reg ? p.id.toUpperCase().slice(0, 2) + String(p.n).padStart(2, '0') : String(p.n).padStart(4, '0')), HSC = '#136880';
+    const lines = p.reg ? p.tk : p.seatFree
       ? [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['指定席　座席料金込み', 'Reserved seats included', 1], ['高速鉄道　2往復無料', '2 round trips on HSR free', 1]]
       : [['自由席列車　乗り放題', 'Unlimited non-reserved rides'], ['各停・快速・環状快速・特快', 'Local / Rapid / Loop / Limited Exp.'], [`指定席は別途 ¥${sf.toLocaleString('en-US')}`, 'Seat fee extra']];
     const validJa = o.range ? o.range : (p.n === 1 ? '当日限り' : `連続${p.n}日間`), validEn = o.rangeEn || (p.n === 1 ? 'Valid on the day' : `Valid ${p.n} days`);
-    return h('article', { class: 'tk tkP' + (p.seatFree ? ' tkP-hs' : ''), 'data-i18n-off': '', style: `--tk:${p.col}` },
-      h('div', { class: 'tkA-side' }, h('b', { lang: 'ja' }, p.n + '日券'), h('em', { lang: 'en' }, p.n + ' DAY PASS'), h('small', { lang: 'ja' }, '光瀬都市鉄道', h('br'), 'フリーパス')),
+    return h('article', { class: 'tk tkP' + (p.seatFree ? ' tkP-hs' : '') + (p.reg ? ' tkP-r' : ''), 'data-i18n-off': '', style: `--tk:${p.col}` },
+      h('div', { class: 'tkA-side' }, h('b', { lang: 'ja' }, p.n + '日券'), h('em', { lang: 'en' }, p.reg ? p.sideEn : p.n + ' DAY PASS'), h('small', { lang: 'ja' }, ...(p.reg ? [p.side[0], h('br'), p.side[1]] : ['光瀬都市鉄道', h('br'), 'フリーパス']))),
       h('div', { class: 'tkA-body' },
         h('div', { class: 'tkP-ph', style: `background-image:url(${p.img});background-position:${p.pos}`, role: 'img', 'aria-label': p.alt }),
-        h('div', { class: 'tkA-top' }, h('span', { lang: 'ja' }, '光瀬都市鉄道　フリーパス', h('br'), h('i', { lang: 'en' }, 'Hikarise Visitor Pass')), h('span', { class: 'r', lang: 'ja' }, '有効　' + validJa, h('br'), h('i', { lang: 'en' }, validEn))),
+        h('div', { class: 'tkA-top' }, h('span', { lang: 'ja' }, ...(p.reg ? [p.name.ja.replace(/\d日券$/, '周遊券'), h('br'), h('i', { lang: 'en' }, p.name.en)] : ['光瀬都市鉄道　フリーパス', h('br'), h('i', { lang: 'en' }, 'Hikarise Visitor Pass')])), h('span', { class: 'r', lang: 'ja' }, '有効　' + validJa, h('br'), h('i', { lang: 'en' }, validEn))),
         p.seatFree ? h('div', { class: 'tkP-mem' }, h('b', { lang: 'ja' }, '指定席込み'), h('small', { lang: 'en' }, 'SEAT FEE INCLUDED')) : null,
         h('div', { class: 'tkP-mid' }, h('div', { class: 'tkP-pr' }, h('small', null, '¥'), p.price.toLocaleString('en-US')),
           h('ul', null, lines.map(l => h('li', { class: l[2] ? 'em' : '' }, h('span', { lang: 'ja' }, l[0]), h('i', { lang: 'en' }, l[1]))))),
         h('div', { class: 'tkP-ft' }, h('span', { lang: 'ja' }, `1日あたり 約¥${passPerDay(p).toLocaleString('en-US')}`), h('span', { class: 'no' }, 'No.' + no))));
   }
-  HK.passes = { list: PASSES, card: passCard, perDay: passPerDay };
+  HK.passes = { list: PASSES, card: passCard, perDay: passPerDay, name: passName };
 
-  /** 預約頁的「優惠套票」分頁：選券種・開始日・人數，開出模擬的券（不儲存） */
+  /* ───── 2.2.0 統一的訂購格式：1.開始日期 → 2.領取車站 → 3.提前預約車票 → 4.訂購結果（所有套票共用） ───── */
+  const PICKUP = ['咲海研究學園都市', '東平倉', 'みつせ', '花倉街道', '戸宮', '松澤國際空港', '新光瀨', '勝守', '新勝守', '上羽神別', '汐崎'];
+  const pkNorm = z => String(z || '').replace(/戶/g, '戸').replace(/澤/g, '沢').replace(/學/g, '学').replace(/國/g, '国').replace(/\s+/g, '');
+  const pickupStations = H => PICKUP.map(n => H.stations.find(s => pkNorm(s.zh) === pkNorm(n))).filter(Boolean);
+
+  /** 預約頁的「優惠套票」分頁：選券種 → 依序填寫 1.開始日期 2.領取車站 3.提前預約車票 → 確認訂購，顯示訂購結果（不儲存） */
   function passPanel(H) {
     const sf = H.cfg && H.cfg.seatFee || 500, today = new Date(), pad = n => String(n).padStart(2, '0');
     const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-    const st = { p: PASSES[1] }, dIn = h('input', { type: 'date', value: iso(today) });
-    const nSel = h('select', { 'aria-label': '枚數' }, [1, 2, 3, 4, 5, 6].map(n => h('option', { value: n }, n + ' 枚')));
-    const cards = h('div', { class: 'pass-grid' }), out = h('div', { class: 'pass-out' });
     const ymd = s => s.replaceAll('-', '/');
-    const draw = () => {
-      cards.replaceChildren(...PASSES.map(p => h('button', { type: 'button', class: 'pass-pick', 'aria-pressed': String(st.p === p), onclick: () => { st.p = p; draw(); } }, passCard(p, { seatFee: sf }), h('span', { class: 'pass-sel' }, st.p === p ? '選取中' : '選擇這張'))));
-      const p = st.p, n = Number(nSel.value), d0 = new Date(dIn.value + 'T00:00:00'), d1 = new Date(d0); d1.setDate(d1.getDate() + p.n - 1);
-      const range = p.n === 1 ? ymd(dIn.value) : `${ymd(dIn.value)}～${ymd(iso(d1))}`;
-      out.replaceChildren(h('h3', { class: 'h3' }, '開票內容'),
-        h('div', { class: 'pass-ticket' }, passCard(p, { seatFee: sf, range, rangeEn: 'Valid ' + range, no: String(Math.abs(hash(p.n + dIn.value + n)) % 1e4).padStart(4, '0') })),
+    const addDays = (isoStr, k) => { const d = new Date(isoStr + 'T00:00:00'); d.setDate(d.getDate() + k); return iso(d); };
+    const pks = pickupStations(H);
+    const st = { p: PASSES[1], pk: pks[0] ? pks[0].id : '', rsv: false, pick: null, sights: null };
+    const dIn = h('input', { type: 'date', value: iso(today), min: iso(today), required: true, 'aria-label': '開始日期' });
+    const nSel = h('select', { 'aria-label': '枚數' }, [1, 2, 3, 4, 5, 6].map(n => h('option', { value: n }, n + ' 枚')));
+    const pkSel = h('select', { 'aria-label': '領取車站' }, pks.map(s => h('option', { value: s.id }, s.zh)));
+    const rChk = h('input', { type: 'checkbox', id: 'po-rsv' });
+    const rDay = h('select', { 'aria-label': '預約日期' }), rTo = h('select', { 'aria-label': '抵達站' }, H.stations.map(s => h('option', { value: s.id }, s.zh)));
+    const rTime = h('input', { type: 'time', value: '07:00', 'aria-label': '出發時刻' }), rList = h('div', { class: 'po-trains', 'aria-live': 'polite' });
+    const rBox = h('div', { class: 'po-rbox', hidden: true });
+    const stGrid = h('div', { class: 'pass-grid' }), regGrid = h('div', { class: 'pass-grid' });
+    const detail = h('div', { class: 'pass-detail' }), prev = h('div', { class: 'pass-out' }), result = h('div', { class: 'pass-result', hidden: true });
+    const stn = id => H.stName(id);
+    /* 預約車票的顯示：站名與路線名各自獨立成節點，語言切換時才翻得到 */
+    const rsvNodes = (x, full) => [ymd(x.day) + ' ' + H.hm(x.dep) + ' ', h('span', null, stn(x.from)), ' → ' + H.hm(x.arr) + ' ', h('span', null, stn(x.to)),
+      ...(full ? [' ', h('span', null, x.svc), ' ', h('span', null, x.tf ? `轉乘 ${x.tf} 次` : '直達')] : [])];
+    const period = () => { const n = st.p.n, a = dIn.value; if (!a) return { a: '', b: '', txt: '' }; const b = addDays(a, n - 1); return { a, b, txt: n === 1 ? ymd(a) : `${ymd(a)}～${ymd(b)}` }; };
+    const orderNo = () => 'HK' + String(Math.abs(hash([st.p.id || st.p.n, dIn.value, nSel.value, st.pk, st.pick ? st.pick.key : ''].join('|'))) % 1e8).padStart(8, '0');
+
+    /* 2.2.0：地區周遊券依「地方」顯示該地方的景點介紹（資料來自 sights.json＋areas.json） */
+    function loadSights() {
+      if (st.sights || !HK.area) return;
+      st.sights = 'loading';
+      Promise.all([HK.area.load(), HK.getJSON('data/sights.json', true)]).then(([A, S]) => { st.sights = (S || []).map(d => ({ d, ds: HK.area.distOf((d.stations && d.stations.length ? d.stations : [d.station])[0]) })); drawDetail(); }).catch(() => { st.sights = []; });
+    }
+    function drawDetail() {
+      const p = st.p, kids = [];
+      if (p.reg) {
+        kids.push(h('h3', { class: 'h3' }, tri(p.name), h('small', { class: 'pass-yen' }, yen(p.price), '　', h('span', null, `${p.n} 日券　大人`))), h('p', { class: 'lead' }, tri(p.who)));
+        kids.push(h('h4', { class: 'h4' }, '套票內容'), h('ol', { class: 'pass-perks' }, p.perks.map(k => h('li', null, h('b', { class: 'pk pk-' + (k.k === '∞' ? 'u' : k.k === '⇄' ? 'r' : 'i') }, k.k), h('span', null, tri(k))))));
+        kids.push(h('p', { class: 'note' }, `不含指定席座席費：搭乘特急等指定席列車時，另付指定席費用（${yen(sf)}）。`), h('p', { class: 'note' }, '住宿與參觀費用折抵為模擬內容，實際兌換方式將於本網站公告。'));
+        loadSights();
+        const arr = Array.isArray(st.sights) ? st.sights.filter(x => x.ds && p.regions.includes(x.ds.region)) : [];
+        if (arr.length) {
+          kids.push(h('h4', { class: 'h4' }, '套票範圍的景點介紹'), h('div', { class: 'pass-sights' }, arr.map(({ d, ds }) => h('article', { class: 'pass-sight' },
+            d.photos && d.photos[0] ? h('img', { src: d.photos[0].src, alt: d.photos[0].alt || '', loading: 'lazy' }) : null,
+            h('div', null,
+              h('h5', null, h('a', { href: 'sights.html#' + d.id }, d.name), p.credit.includes(d.id) ? h('span', { class: 'pass-credit' }, '參觀費用折抵') : null),
+              h('p', { class: 'sarea' }, h('span', { class: 'atag' }, h('b', null, tri(HK.area.regOf(ds))), tri(ds.full))),
+              h('p', null, d.lead),
+              d.address ? h('p', { class: 'saddr' }, h('strong', null, '住址'), Lg() === 'en' && d.addressEn ? d.addressEn : d.address) : null)))));
+        }
+      } else {
+        kids.push(h('h3', { class: 'h3' }, `${p.n} 日券`, h('small', { class: 'pass-yen' }, yen(p.price), '　', h('span', null, '大人'))), h('p', { class: 'lead' }, p.who),
+          p.seatFree ? h('p', { class: 'note' }, '七日券已含指定席座席費，以及高速鉄道 2 往復（乘車費）。') : h('p', { class: 'note' }, '搭乘指定席列車時，須另付指定席座席費。'));
+      }
+      detail.replaceChildren(...kids);
+    }
+    function drawCards() {
+      const mk = p => h('button', { type: 'button', class: 'pass-pick', 'aria-pressed': String(st.p === p), onclick: () => { st.p = p; st.pick = null; drawAll(); } }, passCard(p, { seatFee: sf }), h('span', { class: 'pass-sel' }, st.p === p ? '選取中' : '選擇這張'));
+      stGrid.replaceChildren(...PASSES.filter(p => !p.reg).map(mk)); regGrid.replaceChildren(...PASSES.filter(p => p.reg).map(mk));
+    }
+    /* 預約日期＝使用期間內的每一天；出發站固定為領取車站（在該站領取後直接搭乘） */
+    function drawRsv() {
+      const pr = period(); rBox.hidden = !st.rsv;
+      const days = []; for (let k = 0; pr.a && k < st.p.n; k++) days.push(addDays(pr.a, k));
+      const keep = rDay.value; rDay.replaceChildren(...days.map(d => h('option', { value: d }, ymd(d)))); if (days.includes(keep)) rDay.value = keep;
+      rList.replaceChildren(); if (!st.rsv) { st.pick = null; return; }
+      const to = rTo.value, from = st.pk, tt = (rTime.value || '07:00').split(':'), t0 = (+tt[0]) * 3600 + (+tt[1]) * 60;
+      if (!from || !to || from === to) { rList.append(h('p', { class: 'note' }, '請選擇與領取車站不同的抵達站。')); st.pick = null; return; }
+      let js = []; try { js = H.search(from, to, t0, 5) || []; } catch (e) { js = []; }
+      if (!js.length) { rList.append(h('p', { class: 'note' }, '這個時段沒有可預約的班次，請調整抵達站或出發時刻。')); st.pick = null; return; }
+      const items = js.map(j => ({ key: `${rDay.value}|${from}|${to}|${j.dep}`, from, to, dep: j.dep, arr: j.arr, sv: j.legs.map(l => l.sv), svc: j.legs.map(l => l.sv.routeName + (l.gou ? ' ' + l.gou : '')).join(' ＋ '), tf: j.legs.length - 1 }));
+      if (!st.pick || !items.some(x => x.key === st.pick.key)) st.pick = { ...items[0], day: rDay.value };
+      st.pick.day = rDay.value;
+      rList.append(h('p', { class: 'note', style: 'margin:0 0 6px' }, '請選擇想預約的第一趟車票：'), ...items.map(x => h('label', { class: 'po-train' },
+        h('input', { type: 'radio', name: 'po-train', checked: st.pick.key === x.key, onchange: () => { st.pick = { ...x, day: rDay.value }; drawPrev(); } }),
+        h('span', { class: 'po-t' }, rsvNodes({ ...x, day: rDay.value }, false)), h('span', { class: 'po-s' }, h('span', { style: 'display:inline-flex;gap:4px;margin-right:6px' }, ...x.sv.map(v => HK.typeTag(v))), h('span', null, x.svc), '　', h('span', null, x.tf ? `轉乘 ${x.tf} 次` : '直達')))));
+    }
+    function drawPrev() {
+      const p = st.p, n = Number(nSel.value), pr = period();
+      prev.replaceChildren(h('h3', { class: 'h3' }, '開票內容'),
+        h('div', { class: 'pass-ticket' }, passCard(p, { seatFee: sf, range: pr.txt, rangeEn: 'Valid ' + pr.txt, no: String(Math.abs(hash(p.n + dIn.value + n + (p.id || ''))) % 1e4).padStart(4, '0') })),
         h('table', { class: 'tbl', style: 'max-width:520px;margin-top:12px' }, h('tbody', null,
-          h('tr', null, h('th', null, '券種'), h('td', null, `${p.n} 日券　大人`)),
-          h('tr', null, h('th', null, '使用期間'), h('td', null, range)),
+          h('tr', null, h('th', null, '券種'), h('td', null, p.reg ? tri(p.name) : `${p.n} 日券　大人`)),
+          h('tr', null, h('th', null, '開始日期'), h('td', null, pr.a ? ymd(pr.a) : '—')),
+          h('tr', null, h('th', null, '使用期間'), h('td', null, pr.txt || '—')),
+          h('tr', null, h('th', null, '領取車站'), h('td', null, st.pk ? h('span', null, stn(st.pk)) : '—')),
+          h('tr', null, h('th', null, '提前預約車票'), h('td', null, st.rsv && st.pick ? rsvNodes(st.pick, false) : '不預約')),
           h('tr', null, h('th', null, '單價'), h('td', null, yen(p.price))),
-          h('tr', { class: 'tot' }, h('th', null, `合計　${n} 枚`), h('td', null, yen(p.price * n)))),
-        ),
-        p.seatFree ? h('p', { class: 'note' }, '七日券已含指定席座席費，以及高速鉄道 2 往復（乘車費）。') : h('p', { class: 'note' }, '搭乘指定席列車時，須另付指定席座席費。'),
-        h('div', { class: 'noprint', style: 'margin-top:10px;display:flex;gap:10px' }, h('button', { class: 'btn', type: 'button', onclick: () => window.print() }, '列印')),
-        h('p', { class: 'note' }, '本頁為模擬開票，不會儲存。套票的實際販售方式與販售地點，將於本網站公告。'));
-    };
-    dIn.addEventListener('change', draw); nSel.addEventListener('change', draw);
+          h('tr', { class: 'tot' }, h('th', null, `合計　${n} 枚`), h('td', null, yen(p.price * n))))));
+    }
+    function drawAll() { drawCards(); drawDetail(); drawRsv(); drawPrev(); }
+    function order() {
+      if (!dIn.value) { dIn.focus(); return; }
+      if (!st.pk) return;
+      const p = st.p, n = Number(nSel.value), pr = period(), no = orderNo();
+      const rows = [['訂單編號', no], ['券種', p.reg ? tri(p.name) : `${p.n} 日券　大人`], ['枚數', `${n} 枚`], ['開始日期', ymd(pr.a)], ['使用期間', pr.txt], ['領取車站', h('span', null, stn(st.pk))],
+        ['提前預約車票', st.rsv && st.pick ? rsvNodes(st.pick, true) : '不預約'], ['合計', yen(p.price * n)]];
+      result.replaceChildren(
+        h('div', { class: 'po-done' }, h('b', { class: 'po-ok', 'aria-hidden': 'true' }, '✓'), h('div', null, h('h3', { class: 'h3', style: 'margin:0' }, '訂購完成'), h('p', { class: 'note', style: 'margin:2px 0 0' }, '這是模擬訂購的結果，不會被儲存。'))),
+        h('table', { class: 'tbl po-res', style: 'max-width:560px;margin-top:12px' }, h('tbody', null, rows.map((r, k) => h('tr', { class: k === rows.length - 1 ? 'tot' : '' }, h('th', null, r[0]), h('td', null, r[1]))))),
+        h('div', { class: 'pass-ticket' }, passCard(p, { seatFee: sf, range: pr.txt, rangeEn: 'Valid ' + pr.txt, no: no.slice(-4) })),
+        h('p', { class: 'note' }, '請在使用期間第一天之前，於領取車站（', h('span', null, stn(st.pk)), st.rsv && st.pick ? '）出示訂單編號領取套票與預約的車票。' : '）出示訂單編號領取套票。'),
+        h('div', { class: 'noprint', style: 'margin-top:10px;display:flex;gap:10px;flex-wrap:wrap' },
+          h('button', { class: 'btn', type: 'button', onclick: () => window.print() }, '列印'),
+          h('button', { class: 'btn ghost', type: 'button', onclick: () => back() }, '修改訂單'),
+          h('button', { class: 'btn ghost', type: 'button', onclick: () => { st.rsv = false; rChk.checked = false; st.pick = null; back(); } }, '重新訂購')));
+      form.hidden = true; prev.hidden = true; result.hidden = false; result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    function back() { form.hidden = false; prev.hidden = false; result.hidden = true; drawAll(); form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const step = (no, title, ...kids) => h('fieldset', { class: 'po-step' }, h('legend', null, h('b', null, String(no)), title), ...kids);
+    const field = (l, el) => h('label', { class: 'f' }, h('span', null, l), el);
+    const form = h('form', { class: 'pass-order', onsubmit: ev => { ev.preventDefault(); order(); } },
+      h('h3', { class: 'h3' }, '訂購'),
+      step(1, '開始日期', h('div', { class: 'bk-form' }, field('開始日期', dIn), field('枚數（大人）', nSel)), h('p', { class: 'note' }, '從開始日期起算，連續使用到券種規定的天數。')),
+      step(2, '領取車站', h('div', { class: 'bk-form' }, field('領取車站', pkSel)), h('p', { class: 'note' }, `可領取車站共 ${pks.length} 站：`, ...pks.flatMap((s, i) => [i ? '、' : '', h('span', null, s.zh)]), '。')),
+      step(3, '提前預約車票', h('label', { class: 'po-chk', for: 'po-rsv' }, rChk, h('span', null, '預約所選日期內想搭的第一趟車票，並在上述領取車站領取')),
+        rBox),
+      step(4, '訂購結果', h('p', { class: 'note', style: 'margin-top:0' }, '按下「確認訂購」後，會顯示訂單編號、領取方式與訂購內容。'), h('button', { class: 'btn', type: 'submit' }, '確認訂購')));
+    rBox.append(h('div', { class: 'bk-form' }, field('預約日期', rDay), field('出發站（＝領取車站）', h('output', { class: 'po-from' })), field('抵達站', rTo), field('出發時刻', rTime)), rList);
+    const upd = () => { rBox.querySelector('.po-from').replaceChildren(...(st.pk ? [h('span', null, stn(st.pk))] : [])); drawRsv(); drawPrev(); };
+    dIn.addEventListener('change', () => { drawRsv(); drawPrev(); }); nSel.addEventListener('change', drawPrev);
+    pkSel.addEventListener('change', () => { st.pk = pkSel.value; st.pick = null; upd(); });
+    rChk.addEventListener('change', () => { st.rsv = rChk.checked; upd(); }); rDay.addEventListener('change', () => { st.pick = null; drawRsv(); drawPrev(); });
+    rTo.addEventListener('change', () => { st.pick = null; drawRsv(); drawPrev(); }); rTime.addEventListener('change', () => { st.pick = null; drawRsv(); drawPrev(); });
     const panel = h('div', { class: 'pass-panel' },
-      h('p', { class: 'lead' }, '期間內可無限次搭乘光瀨都市鉄道的自由席列車。選一張券、指定開始日期，就能開出模擬的套票。'),
-      h('div', { class: 'finder' }, h('div', { class: 'bk-form' }, h('label', { class: 'f' }, h('span', null, '開始日'), dIn), h('label', { class: 'f' }, h('span', null, '枚數（大人）'), nSel))),
-      cards, out);
-    draw(); return panel;
+      h('p', { class: 'lead' }, '期間內可無限次搭乘光瀨都市鉄道的列車。選一張券，依序填寫開始日期、領取車站與提前預約車票，就能完成模擬訂購。'),
+      h('h3', { class: 'h3' }, '一般套票（1・3・5・7日券）'), stGrid,
+      h('h3', { class: 'h3' }, '地區周遊券（依地方推出）'), regGrid,
+      detail, form, prev, result);
+    drawAll(); upd(); return panel;
   }
   HK.passPanel = passPanel;
   HK.booking = booking;

@@ -181,7 +181,7 @@
     if (ap && center) { const f = H.fare(ap.id, center.id); if (f) { const one = f.yen, rt = one * 2; fareLine = { one, rt }; } }
     root.append(sec('優惠套票　一日券・三日券・五日券・七日券', 'Visitor Passes',
       h('p', null, '專為旅客準備的套票。購買後，在使用期間內可以無限次搭乘光瀨都市鉄道的自由席列車；搭乘指定席列車時，只需要另外付指定席費用（不需再付乘車券）。七日券已含指定席座席費，並含高速鉄道 2 往復。'),
-      h('div', { class: 'pass-grid static' }, HK.passes.list.map(p => HK.passes.card(p, { seatFee: sf }))),
+      h('div', { class: 'pass-grid static' }, HK.passes.list.filter(p => !p.reg).map(p => HK.passes.card(p, { seatFee: sf }))),
       fareLine ? h('p', { class: 'note' }, `參考：${ap.zh}～${center.zh} 單程乘車券 ${yen(fareLine.one)}、來回 ${yen(fareLine.rt)}。一日券（${yen(1500)}）大約搭 ${Math.ceil(1500 / fareLine.one)} 次這樣的單程就回本；三日券（${yen(4500)}）約 ${Math.ceil(4500 / fareLine.one)} 次。以每天往返市區與景點計算，通常很划算。`) : null,
       h('p', { class: 'note' }, h('a', { href: 'booking.html#pass' }, '到線上訂票，開立模擬套票'), '　套票的實際販售方式與販售地點，將於本網站公告。')));
     root.append(sec('注意事項', null, h('ul', { class: 'spoints' },

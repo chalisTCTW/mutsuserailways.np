@@ -297,3 +297,19 @@ body[data-page="home"] main { padding-bottom: 0; }
 @media (max-width: 420px) { .sh-brand span::after { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 @media print { .band::before { display: none; } }
+
+/* ───── 2.2.0：地方・行政區篩選、所在地標籤、景點住址 ───── */
+.afilter { margin: 12px 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255, 255, 255, .72); display: grid; gap: 8px; }
+.afilter .arow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 7px; }
+.afilter .alab { flex: none; min-width: 3.6em; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--g1); }
+.afilter .lchipbtn .cn { font-style: normal; font-size: 11px; font-weight: 700; opacity: .65; margin-left: 2px; }
+.afilter .lchipbtn[aria-pressed="true"] .cn { opacity: .9; }
+.atag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #5d6b66; }
+.atag b { font-weight: 800; color: var(--g1); background: rgba(120, 200, 170, .18); border-radius: 999px; padding: 1px 9px; }
+.sarea { margin: 2px 0 6px; }
+.dcard .sarea { margin: -2px 0 4px; }
+.saddr { margin: 10px 0 0; font-size: 13px; color: #5d6b66; }
+.saddr strong { margin-right: 10px; color: var(--g1); }
+@media (max-width: 520px) { .afilter .alab { min-width: 100%; } }
+.afilter.afail { border-color: #d9a441; background: #fff8e6; }
+footer .copy .ver { opacity: .6; font-size: .92em; white-space: nowrap; }

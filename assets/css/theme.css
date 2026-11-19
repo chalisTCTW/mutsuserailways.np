@@ -318,3 +318,39 @@ header.sh .gnav .subnav { list-style: none; margin: 0; padding: 8px 0; }
 .traingrid .traincard p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 @media (max-width: 960px) { .traingrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 620px) { .traingrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ───── 2.2.0 地區周遊券與統一訂購流程 ───── */
+.tkP-r .tkP-pr { font-size: 8.2cqw; }
+.tkP-r .tkA-side small { font-size: 1.9cqw; }
+.pass-panel > .h3 { margin: 26px 0 0; font-size: 18px; }
+.pass-detail { margin: 26px 0 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255, 255, 255, .7); }
+.pass-detail .h3 { margin: 0 0 6px; font-size: 20px; }
+.pass-yen { margin-left: 12px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.pass-detail .h4 { margin: 18px 0 8px; font-size: 15px; color: var(--g1); }
+.pass-perks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.pass-perks li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.6; }
+.pass-perks .pk { flex: none; min-width: 2.4em; text-align: center; border-radius: 999px; padding: 0 8px; font-size: 12px; line-height: 22px; color: #fff; background: var(--g1); }
+.pass-perks .pk-r { background: #a87a1f; } .pass-perks .pk-i { background: #8f3a2e; }
+.pass-sights { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.pass-sight { display: flex; gap: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.pass-sight img { flex: none; width: 112px; height: 84px; object-fit: cover; border-radius: 10px; }
+.pass-sight h5 { margin: 0 0 2px; font-size: 15px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.pass-sight p { margin: 2px 0; font-size: 13px; line-height: 1.55; }
+.pass-credit { font-size: 11px; font-weight: 800; color: #fff; background: #8f3a2e; border-radius: 999px; padding: 1px 9px; }
+.pass-order { margin-top: 26px; }
+.po-step { margin: 12px 0 0; padding: 12px 16px 14px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255, 255, 255, .72); }
+.po-step legend { padding: 0 8px; font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.po-step legend b { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--g1); color: #fff; font-size: 13px; }
+.po-step .note { margin: 6px 0 0; }
+.po-chk { display: flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+.po-rbox { margin-top: 10px; }
+.po-from { display: inline-block; min-height: 34px; line-height: 34px; font-weight: 700; }
+.po-trains { margin-top: 8px; display: grid; gap: 6px; }
+.po-train { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; padding: 7px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; font-size: 14px; }
+.po-train:has(input:checked) { border-color: var(--g1); box-shadow: 0 0 0 2px rgba(23, 128, 95, .18); }
+.po-t { font-weight: 800; } .po-s { color: var(--muted); font-size: 12.5px; }
+.pass-result { margin-top: 26px; }
+.po-done { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 16px; background: rgba(120, 200, 170, .22); }
+.po-ok { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--g1); color: #fff; font-size: 20px; }
+.po-res th { width: 9em; }
+@media print { .pass-panel > .h3, .pass-detail, .pass-order, .pass-grid { display: none; } }

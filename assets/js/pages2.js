@@ -34,6 +34,57 @@
   const sdEntry = name => { const sd = HK._sd; if (!sd || !sd.stations || !name) return null; const n = normZh(name); return sd.stations.find(e => normZh(e.name) === n) || sd.stations.find(e => normZh(e.name).startsWith(n) || n.startsWith(normZh(e.name))) || null; };
   const stationHref = (H, name) => { const st = stByName(H, name); return 'station.html?' + (st ? 's=' + encodeURIComponent(st.id) : 'n=' + encodeURIComponent(name)); };
   stationData();
+  /* ───────── 2.2.0：地方・行政區（data/areas.json；車站→行政區→地方） ───────── */
+  let _arP = null;
+  function areaData() { if (!_arP) _arP = HK.getJSON('data/areas.json', true).then(d => { HK._ar = d || null; return HK._ar; }).catch(() => { HK._ar = null; return null; }); return _arP; }
+  areaData();
+  const aL = o => (o && (o[L()] || o.zh)) || '';
+  /** 車站（中文名）→ 行政區物件；找不到回傳 null。 */
+  function distOf(name) {
+    const A = HK._ar; if (!A || !name) return null;
+    if (!A._idx) { A._idx = new Map(Object.keys(A.stations).map(k => [normZh(k), A.stations[k]])); A._dz = new Map(A.districts.map(d => [d.id, d])); A._rz = new Map(A.regions.map(r => [r.id, r])); }
+    const n = normZh(name); let id = A._idx.get(n);
+    if (!id) for (const [k, v] of A._idx) { if (k.startsWith(n) || n.startsWith(k)) { id = v; break; } }
+    return id ? A._dz.get(id) || null : null;
+  }
+  const regOf = d => (d && HK._ar && HK._ar._rz.get(d.region)) || null;
+  /** 「尾羽川地方・光瀨郡名島市」這種標示 */
+  const areaText = d => d ? `${aL(regOf(d))}・${aL(d.full)}` : '';
+  const areaTag = d => d ? h('span', { class: 'atag' }, h('b', null, aL(regOf(d))), aL(d.full)) : null;
+  /** 共用的篩選狀態（地方、行政區）：景點／餐廳／車站介紹三個分頁共用，網址 ?area=…&district=… */
+  const AREA = { region: 'all', district: 'all', subs: [] };
+  function areaInit() {
+    const A = HK._ar; if (!A) return;
+    const qs = new URLSearchParams(location.search), r = qs.get('area'), d = qs.get('district');
+    if (r && A.regions.some(x => x.id === r)) AREA.region = r;
+    if (d && A.districts.some(x => x.id === d)) { AREA.district = d; AREA.region = A.districts.find(x => x.id === d).region; }
+  }
+  function areaSet(region, district) {
+    AREA.region = region; AREA.district = district;
+    try { const qs = new URLSearchParams(location.search); region === 'all' ? qs.delete('area') : qs.set('area', region); district === 'all' ? qs.delete('district') : qs.set('district', district); const s = qs.toString(); history.replaceState(null, '', (s ? '?' + s : location.pathname) + (location.hash || '')); } catch (e) { /* 忽略 */ }
+    AREA.subs.forEach(f => f());
+  }
+  HK.area = { load: areaData, distOf, regOf, text: areaText };
+  const inArea = d => !!d && (AREA.region === 'all' || d.region === AREA.region) && (AREA.district === 'all' || d.id === AREA.district);
+  /** 兩層篩選列。dists＝這個分頁裡每一筆資料的行政區（可含 null），只列出有資料的地方與行政區。 */
+  function areaBar(dists) {
+    const A = HK._ar; if (!A) return h('div', { class: 'afilter afail' }, h('p', { class: 'note', style: 'margin:0' }, '地方篩選的資料（data/areas.json）沒有讀取到，請確認這個檔案已經上傳到網站的 data 資料夾。'));
+    const box = h('div', { class: 'afilter' });
+    function render() {
+      const cR = new Map(), cD = new Map(); dists.forEach(d => { if (!d) return; cR.set(d.region, (cR.get(d.region) || 0) + 1); cD.set(d.id, (cD.get(d.id) || 0) + 1); });
+      const chip = (label, on, fn, n) => h('button', { type: 'button', class: 'lchipbtn', 'aria-pressed': String(on), onclick: fn }, label, n != null ? h('em', { class: 'cn' }, String(n)) : null);
+      const total = dists.filter(Boolean).length;
+      const rowR = h('div', { class: 'arow' }, h('span', { class: 'alab' }, '地方'),
+        chip('全部地方', AREA.region === 'all', () => areaSet('all', 'all'), total),
+        ...A.regions.filter(r => cR.get(r.id)).map(r => chip(aL(r), AREA.region === r.id, () => areaSet(r.id, 'all'), cR.get(r.id))));
+      const ds = A.districts.filter(d => cD.get(d.id) && (AREA.region === 'all' || d.region === AREA.region));
+      const rowD = h('div', { class: 'arow' }, h('span', { class: 'alab' }, '行政區'),
+        chip('全部行政區', AREA.district === 'all', () => areaSet(AREA.region, 'all'), AREA.region === 'all' ? total : cR.get(AREA.region) || 0),
+        ...ds.map(d => chip(aL(d), AREA.district === d.id, () => areaSet(d.region, d.id), cD.get(d.id))));
+      box.replaceChildren(rowR, rowD);
+    }
+    render(); AREA.subs.push(render); return box;
+  }
   const TORDER = { loc: 0, exp: 1, ltd: 2, hs: 3 };
   const dispNote = H => ({ midday: '目前採用日中時段班次（部分列車停駛）。', offpeak: '目前採用離峰時段班次（部分列車停駛）。', night: '目前採用深夜時段班次（班次減少）。', recall: '目前為收車時段，不再發出新的班次。' }[H.dispatchNow] || '');
   const safeGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -228,7 +279,7 @@
   /* ───────── 沿線景點（景點＋餐廳兩個分頁） ───────── */
   async function viewSights(H, root) {
     let data = [], dining = null;
-    const sd = await stationData();
+    const sd = await stationData(); await areaData(); areaInit();
     try { data = await HK.getJSON('data/sights.json'); } catch (e) { /* 下面顯示說明 */ }
     try { dining = await HK.getJSON('data/dining.json'); } catch (e) { dining = null; }
     if (!data || !data.length) { root.append(h('div', { class: 'soonbox' }, h('h2', null, '景點資料暫時無法顯示'), h('p', null, '請稍後再試。'))); return; }
@@ -248,9 +299,11 @@
     if (hasSt) stationsTab(H, stBox, data, dining);
 
     /* ── 景點 ── */
-    sightsBox.append(h('p', { class: 'lead' }, '搭電車就能到的光瀨都市圈景點。每個景點都標示最近的車站，可以直接查時刻表或規劃乘車。'),
-      h('nav', { class: 'lchips sjump', 'aria-label': '景點' }, data.map(d => h('a', { class: 'lchipbtn', href: '#' + d.id, onclick: () => show('sights', false) }, d.name))));
-    data.forEach(d => {
+    const sDist = data.map(d => distOf((d.stations && d.stations.length ? d.stations : [d.station])[0]));
+    const sArts = [], sChips = [], sNone = h('p', { class: 'note', hidden: true }, '沒有符合條件的景點。');
+    sightsBox.append(h('p', { class: 'lead' }, '搭電車就能到的光瀨都市圈景點。每個景點都標示最近的車站，可以直接查時刻表或規劃乘車。'), areaBar(sDist),
+      h('nav', { class: 'lchips sjump', 'aria-label': '景點' }, data.map((d, k) => { const a = h('a', { class: 'lchipbtn', href: '#' + d.id, onclick: () => show('sights', false) }, d.name); sChips.push(a); return a; })), sNone);
+    data.forEach((d, di) => {
       const main = h('img', { src: d.photos[0].src, alt: d.photos[0].alt, loading: 'lazy' }), cap = h('figcaption', null, d.photos[0].cap || '');
       const thumbs = d.photos.length > 1 ? h('div', { class: 'sthumbs' }, d.photos.map((p, k) => h('button', { type: 'button', 'aria-label': p.alt, 'aria-pressed': String(k === 0), onclick: ev => { main.src = p.src; main.alt = p.alt; cap.textContent = p.cap || ''; ev.currentTarget.parentNode.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', String(j === k))); } }, h('img', { src: p.src, alt: '', loading: 'lazy' })))) : null;
       // 最近車站可以有一個以上（例：平倉市革命紀念公園＝平倉公園西、東平倉）
@@ -264,17 +317,22 @@
             id ? h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=map&s=' + encodeURIComponent(id) }, '路線圖與接下來的發車') : null,
             id ? h('a', { class: 'btn sm ghost', href: 'timetable.html?tab=route&to=' + encodeURIComponent(id) }, '前往這裡') : null) : h('p', { class: 'note', style: 'margin:6px 0 0' }, '這個車站尚未收錄在目前的時刻表資料中。'));
       });
-      sightsBox.append(h('article', { class: 'sight', id: d.id },
+      const art = h('article', { class: 'sight', id: d.id },
         h('figure', { class: 'sfig' }, main, cap, thumbs),
         h('div', { class: 'sbody' },
           h('div', { class: 'stag', style: SIGHT_BADGE[d.id] ? `--bc:${SIGHT_BADGE[d.id][1]}` : null },
           SIGHT_BADGE[d.id] ? h('span', { class: 'bic' }, SIGHT_BADGE[d.id][0]) : null, d.tag),
           h('h2', null, d.name, h('small', null, `${d.kana}　${d.en}`)),
+          sDist[di] ? h('p', { class: 'sarea' }, areaTag(sDist[di])) : null,
           h('p', { class: 'slead' }, d.lead),
           ...d.body.map(p => h('p', null, p)),
           h('ul', { class: 'spoints' }, d.points.map(p => h('li', null, p))),
-          ...nears)));
+          d.address ? h('p', { class: 'saddr' }, h('strong', null, '住址'), L() === 'en' && d.addressEn ? d.addressEn : d.address) : null,
+          ...nears));
+      sArts.push(art); sightsBox.append(art);
     });
+    function drawS() { let n = 0; sArts.forEach((a, k) => { const ok = inArea(sDist[k]) || (AREA.region === 'all' && AREA.district === 'all'); a.hidden = !ok; sChips[k].hidden = !ok; if (ok) n++; }); sNone.hidden = n > 0; }
+    AREA.subs.push(drawS); drawS();
 
     /* ── 餐廳 ── */
     if (hasDining) {
@@ -283,9 +341,14 @@
       let tier = qs.get('tier') || 'all', sta = qs.get('station') || 'all';
       if (!T[tier]) tier = 'all'; if (sta !== 'all' && !dining.stations.includes(sta)) sta = 'all';
       const list = h('div', { class: 'dgrid' }), count = h('p', { class: 'dcount', 'aria-live': 'polite' });
-      const tierBtns = {}, sel = h('select', { id: 'dstation', onchange: ev => { sta = ev.target.value; draw(); } },
-        h('option', { value: 'all' }, '全部車站'), ...dining.stations.map(n => h('option', { value: n }, n)));
-      sel.value = sta;
+      const tierBtns = {}, sel = h('select', { id: 'dstation', onchange: ev => { sta = ev.target.value; draw(); } });
+      const dDistOf = n => distOf(n);
+      function fillSel() {
+        const ok = dining.stations.filter(n => (AREA.region === 'all' && AREA.district === 'all') || inArea(dDistOf(n)));
+        if (sta !== 'all' && !ok.includes(sta)) sta = 'all';
+        sel.replaceChildren(h('option', { value: 'all' }, '全部車站'), ...ok.map(n => h('option', { value: n }, n)));
+        sel.value = sta;
+      }
       const tierRow = h('div', { class: 'lchips dtier', role: 'group', 'aria-label': '價位' },
         ...['all', '1', '2', '3'].map(k => (tierBtns[k] = h('button', { type: 'button', class: 'lchipbtn', 'aria-pressed': String(k === tier), onclick: () => { tier = k; draw(); } }, k === 'all' ? '全部價位' : `${T[k].label}　${T[k].price}`))));
       const catalog = dining.items;
@@ -295,6 +358,7 @@
         return h('article', { class: 'dcard t' + r.tier },
           h('div', { class: 'dhead' }, h('span', { class: 'dtag t' + r.tier }, T[r.tier].label), h('span', { class: 'dgenre' }, genre)),
           h('h3', null, dn.name(r), h('small', null, dn.sub(r))),
+          h('p', { class: 'sarea' }, areaTag(distOf(r.station))),
           h('p', { class: 'ddish' }, h('strong', null, '推薦'), dn.dish(r)),
           h('p', { class: 'dblurb' }, blurb),
           h('dl', { class: 'dinfo' },
@@ -307,16 +371,16 @@
       }
       function draw() {
         Object.keys(tierBtns).forEach(k => tierBtns[k].setAttribute('aria-pressed', String(k === tier)));
-        sel.value = sta;
-        const rows = catalog.filter(r => (tier === 'all' || String(r.tier) === tier) && (sta === 'all' || r.station === sta));
+        fillSel();
+        const rows = catalog.filter(r => (tier === 'all' || String(r.tier) === tier) && (sta === 'all' || r.station === sta) && ((AREA.region === 'all' && AREA.district === 'all') || inArea(distOf(r.station))));
         list.replaceChildren(...(rows.length ? rows.map(card) : [h('p', { class: 'note' }, '沒有符合條件的餐廳。')]));
         count.textContent = `${rows.length} 間`;
         try { const q = new URLSearchParams(location.search); tier === 'all' ? q.delete('tier') : q.set('tier', tier); sta === 'all' ? q.delete('station') : q.set('station', sta); const s2 = q.toString(); history.replaceState(null, '', (s2 ? '?' + s2 : location.pathname) + (location.hash || '')); } catch (e) { /* 忽略 */ }
       }
-      diningBox.append(h('p', { class: 'lead' }, '沿線各站附近的推薦餐廳，分成三個價位，可以依價位與車站篩選。'),
+      diningBox.append(h('p', { class: 'lead' }, '沿線各站附近的推薦餐廳，分成三個價位，可以依地方、行政區、價位與車站篩選。'), areaBar(catalog.map(r => distOf(r.station))),
         h('div', { class: 'dfilter' }, tierRow, h('label', { class: 'f dsel' }, h('span', null, '車站'), sel), count),
         list, h('p', { class: 'note' }, '※ 店名、住址、價格與營業時間皆為虛構，價位為每人預算的概估。'));
-      draw();
+      AREA.subs.push(draw); draw();
     }
     const hh = location.hash.slice(1), tb = (new URLSearchParams(location.search)).get('tab');
     show(hh === 'dining' || tb === 'dining' ? 'dining' : hh === 'stations' || tb === 'stations' ? 'stations' : 'sights', false);
@@ -335,26 +399,28 @@
     const sd = HK._sd, list = sd.stations.map(e => ({ e, st: stByName(H, e.name), ph: photosOfStation(e, data) }));
     list.sort((a, b) => (a.st ? 0 : 1) - (b.st ? 0 : 1) || a.e.name.localeCompare(b.e.name, 'ja'));
     const lineSet = new Map(); list.forEach(x => { if (x.st) H.svcs.forEach(sv => { if (sv.stops.some(t => t.station === x.st.id && t.pax !== false) && !lineSet.has(sv.line)) lineSet.set(sv.line, sv.color); }); });
+    const stDist = list.map(x => distOf(x.e.name) || distOf(x.st && x.st.zh));
     let line = 'all'; const grid = h('div', { class: 'dgrid stgrid' }), chips = h('div', { class: 'lchips', role: 'group', 'aria-label': '路線' });
     const servesLine = (st, ln) => st && H.svcs.some(sv => sv.line === ln && sv.stops.some(t => t.station === st.id && t.pax !== false));
     function draw() {
       chips.replaceChildren(h('button', { type: 'button', class: 'lchipbtn', 'aria-pressed': String(line === 'all'), onclick: () => { line = 'all'; draw(); } }, '全部路線'),
         ...[...lineSet.entries()].map(([ln, col]) => h('button', { type: 'button', class: 'lchipbtn', 'aria-pressed': String(line === ln), onclick: () => { line = ln; draw(); } }, h('i', { style: `background:${col}` }), ln)));
-      const rows = list.filter(x => line === 'all' || servesLine(x.st, line));
+      const rows = list.filter((x, k) => (line === 'all' || servesLine(x.st, line)) && ((AREA.region === 'all' && AREA.district === 'all') || inArea(stDist[k])));
       grid.replaceChildren(...(rows.length ? rows.map(x => {
-        const e = x.e, st = x.st, lines = st ? chipLines(H, st.id, null) : [], sg = sightsOfStation(data, e.name);
+        const e = x.e, st = x.st, xd = stDist[list.indexOf(x)], lines = st ? chipLines(H, st.id, null) : [], sg = sightsOfStation(data, e.name);
         let primary = null;
         if (st) for (const sv of H.svcs) { if (sv.stops.some(t => t.station === st.id && t.pax !== false)) { primary = sv; break; } }
         return h('a', { class: 'dcard stcard', href: stationHref(H, e.name), style: primary ? `--bc:${primary.color}` : null },
           primary ? h('span', { class: 'lbadge', title: primary.line }, primary.line.slice(0, 1)) : null,
           x.ph.length ? h('img', { src: x.ph[0].src, alt: x.ph[0].alt || '', loading: 'lazy' }) : null,
           h('h3', null, st ? H.codeBadges(st.id) : null, st ? st.zh : e.name, st && st.en ? h('small', null, st.en) : null),
+          xd ? h('p', { class: 'sarea' }, areaTag(xd)) : null,
           lines.length ? h('div', { class: 'sl' }, lines) : null,
           e.intro && e.intro[0] ? h('p', { class: 'dblurb' }, e.intro[0]) : null,
           sg.length ? h('p', { class: 'note', style: 'margin:0' }, '附近景點：' + sg.map(d => d.name).join('、')) : null);
       }) : [h('p', { class: 'note' }, '沒有符合條件的車站。')]));
     }
-    box.append(h('p', { class: 'lead' }, '各站的專屬介面：時刻表、停靠種別、月台、轉乘、附近的景點與餐廳。'), chips, grid); draw();
+    box.append(h('p', { class: 'lead' }, '各站的專屬介面：時刻表、停靠種別、月台、轉乘、附近的景點與餐廳。'), areaBar(stDist), chips, grid); AREA.subs.push(draw); draw();
   }
 
   /* ───────── 車站專屬頁面（station.html?s=車站ID 或 ?n=車站名稱） ───────── */
@@ -380,6 +446,8 @@
     }
     const facts = h('dl', { class: 'sp-facts' });
     const fact = (k, v) => { if (v == null || v === '') return; facts.append(h('dt', null, k), h('dd', null, v)); };
+    await areaData(); const myDist = distOf(name);
+    if (myDist) fact('所在地', areaText(myDist));
     if (st) {
       fact('停靠路線', lines.length ? h('span', { class: 'sl' }, lines) : null);
       if (H.zonesConfigured) fact('票價分區', st.zones && st.zones.length ? `第 ${st.zones.join('・')} 區` : null);
