@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>入口網站 檔案檢查（2.2.1）</title>
+<title>入口網站 檔案檢查（2.3.0）</title>
 <style>
 body{font:15px/1.7 system-ui,"Noto Sans TC","Hiragino Sans",sans-serif;margin:0;background:#f4faf7;color:#25332e}
 main{max-width:760px;margin:0 auto;padding:24px 18px 60px}
@@ -27,8 +27,12 @@ code{background:#eef5f2;padding:1px 6px;border-radius:6px;font-size:13px}
     document.getElementById('sum').textContent=(done<total?'檢查中…（'+done+'/'+total+'）':(bad?('有 '+bad+' 項不是新版／讀不到，請看下面的 ✖'):'全部都是新版 ✔'));}
   function get(u){return fetch(u+(u.indexOf('?')<0?'?':'&')+'_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text();});}
   var T=[
-    ['sights.html 載入的版本（?v=）',function(){return get('sights.html').then(function(t){var m=t.match(/pages2\.js\?v=([0-9.]+)/);return m?[/^2\.2\./.test(m[1]),'sights.html 引用 pages2.js?v='+m[1]+(/^2\.2\./.test(m[1])?'':'（應為 2.2.x：這個 html 還是舊的，請重新上傳 *.html）')]:[false,'讀不到版本']});}],
-    ['booking.html 載入的版本（?v=）',function(){return get('booking.html').then(function(t){var m=t.match(/booking\.js\?v=([0-9.]+)/);return m?[/^2\.2\./.test(m[1]),'booking.html 引用 booking.js?v='+m[1]]:[false,'讀不到版本']});}],
+    ['sights.html 載入的版本（?v=）',function(){return get('sights.html').then(function(t){var m=t.match(/pages2\.js\?v=([0-9.]+)/);return m?[/^2\.3\./.test(m[1]),'sights.html 引用 pages2.js?v='+m[1]+(/^2\.3\./.test(m[1])?'':'（應為 2.3.x：這個 html 還是舊的，請重新上傳 *.html）')]:[false,'讀不到版本']});}],
+    ['booking.html 載入的版本（?v=）',function(){return get('booking.html').then(function(t){var m=t.match(/booking\.js\?v=([0-9.]+)/);return m?[/^2\.3\./.test(m[1]),'booking.html 引用 booking.js?v='+m[1]]:[false,'讀不到版本']});}],
+    ['assets/js/hk-ui.js（輕軌：路線圖畫法）',function(){return get('assets/js/hk-ui.js').then(function(t){var o=t.indexOf('isLrtEdge')>=0&&t.indexOf('--lrt-color')>=0;return [o,o?'已含 2.3.0 的輕軌畫法':'舊檔：沒有輕軌畫法，請重新上傳 assets/js/hk-ui.js'];});}],
+    ['assets/js/hk-core.js（輕軌：路線判定）',function(){return get('assets/js/hk-core.js').then(function(t){var o=t.indexOf('LIGHT_RAIL')>=0&&t.indexOf('isLrtEdge')>=0;return [o,o?'已含 2.3.0 的輕軌判定（LIGHT_RAIL）':'舊檔：沒有輕軌判定，請重新上傳 assets/js/hk-core.js'];});}],
+    ['assets/css/site.css（輕軌：藍色細線）',function(){return get('assets/css/site.css').then(function(t){var o=t.indexOf('.e-line.lrt')>=0;return [o,o?'已含 2.3.0 的輕軌線條樣式':'舊檔：沒有輕軌樣式，請重新上傳 assets/css/site.css'];});}],
+    ['data/snapshot.json（有沒有輕軌路線）',function(){return get('data/snapshot.json').then(function(t){var m=t.match(/LIGHT_RAIL/g);var n=m?m.length:0;return [true,n?('快照裡有 '+n+' 筆 LIGHT_RAIL 路線（上下行各算一筆）'):'快照裡還沒有 LIGHT_RAIL 路線——遊戲裡把路線類型改成「輕軌」再匯出就會變藍色細線'];});}],
     ['assets/js/pages2.js（地方篩選程式）',function(){return get('assets/js/pages2.js').then(function(t){var o=t.indexOf('areaBar')>=0;return [o,o?'有地方篩選程式':'這是舊版 pages2.js，請重新上傳 assets/js/pages2.js']});}],
     ['assets/js/booking.js（地區周遊券・訂購流程）',function(){return get('assets/js/booking.js').then(function(t){var o=t.indexOf("id: 'kt3'")>=0&&t.indexOf('PICKUP')>=0;return [o,o?'有兩款地區周遊券與統一訂購流程':'這是舊版 booking.js，請重新上傳 assets/js/booking.js']});}],
     ['assets/js/i18n-dict.js（新翻譯）',function(){return get('assets/js/i18n-dict.js').then(function(t){var o=t.indexOf('全部行政區')>=0;return [o,o?'有 2.2.x 的新翻譯':'這是舊版字典，請重新上傳 assets/js/i18n-dict.js']});}],
