@@ -518,3 +518,14 @@ assets/js/hs.js、data/stations.json、data/sights.json、assets/photo/（新增
 assets/js/pages3.js、assets/js/i18n-dict.js、assets/css/mint.css、assets/css/theme.css、所有 *.html（?v=）。
 ⚠ 升級時不要覆蓋 data/snapshot.json、data/layout.json（本次完全沒動，已逐位元比對與上傳的原檔相同）。
 未驗證：真實瀏覽器的字體顯示、手機版版面（只用無頭 Chrome 截圖檢查桌面寬度）。
+
+【2.2.1】診斷用小改（功能沒變）
+・前輩回報「2.2.0 看不到地方篩選」。把 zip 解到全新資料夾用 HTTP 伺服器測，篩選／套票／訂購流程都正常，所以多半是網站上線的檔案
+  和 zip 不一致（舊 html／舊快取／漏傳新增的 data/areas.json）。2.2.1 加了三個診斷功能：
+  1. 每一頁頁尾顯示「Portal v2.2.1」，看得到就代表載入的是新的 site.js。
+  2. 篩選資料（data/areas.json）讀不到時，景點頁會直接顯示黃色警告，不再靜靜地消失。
+  3. 新增 check.html：打開 https://你的網址/check.html，會逐項檢查 html 版本、pages2.js／booking.js／i18n-dict.js／mint.css 是否為新版，
+     以及 areas.json、dining.json（142 間）、sights.json（住址）是否讀得到。
+・所有頁面（board.html 除外）的 ?v= 更新為 2.2.1。
+更新檔案：check.html（新）、assets/js/site.js、assets/js/pages2.js、assets/js/i18n-dict.js、assets/css/mint.css、所有 *.html。
+⚠ 請把整個資料夾「裡面」的所有檔案與子資料夾都上傳（包含新增的 data/areas.json），但不要覆蓋 data/snapshot.json、data/layout.json。

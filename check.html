@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>入口網站 檔案檢查（2.2.1）</title>
+<style>
+body{font:15px/1.7 system-ui,"Noto Sans TC","Hiragino Sans",sans-serif;margin:0;background:#f4faf7;color:#25332e}
+main{max-width:760px;margin:0 auto;padding:24px 18px 60px}
+h1{font-size:22px;margin:0 0 4px}
+p.s{margin:0 0 18px;color:#5d6b66}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden}
+td,th{padding:9px 12px;border-bottom:1px solid #e3eee9;text-align:left;vertical-align:top}
+th{background:#e7f4ee;font-size:13px}
+.ok{color:#17805f;font-weight:800}.ng{color:#c0392b;font-weight:800}.wt{color:#8a8a8a}
+code{background:#eef5f2;padding:1px 6px;border-radius:6px;font-size:13px}
+#sum{margin:18px 0;padding:12px 16px;border-radius:14px;background:#fff;border:1px solid #cfe5db}
+</style></head><body><main>
+<h1>入口網站 檔案檢查</h1>
+<p class="s">確認網站上實際放的檔案是不是 2.2.x 新版。這一頁不會改任何東西。把整個畫面（或下面的 ✖ 項目）告訴人家就好。</p>
+<div id="sum">檢查中…</div>
+<table><thead><tr><th>項目</th><th>結果</th><th>說明</th></tr></thead><tbody id="rows"></tbody></table>
+<p class="s" style="margin-top:16px">如果全部都是 ✔，但網站頁面還是舊的：在該頁面按 <code>Ctrl + F5</code>（Mac：<code>Cmd + Shift + R</code>）強制重新整理；GitHub Pages 更新後也可能要等 1～2 分鐘。</p>
+<script>
+(function(){
+  var rows=document.getElementById('rows'),bad=0,done=0,total=0;
+  function add(name,ok,msg){done++;if(!ok)bad++;var tr=document.createElement('tr');
+    tr.innerHTML='<td></td><td class="'+(ok?'ok':'ng')+'">'+(ok?'✔':'✖')+'</td><td></td>';
+    tr.children[0].textContent=name;tr.children[2].textContent=msg;rows.appendChild(tr);
+    document.getElementById('sum').textContent=(done<total?'檢查中…（'+done+'/'+total+'）':(bad?('有 '+bad+' 項不是新版／讀不到，請看下面的 ✖'):'全部都是新版 ✔'));}
+  function get(u){return fetch(u+(u.indexOf('?')<0?'?':'&')+'_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text();});}
+  var T=[
+    ['sights.html 載入的版本（?v=）',function(){return get('sights.html').then(function(t){var m=t.match(/pages2\.js\?v=([0-9.]+)/);return m?[/^2\.2\./.test(m[1]),'sights.html 引用 pages2.js?v='+m[1]+(/^2\.2\./.test(m[1])?'':'（應為 2.2.x：這個 html 還是舊的，請重新上傳 *.html）')]:[false,'讀不到版本']});}],
+    ['booking.html 載入的版本（?v=）',function(){return get('booking.html').then(function(t){var m=t.match(/booking\.js\?v=([0-9.]+)/);return m?[/^2\.2\./.test(m[1]),'booking.html 引用 booking.js?v='+m[1]]:[false,'讀不到版本']});}],
+    ['assets/js/pages2.js（地方篩選程式）',function(){return get('assets/js/pages2.js').then(function(t){var o=t.indexOf('areaBar')>=0;return [o,o?'有地方篩選程式':'這是舊版 pages2.js，請重新上傳 assets/js/pages2.js']});}],
+    ['assets/js/booking.js（地區周遊券・訂購流程）',function(){return get('assets/js/booking.js').then(function(t){var o=t.indexOf("id: 'kt3'")>=0&&t.indexOf('PICKUP')>=0;return [o,o?'有兩款地區周遊券與統一訂購流程':'這是舊版 booking.js，請重新上傳 assets/js/booking.js']});}],
+    ['assets/js/i18n-dict.js（新翻譯）',function(){return get('assets/js/i18n-dict.js').then(function(t){var o=t.indexOf('全部行政區')>=0;return [o,o?'有 2.2.x 的新翻譯':'這是舊版字典，請重新上傳 assets/js/i18n-dict.js']});}],
+    ['assets/css/mint.css（篩選樣式）',function(){return get('assets/css/mint.css').then(function(t){var o=t.indexOf('.afilter')>=0;return [o,o?'有篩選樣式':'這是舊版 mint.css']});}],
+    ['data/areas.json（地方・行政區）',function(){return get('data/areas.json').then(function(t){var j=JSON.parse(t);var o=j.regions&&j.regions.length===6&&j.districts&&j.districts.length>=16;return [o,'地方 '+(j.regions||[]).length+' 個、行政區 '+(j.districts||[]).length+' 個、車站 '+Object.keys(j.stations||{}).length+' 站']}).catch(function(e){return [false,'讀不到（'+e.message+'）：請上傳新增的 data/areas.json']});}],
+    ['data/dining.json（餐廳 142 間）',function(){return get('data/dining.json').then(function(t){var j=JSON.parse(t);var n=(j.items||j.list||j.restaurants||[]).length;return [n>=142,'共 '+n+' 間'+(n>=142?'':'（應為 142 間：請重新上傳 data/dining.json）')]}).catch(function(e){return [false,'讀不到（'+e.message+'）']});}],
+    ['data/sights.json（景點住址）',function(){return get('data/sights.json').then(function(t){var j=JSON.parse(t);var n=j.filter(function(d){return d.address}).length;return [n===j.length,j.length+' 個景點中有 '+n+' 個有住址'+(n===j.length?'':'：請重新上傳 data/sights.json')]}).catch(function(e){return [false,'讀不到（'+e.message+'）']});}],
+    ['data/snapshot.json（ATOS 回傳的路網）',function(){return get('data/snapshot.json').then(function(t){return [t.length>1000,'存在（'+Math.round(t.length/1024)+' KB）。這個檔案不要用 zip 裡的覆蓋']}).catch(function(e){return [false,'讀不到（'+e.message+'）']});}]
+  ];
+  total=T.length;
+  T.forEach(function(x){x[1]().then(function(r){add(x[0],r[0],r[1]);}).catch(function(e){add(x[0],false,String(e&&e.message||e));});});
+})();
+</script></main></body></html>
