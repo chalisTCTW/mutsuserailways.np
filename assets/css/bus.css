@@ -49,8 +49,11 @@
 .bus-legs li { display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center; font-size: 14px; font-variant-numeric: tabular-nums; }
 .bus-legs .dir { color: #5f7085; font-size: 12.5px; flex-basis: 100%; padding-left: 62px; }
 .bus-map { border: 1px solid #dceaf7; border-radius: 14px; background: #fbfdff; overflow: hidden; }
-.bus-svgwrap { overflow: auto; max-height: 78vh; }
-.bus-svg { display: block; width: 100%; height: auto; }
+.bus-svgwrap { position: relative; height: min(72vh, 680px); overflow: hidden; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.bus-svgwrap.drag { cursor: grabbing; }
+.bus-svg { display: block; width: 100%; height: 100%; }
+.bus-zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 6px; }
+.bus-zb { width: 38px; height: 38px; border-radius: 10px; border: 1px solid #dceaf7; background: #fff; color: #0a2b59; font-size: 19px; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(10,43,89,.12); }
 .bus-svg .grid line { stroke: #e9f1f9; stroke-width: 1; }
 .bus-svg text.key { fill: #1d2733; }
 .bus-svg text:not(.key) { fill: #5f7085; }
@@ -64,3 +67,5 @@
 .bus-station .note { color: #5f7085; font-size: 13.5px; margin: 0 0 6px; }
 .bus-walk { display: inline-block; min-width: 46px; text-align: center; border: 1px dashed #5f7085; color: #5f7085; border-radius: 7px; padding: 1px 8px; font-size: 13px; margin-right: 8px; }
 .bus-legs li.walk { color: #5f7085; }
+.bus-rail { display: inline-flex; min-width: 46px; margin-right: 8px; }
+.bus-rail:empty { display: none; }

@@ -30,12 +30,24 @@ def en_of(base_en, suf_en):
   if suf_en in ('Higashi','Nishi'): return suf_en+'-'+base_en
   return base_en+' '+suf_en
 rng=random.Random(20261121)
-def filler(hub):
+# 2.10.1：和車站同名／同地名（例：浦津、荒木）的站牌，必須在那個車站 2 km 以內（地名跟著聚落走）
+_k=lambda c:'\u4e00'<=c<='\u9fff' or c=='々'
+GENERIC={'中央','病院','病院前','大學','公園','高校','團地','前'}
+STEMS={}
+for n,pp in ST.items():
+  for part in n.split('/'):
+    for stem in ([part]+([part[:2]] if len(part)>=3 and all(_k(c) for c in part[:2]) else [])):
+      if len(stem)>=2 and stem not in GENERIC: STEMS.setdefault(stem.replace('瀬','瀨'),[]).append(pp)
+def far_name(nm,p):
+  m=nm.replace('瀬','瀨')
+  return any(stem in m and min(math.dist(p,q) for q in qs)>2000 for stem,qs in STEMS.items())
+def filler(hub,p=None):
   pool=POOL.get(hub) or POOL['みつせ']
-  for _ in range(2000):
+  for _ in range(4000):
     b=rng.choice(pool); s=rng.choice(SUF)
     nm=b[0]+s[0] if not (s[0] in ('東','西')) else b[0]+s[0]
     if nm in used or nm in ST: continue
+    if p is not None and far_name(nm,p): continue
     used.add(nm); NAMEEN[nm]=en_of(b[1],s[1]); return nm
   raise Exception('pool exhausted '+hub)
 HUBXY={h:ST[h] for h in ['みつせ','戸宮','花倉街道','東平倉','谷山','白藏山','紫市','名島港','勝守','十万浦市','上羽神別']}
@@ -52,6 +64,47 @@ def anchor(n):
     return (ST[s][0]+off[0],ST[s][1]+off[1])
   return None
 SEG={}  # (a,b) -> fillers list (shared between routes that share the same key pair)
+# 2.10.1：放射狀的次要路線（1 小時 1 班）。從各核心站往「現有路線還沒有去的方向」延伸，
+# 讓核心站的路線數達到目標（みつせ・戸宮 10 條，其他 6 條）。終點用假想的團地・ニュータウン等地名。
+from routes import SECONDARY
+TSUF=[('團地','Danchi'),('ニュータウン','New Town'),('車庫前','Depot'),('高校前','High School'),('台','-dai'),('工業団地','Industrial Park'),('霊園前','Cemetery'),('営業所前','Bus Office'),('ヶ丘','-gaoka'),('運動公園','Sports Park'),('温泉','Onsen'),('ゴルフ場前','Golf Course')]
+srng=random.Random(4096)
+ROUTES=list(ROUTES)
+def known_pos(n):
+  if n in FIXED and FIXED[n]: return FIXED[n]
+  return anchor(n)
+for hub,(hstops,target,prefix) in SECONDARY.items():
+  hp=ST[hub]
+  serving=[R for R in ROUTES if any(x in R['seq'] for x in hstops)]
+  ang=[]
+  for R in serving:
+    sq=R['seq']
+    for i,x in enumerate(sq):
+      if x not in hstops: continue
+      for j in (i-1,i+1):
+        if 0<=j<len(sq):
+          q=known_pos(sq[j])
+          if q and math.dist(q,hp)>50: ang.append(math.atan2(q[1]-hp[1],q[0]-hp[0]))
+  nos=[int(R['no']) for R in ROUTES if R['no'].isdigit() and int(R['no'])//100==prefix]
+  nxt=max(nos)+1 if nos else prefix*100+1
+  k=0
+  while len(serving)+k<target:
+    cands=[math.radians(d) for d in range(0,360,15)]
+    angd=lambda a,b:abs((a-b+math.pi)%(2*math.pi)-math.pi)
+    best=max(cands,key=lambda c:(min([angd(c,e) for e in ang] or [9]), srng.random()))
+    ang.append(best)
+    D=srng.uniform(2300,3900)
+    tp=(hp[0]+math.cos(best)*D, hp[1]+math.sin(best)*D)
+    hs=hstops[k%len(hstops)]
+    for _ in range(500):
+      b=srng.choice(POOL.get(hub) or POOL['みつせ']); t=srng.choice(TSUF)
+      nm=b[0]+t[0]
+      if nm in used or nm in ST or far_name(nm,tp): continue
+      break
+    used.add(nm); NAMEEN[nm]=en_of(b[1],t[1]); FIXED[nm]=tp; POS[nm]=tp
+    n=max(6,min(14,round(D/330)+1))
+    ROUTES.append(dict(no=str(nxt),hub=hub,n=n,seq=[hs,nm],hw=60,minor=True))
+    nxt+=1; k+=1
 routes_out=[]
 ORDER=sorted(ROUTES,key=lambda R:(R['n']-len(R['seq']))/max(1,len(R['seq'])))
 for R in ORDER:
@@ -102,7 +155,7 @@ for R in ORDER:
       lst=[]
       for m in range(k):
         t=(m+1)/(k+1); p=(pa[0]+(pb[0]-pa[0])*t, pa[1]+(pb[1]-pa[1])*t)
-        nm=filler(area(p)); POS[nm]=p; lst.append(nm)
+        nm=filler(area(p),p); POS[nm]=p; lst.append(nm)
       SEG[key]=(a,lst)
     first,lst=SEG[key]
     mids=lst if first==a else lst[::-1]
@@ -113,7 +166,7 @@ for R in ORDER:
   speed=420 if R.get('express') else 260   # m/min（含停站）
   ring=stops+([stops[0]] if loop else [])
   t=[max(1,round(math.dist(POS[ring[i]],POS[ring[i+1]])/speed)) for i in range(len(ring)-1)]
-  routes_out.append(dict(no=R['no'],hub=R['hub'],loop=loop,express=R.get('express',False),name=R.get('name',''),stops=stops,t=t))
+  routes_out.append(dict(no=R['no'],hub=R['hub'],loop=loop,express=R.get('express',False),name=R.get('name',''),stops=stops,t=t,**({'hw':R['hw'],'minor':True} if R.get('hw') else {})))
 # stops
 stops_out={}
 for n,p in POS.items():
@@ -123,7 +176,7 @@ for n,p in POS.items():
   stops_out[n]=dict(x=round(p[0]),z=round(p[1]),en=en,**({'st':link} if link else {}))
 used_names=set(x for r in routes_out for x in r['stops'])
 stops_out={k:v for k,v in stops_out.items() if k in used_names}
-data=dict(v='2.10.0',fare=dict(base=100,step=20,per=5),
+data=dict(v='2.10.1',fare=dict(base=100,step=20,per=5),
   hours=dict(first=240,last=1470,bands=[[0,360,45],[360,540,15],[540,900,30],[900,1140,15],[1140,1500,45]]),
   stops=stops_out,routes=routes_out)
 json.dump(data,open(OUT,'w'),ensure_ascii=False,separators=(',',':'))

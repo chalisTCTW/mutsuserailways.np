@@ -48,10 +48,12 @@
     deps.sort((x, y) => x - y);
     PAT = [];
     D.routes.forEach(r => {
+      // 2.10.1：次要路線（r.hw）整天固定班距（約 1 小時 1 班）
+      const dp = r.hw ? (() => { const a = []; for (let t = first; t <= last; t += r.hw) a.push(t); return a; })() : deps;
       const mk = (stops, t, dir) => {
         const off = [0];
         for (let i = 0; i < t.length; i++) off.push(off[i] + t[i]);
-        PAT.push({ r, dir, stops, off, deps, dest: stops[stops.length - 1] });
+        PAT.push({ r, dir, stops, off, deps: dp, dest: stops[stops.length - 1] });
       };
       if (r.loop) {
         const ring = r.stops.concat([r.stops[0]]);
@@ -99,7 +101,8 @@
       });
     });
   }
-  function searchOnce(from, to, t0) {
+  /** 從 from 在 t0 出發，到所有站牌的最早抵達（每一輪＝多搭一班）。 */
+  function profile(from, t0) {
     const K = 5, best = new Map(), rounds = [new Map([[from, { t: t0 }]])];
     best.set(from, t0);
     walkFrom(rounds[0], best);
@@ -125,6 +128,10 @@
       rounds.push(cur);
       if (!cur.size) break;
     }
+    return { rounds, best, from };
+  }
+  function trace(P, to) {
+    const rounds = P.rounds, from = P.from;
     let kb = -1;
     for (let k = 1; k < rounds.length; k++) { const e = rounds[k].get(to); if (e && (kb < 0 || e.t < rounds[kb].get(to).t)) kb = k; }
     if (kb < 0) return null;
@@ -143,6 +150,7 @@
     if (legs[0].walk) { legs[0].arr = rides[0].dep; legs[0].dep = rides[0].dep - WALK; }
     return { legs, rides: rides.length, dep: legs[0].dep, arr: legs[legs.length - 1].arr, fare: legs.reduce((x, l) => x + l.fare, 0) };
   }
+  const searchOnce = (from, to, t0) => trace(profile(from, t0), to);
   function search(from, to, t0, n) {
     const out = [];
     let t = t0;
@@ -191,6 +199,7 @@
     box.append(h('div', { class: 'bus-strip-head' }, badge(r.no),
       h('b', null, ...rname(r)),
       r.express ? h('span', { class: 'bus-xf' }, '快速') : null,
+      r.minor ? h('span', { class: 'bus-xf' }, '每小時 1 班') : null,
       h('span', { class: 'meta' }, '全 ' + stops.length + ' 站・約 ' + total + ' 分・' + yen(fareOf(stops.length - 1)) + '（全程）')),
       h('div', { class: 'bus-strip-body', style: '--c:' + colorOf(r.no) }, ul));
     return box;
@@ -205,7 +214,7 @@
       const rs = D.routes.filter(r => r.hub === hub);
       if (!cur || cur.hub !== hub) cur = rs[0];
       list.replaceChildren(...rs.map(r => h('button', { type: 'button', class: 'bus-rbtn', 'aria-pressed': String(r === cur), onclick: () => { cur = r; draw(); } },
-        badge(r.no), h('span', null, ...rname(r)))));
+        badge(r.no), h('span', null, ...rname(r)), r.minor ? h('span', { class: 'bus-xf' }, '每小時 1 班') : null)));
       detail.replaceChildren(routeStrip(cur));
     }
     draw();
@@ -315,52 +324,122 @@
     return pts[0][1] === pts[1][1] ? 'h' : 'v';
   }
 
+  /** 拖曳＋縮放：滑鼠拖曳／滾輪、手指拖曳／兩指縮放、按鈕。改的是 SVG 的 viewBox，線條和字都保持清晰。
+   *  full：整張圖的範圍（SVG 單位）；focus：一開始對準的點（手機上整張圖太小時才用）；keep：之前的畫面。 */
+  function panZoom(wrap, svg, full, focus, keep, save) {
+    let s = 1, cx = 0, cy = 0;            // s：每個 SVG 單位幾個像素；(cx, cy)：畫面中心
+    const size = () => [wrap.clientWidth || 360, wrap.clientHeight || 400];
+    const fit = () => { const [w, hh] = size(); return Math.min(w / full.w, hh / full.h); };
+    const clampS = v => Math.max(fit() * 0.8, Math.min(5, v));
+    const apply = () => {
+      const [w, hh] = size();
+      cx = Math.max(full.x, Math.min(full.x + full.w, cx)); cy = Math.max(full.y, Math.min(full.y + full.h, cy));
+      svg.setAttribute('viewBox', `${(cx - w / 2 / s).toFixed(1)} ${(cy - hh / 2 / s).toFixed(1)} ${(w / s).toFixed(1)} ${(hh / s).toFixed(1)}`);
+      save({ s, cx, cy });
+    };
+    const reset = () => {
+      const f = fit();
+      if (focus && f < 0.7) { s = 0.8; cx = focus[0]; cy = focus[1]; } else { s = f; cx = full.x + full.w / 2; cy = full.y + full.h / 2; }
+      apply();
+    };
+    const toSvg = (px, py) => { const r = wrap.getBoundingClientRect(), [w, hh] = size(); return [cx + (px - r.left - w / 2) / s, cy + (py - r.top - hh / 2) / s]; };
+    const zoomAt = (k, px, py) => {
+      const before = px == null ? [cx, cy] : toSvg(px, py);
+      s = clampS(s * k);
+      if (px != null) { const after = toSvg(px, py); cx += before[0] - after[0]; cy += before[1] - after[1]; }
+      apply();
+    };
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    const P = new Map(); let last = null;
+    wrap.addEventListener('pointerdown', e => { if (e.target.closest('.bus-zoom')) return; wrap.setPointerCapture(e.pointerId); P.set(e.pointerId, [e.clientX, e.clientY]); last = null; wrap.classList.add('drag'); });
+    wrap.addEventListener('pointermove', e => {
+      if (!P.has(e.pointerId)) return;
+      const prev = P.get(e.pointerId); P.set(e.pointerId, [e.clientX, e.clientY]);
+      if (P.size === 1) { cx -= (e.clientX - prev[0]) / s; cy -= (e.clientY - prev[1]) / s; apply(); }
+      else if (P.size === 2) {
+        const [a, b] = [...P.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        if (last) { zoomAt(d / last.d, m[0], m[1]); cx -= (m[0] - last.m[0]) / s; cy -= (m[1] - last.m[1]) / s; apply(); }
+        last = { d, m };
+      }
+    });
+    const up = e => { P.delete(e.pointerId); last = null; if (!P.size) wrap.classList.remove('drag'); };
+    wrap.addEventListener('pointerup', up); wrap.addEventListener('pointercancel', up);
+    wrap.addEventListener('wheel', e => { e.preventDefault(); zoomAt(Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY); }, { passive: false });
+    wrap.addEventListener('dblclick', e => { if (!e.target.closest('.bus-zoom')) zoomAt(1.6, e.clientX, e.clientY); });
+    if (keep) { s = keep.s; cx = keep.cx; cy = keep.cy; requestAnimationFrame(apply); } else requestAnimationFrame(reset);
+    return { zoom: k => zoomAt(k), reset };
+  }
+
   function viewMap(el) {
-    let hub = 'みつせ', focus = null;
+    let hub = 'みつせ', focus = null, view = null;   // view：目前的縮放／位置（換地區才重設，點路線號時保留）
     const box = h('div', { class: 'bus-map' });
     const chips = h('div', { class: 'bus-hubs', role: 'group', 'aria-label': '地區' });
     const NS = 'http://www.w3.org/2000/svg';
     const sv = (tag, attrs) => { const e = document.createElementNS(NS, tag); Object.keys(attrs || {}).forEach(k => e.setAttribute(k, attrs[k])); return e; };
     const U = 26, W = 0.2;   // 一格 26px；並排的線距 0.2 格
     function draw() {
-      chips.replaceChildren(...['全部'].concat(HUBS).map(g => h('button', { type: 'button', 'aria-pressed': String(g === hub), onclick: () => { hub = g; focus = null; draw(); } }, g)));
+      chips.replaceChildren(...['全部'].concat(HUBS).map(g => h('button', { type: 'button', 'aria-pressed': String(g === hub), onclick: () => { hub = g; focus = null; view = null; draw(); } }, g)));
       const all = hub === '全部';
       const rs = D.routes.filter(r => all || r.hub === hub).sort((a, b) => +a.no - +b.no);
       // 每段走廊有哪些路線（依路線號排）→ 各自的偏移
-      const use = new Map();
-      rs.forEach(r => corridorsOf(r).forEach(c => { if (!use.has(c.key)) use.set(c.key, []); if (!use.get(c.key).includes(r)) use.get(c.key).push(r); }));
-      const offOf = (key, r) => { const l = use.get(key); return (l.indexOf(r) - (l.length - 1) / 2) * W; };
+      // 2.10.1：共線的判斷改成「半格一小段」為單位——不同走廊重疊在同一條路上也會並排（例：從核心站放射出去的路線共用出站的那一段）
+      const rawOf = r => { const pts = []; corridorsOf(r).forEach(c => { let q = D.corr[c.key].pts.map(p => p.slice()); if (c.rev) q.reverse(); q.forEach(p => { const l = pts[pts.length - 1]; if (!l || Math.abs(l[0] - p[0]) > 1e-6 || Math.abs(l[1] - p[1]) > 1e-6) pts.push(p); }); }); return pts; };
+      const stepsOf = pts => {
+        const out = [];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const a = pts[i], b = pts[i + 1], hz = Math.abs(a[1] - b[1]) < 1e-6, len = hz ? b[0] - a[0] : b[1] - a[1];
+          const n = Math.max(1, Math.round(Math.abs(len) / 0.5)), sg = Math.sign(len) || 1, st = Math.abs(len) / n * sg;
+          for (let k = 0; k < n; k++) {
+            const p = hz ? [a[0] + st * k, a[1]] : [a[0], a[1] + st * k], q = hz ? [p[0] + st, p[1]] : [p[0], p[1] + st];
+            const lo = hz ? Math.min(p[0], q[0]) : Math.min(p[1], q[1]);
+            out.push({ key: (hz ? 'h' : 'v') + (hz ? lo.toFixed(2) + ',' + p[1].toFixed(2) : p[0].toFixed(2) + ',' + lo.toFixed(2)), hz, p, q, sg });
+          }
+        }
+        return out;
+      };
+      const RS = new Map(), bund = new Map();
+      rs.forEach(r => { const S = stepsOf(rawOf(r)); RS.set(r, S); S.forEach(t => { if (!bund.has(t.key)) bund.set(t.key, []); const l = bund.get(t.key); if (!l.includes(r)) l.push(r); }); });
+      const offV = (t, r) => { const l = bund.get(t.key), o = (l.indexOf(r) - (l.length - 1) / 2) * W; return t.hz ? [0, o] : [-o, 0]; };
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
       rs.forEach(r => r.stops.forEach(s => { const g = D.stops[s].g; x0 = Math.min(x0, g[0]); x1 = Math.max(x1, g[0]); y0 = Math.min(y0, g[1]); y1 = Math.max(y1, g[1]); }));
       const m = all ? 2 : 3.2;
       x0 -= m; y0 -= m * 0.6; x1 += m * 1.6; y1 += m;
       const svg = sv('svg', { viewBox: `${x0 * U} ${y0 * U} ${(x1 - x0) * U} ${(y1 - y0) * U}`, class: 'bus-svg' + (all ? ' all' : ''), role: 'img', 'aria-label': '公車路線示意圖' });
-      svg.style.minWidth = (all ? 900 : Math.min(1400, (x1 - x0) * U * 0.9)) + 'px';
       const gGrid = sv('g', { class: 'grid' }), gR = sv('g'), gS = sv('g'), gL = sv('g');
       for (let x = Math.ceil(x0); x <= x1; x++) gGrid.append(sv('line', { x1: x * U, y1: y0 * U, x2: x * U, y2: y1 * U }));
       for (let y = Math.ceil(y0); y <= y1; y++) gGrid.append(sv('line', { x1: x0 * U, y1: y * U, x2: x1 * U, y2: y * U }));
       svg.append(gGrid, gR, gS, gL);
+      const add = (p, v, d, k) => [p[0] + v[0] + (d ? d[0] * k : 0), p[1] + v[1] + (d ? d[1] * k : 0)];
       rs.forEach(r => {
-        const pts = [];
-        corridorsOf(r).forEach(c => {
-          let q = offsetPts(D.corr[c.key].pts, offOf(c.key, r));
-          if (c.rev) q = q.reverse();
-          q.forEach(p => pts.push(p));
-        });
-        if (!pts.length) return;
+        const S = RS.get(r); if (!S.length) return;
+        const V = S.map(t => offV(t, r)), dir = t => t.hz ? [t.sg, 0] : [0, t.sg];
+        const pts = [add(S[0].p, V[0])];
+        for (let i = 1; i < S.length; i++) {
+          const a = S[i - 1], b = S[i], q = b.p;
+          if (a.hz === b.hz) {
+            if (a.sg !== b.sg) { pts.push(add(q, V[i - 1]), add(q, V[i])); continue; }        // 折返
+            if (V[i - 1][0] !== V[i][0] || V[i - 1][1] !== V[i][1]) { const d = dir(a); pts.push(add(q, V[i - 1], d, -0.18), add(q, V[i], d, 0.18)); }   // 並排的條數變了：斜斜換位
+          } else pts.push([q[0] + V[i - 1][0] + V[i][0], q[1] + V[i - 1][1] + V[i][1]]);
+        }
+        const L = S[S.length - 1]; pts.push(add(L.q, V[V.length - 1]));
         const dim = focus && focus !== r;
         gR.append(sv('polyline', { points: pts.map(p => (p[0] * U).toFixed(1) + ',' + (p[1] * U).toFixed(1)).join(' '), fill: 'none', stroke: colorOf(r.no),
           'stroke-width': (all ? 4 : 4.4), 'stroke-linejoin': 'round', 'stroke-linecap': 'round', opacity: dim ? '.15' : '1' }));
       });
-      // 站牌：共線幾條就畫多長的膠囊（橫跨並排的線）
+      // 站牌：那個位置並排幾條就畫多長的膠囊（橫跨並排的線）
       const info = new Map();   // 站名 → { n, dir }
-      use.forEach((l, key) => {
-        const c = D.corr[key];
-        [c.a, c.b].concat(c.mids).forEach(s => {
-          if (!rs.some(r => r.stops.includes(s))) return;
-          const d = dirAt(c.pts, D.stops[s].g);
-          const cur = info.get(s);
-          if (!cur || l.length > cur.n) info.set(s, { n: l.length, dir: d });
+      rs.forEach(r => {
+        const S = RS.get(r);
+        r.stops.forEach(s => {
+          const g = D.stops[s].g;
+          S.forEach(t => {
+            const on = t.hz ? Math.abs(g[1] - t.p[1]) < 1e-6 && g[0] >= Math.min(t.p[0], t.q[0]) - 1e-6 && g[0] <= Math.max(t.p[0], t.q[0]) + 1e-6
+                            : Math.abs(g[0] - t.p[0]) < 1e-6 && g[1] >= Math.min(t.p[1], t.q[1]) - 1e-6 && g[1] <= Math.max(t.p[1], t.q[1]) + 1e-6;
+            if (!on) return;
+            const n = bund.get(t.key).length, cur = info.get(s);
+            if (!cur || n > cur.n) info.set(s, { n, dir: t.hz ? 'h' : 'v' });
+          });
+          if (!info.has(s)) info.set(s, { n: 1, dir: 'h' });
         });
       });
       // 站名：轉乘站 → 重點站 → 其他站牌的順序放，和已經放好的字重疊就不放（避免糊成一團）
@@ -378,17 +457,24 @@
         if (all && !xf) return;
         const fs = all ? 13 : (key ? 12.5 : 10.5), tw = [...s].length * fs * 0.98;
         const t = sv('text', { 'font-size': fs, class: (xf ? 'xf' : '') + (key ? ' key' : '') });
-        let bb;
-        if (v.dir === 'h') {   // 水平線上的站：斜 40 度放在線的上方
-          const x = rx + 2, y = mk[1] - 4, c = Math.cos(0.698), sn = Math.sin(0.698);
-          t.setAttribute('transform', `translate(${x},${y}) rotate(-40)`);
-          bb = [x, y - tw * sn - fs * 0.6, x + tw * c + fs * 0.5, y + 2];
-        } else {
-          const x = mk[0] + mk[2] + 5, y = ry + 4;
-          t.setAttribute('x', x); t.setAttribute('y', y);
-          bb = [x, y - fs * 0.85, x + tw, y + fs * 0.2];
-        }
-        if (!xf && hit(bb)) return;
+        // 擺放候選：先照線的方向放，撞到其他站名就換位置（右→左→上→下／右上斜→右下斜…）
+        const c = Math.cos(0.698), sn = Math.sin(0.698), R = mk[0] + mk[2], B = mk[1] + mk[3];
+        const cand = v.dir === 'h' ? [
+          { tf: [rx + 2, mk[1] - 4, -40], bb: [rx + 2, mk[1] - 4 - tw * sn - fs * 0.6, rx + 2 + tw * c + fs * 0.5, mk[1] - 2] },
+          { tf: [rx + 2, B + fs * 0.8, 40], bb: [rx + 2, B, rx + 2 + tw * c + fs * 0.5, B + fs * 0.8 + tw * sn + fs * 0.4] },
+          { x: R + 5, y: ry + 4, a: 'start', bb: [R + 5, ry + 4 - fs * 0.85, R + 5 + tw, ry + 4 + fs * 0.2] },
+          { x: mk[0] - 5, y: ry + 4, a: 'end', bb: [mk[0] - 5 - tw, ry + 4 - fs * 0.85, mk[0] - 5, ry + 4 + fs * 0.2] }
+        ] : [
+          { x: R + 5, y: ry + 4, a: 'start', bb: [R + 5, ry + 4 - fs * 0.85, R + 5 + tw, ry + 4 + fs * 0.2] },
+          { x: mk[0] - 5, y: ry + 4, a: 'end', bb: [mk[0] - 5 - tw, ry + 4 - fs * 0.85, mk[0] - 5, ry + 4 + fs * 0.2] },
+          { x: rx, y: mk[1] - 5, a: 'middle', bb: [rx - tw / 2, mk[1] - 5 - fs * 0.85, rx + tw / 2, mk[1] - 3] },
+          { x: rx, y: B + fs, a: 'middle', bb: [rx - tw / 2, B + 2, rx + tw / 2, B + fs * 1.2] }
+        ];
+        const pick = cand.find(o => !hit(o.bb)) || (xf ? cand[0] : null);
+        if (!pick) return;
+        if (pick.tf) t.setAttribute('transform', `translate(${pick.tf[0]},${pick.tf[1]}) rotate(${pick.tf[2]})`);
+        else { t.setAttribute('x', pick.x); t.setAttribute('y', pick.y); t.setAttribute('text-anchor', pick.a); }
+        const bb = pick.bb;
         boxes.push(bb);
         t.textContent = s;
         gL.append(t);
@@ -396,17 +482,139 @@
       const legend = h('div', { class: 'bus-maplg' }, rs.map(r => h('button', { type: 'button', class: 'bus-lgb', 'aria-pressed': String(focus === r), onclick: () => { focus = focus === r ? null : r; draw(); } }, badge(r.no))),
         h('span', { class: 'note' }, '◎＝可轉乘光瀨都市鉄道・單軌的站牌。點路線號可以只看那一條。圖為方格示意，並非實際道路與方位。'));
       const wrap = h('div', { class: 'bus-svgwrap' }, svg);
+      const zb = (t, lb, f) => h('button', { type: 'button', class: 'bus-zb', title: lb, 'aria-label': lb, onclick: f }, t);
+      const ctr = h('div', { class: 'bus-zoom' }, zb('＋', '放大', () => pz.zoom(1.4)), zb('－', '縮小', () => pz.zoom(1 / 1.4)), zb('⟲', '重設', () => pz.reset()));
+      wrap.append(ctr);
       box.replaceChildren(wrap, legend);
-      // 手機上圖比畫面大：一開始捲到這個地區的起點站（例：みつせ車站西口）附近
       const c0 = rs[0] && D.stops[rs[0].stops[0]].g;
-      if (c0) requestAnimationFrame(() => {
-        const k = svg.getBoundingClientRect().width / ((x1 - x0) * U);
-        wrap.scrollLeft = Math.max(0, (c0[0] - x0) * U * k - wrap.clientWidth / 2);
-        wrap.scrollTop = Math.max(0, (c0[1] - y0) * U * k - wrap.clientHeight / 2);
-      });
+      const pz = panZoom(wrap, svg, { x: x0 * U, y: y0 * U, w: (x1 - x0) * U, h: (y1 - y0) * U }, all || !c0 ? null : [c0[0] * U, c0[1] * U], view, v => { view = v; });
     }
     draw();
     el.append(h('h3', { class: 'mb-h3' }, '公車路線圖'), chips, box);
+  }
+
+  /* ───────── 鉄道・單軌 × 公車 轉乘查詢（2.10.1） ─────────
+   * 起訖可以是車站或公車站牌。組合：公車直達／鉄道直達／公車→鉄道／鉄道→公車／公車→鉄道→公車。
+   * 鉄道段用入口網站本來的連乘搜尋（H.searchEx，秒）；公車段用上面的 profile／trace（分）。車站與站牌之間步行 3 分。 */
+  function viewMulti(el, H) {
+    const XW = WALK;                                  // 車站 ↔ 站牌 步行（分）
+    const stopsOfSt = id => { const zh = norm(H.stName(id)); return Object.keys(D.stops).filter(s => D.stops[s].st && norm(D.stops[s].st) === zh); };
+    const stOfStop = s => { const st = D.stops[s] && D.stops[s].st; if (!st) return null; const x = H.stations.find(o => norm(o.zh) === norm(st)); return x ? x.id : null; };
+    const railSt = H.stations.filter(x => stopsOfSt(x.id).length);   // 有公車站牌的車站（轉乘點）
+    const pos = v => v.k === 'r' ? (H.stById[v.id] ? [H.stById[v.id].x, H.stById[v.id].z] : null) : [D.stops[v.id].x, D.stops[v.id].z];
+    const parse = v => ({ k: v.slice(0, 1), id: v.slice(2) });
+    function placeSelect(value, id) {
+      const sel = h('select', { id, class: 'bus-sel' });
+      const og1 = h('optgroup', { label: '鉄道・單軌車站' });
+      H.stations.slice().sort((a, b) => a.zh.localeCompare(b.zh, 'ja')).forEach(x => og1.append(h('option', { value: 'r:' + x.id }, x.zh)));
+      const og2 = h('optgroup', { label: '公車站牌' });
+      Object.keys(D.stops).sort((a, b) => a.localeCompare(b, 'ja')).forEach(x => og2.append(h('option', { value: 'b:' + x }, x)));
+      sel.append(og1, og2); sel.value = value; return sel;
+    }
+    const railLeg = (j) => ({ rail: true, j, dep: j.dep / 60, arr: j.arr / 60, fare: (H.journeyFare(j.legs) || { yen: 0 }).yen });
+    const railOnce = (a, b, tMin) => { if (a === b) return null; try { const r = H.searchEx(a, b, Math.round(tMin * 60), 1, {}); return r && r[0] ? railLeg(r[0]) : null; } catch (e) { return null; } };
+    const busOnce = (P, to) => { const r = trace(P, to); return r ? { bus: true, r, dep: r.dep, arr: r.arr, fare: r.fare } : null; };
+    const walkSeg = (a, b, t) => ({ walk: true, a, b, dep: t, arr: t + XW, fare: 0 });
+
+    function plans(A, B, t0) {
+      const out = [];
+      const push = segs => { segs = segs.filter(Boolean); if (!segs.length) return; out.push({ segs, dep: segs[0].dep, arr: segs[segs.length - 1].arr, fare: segs.reduce((x, g) => x + g.fare, 0), n: segs.filter(g => !g.walk).length }); };
+      const destStops = B.k === 'b' ? [B.id] : stopsOfSt(B.id);
+      const bp = pos(B);
+      // 抵達端：要搭鉄道到哪些車站（目的地是車站＝那一站；目的地是站牌＝離它最近、有公車接駁的 3 個車站）
+      const egress = B.k === 'r' ? [B.id] : railSt.slice().sort((x, y) => Math.hypot(x.x - bp[0], x.z - bp[1]) - Math.hypot(y.x - bp[0], y.z - bp[1])).slice(0, 3).map(x => x.id);
+      // 出發端：起點的公車 profile（起點是車站就從它的站牌出發，加步行）
+      const startStops = A.k === 'b' ? [{ s: A.id, t: t0, pre: [] }] : stopsOfSt(A.id).map(s => ({ s, t: t0 + XW, pre: [walkSeg(A.id, s, t0)] }));
+      const profs = startStops.map(o => ({ o, P: profile(o.s, o.t) }));
+      // (1) 公車直達（含公車間轉乘）
+      profs.forEach(({ o, P }) => destStops.forEach(d => {
+        if (d === o.s) return;
+        const b = busOnce(P, d); if (!b) return;
+        push(o.pre.concat([b], B.k === 'r' ? [walkSeg(d, B.id, b.arr)] : []));
+      }));
+      // 出發端可以上鉄道的車站與時刻
+      const access = [];
+      if (A.k === 'r') access.push({ st: A.id, t: t0, pre: [] });
+      if (A.k === 'b' && stOfStop(A.id)) access.push({ st: stOfStop(A.id), t: t0 + XW, pre: [walkSeg(A.id, stOfStop(A.id), t0)] });   // 起點站牌就在車站旁
+      profs.forEach(({ o, P }) => {
+        const cand = [];
+        railSt.forEach(x => stopsOfSt(x.id).forEach(s => { const b = s === o.s ? null : busOnce(P, s); if (b) cand.push({ st: x.id, t: b.arr + XW, pre: o.pre.concat([b, walkSeg(s, x.id, b.arr)]) }); }));
+        cand.sort((a, b) => a.t - b.t);
+        const seen = new Set(); cand.forEach(c => { if (seen.has(c.st) || seen.size >= 3) return; seen.add(c.st); access.push(c); });
+      });
+      // (2) 鉄道（＋前後的公車）
+      access.forEach(ac => egress.forEach(E => {
+        const r = ac.st === E ? null : railOnce(ac.st, E, ac.t);
+        if (!r && ac.st !== E) return;
+        const tE = r ? r.arr : ac.t;
+        if (B.k === 'r') { if (r) push(ac.pre.concat([r])); return; }
+        stopsOfSt(E).forEach(s => {
+          const t1 = tE + XW;
+          if (s === B.id) { push(ac.pre.concat([r, walkSeg(E, s, tE)])); return; }
+          const b = busOnce(profile(s, t1), B.id); if (b) push(ac.pre.concat([r, walkSeg(E, s, tE), b]));
+        });
+      }));
+      out.sort((a, b) => a.arr - b.arr || a.n - b.n || b.dep - a.dep || a.fare - b.fare);
+      const seen = new Set();
+      return out.filter(p => { const k = p.segs.map(g => g.walk ? 'w' : g.rail ? 'r' + g.dep : 'b' + g.r.legs.map(l => l.walk ? 'w' : l.p.r.no).join('/')).join('|'); if (seen.has(k)) return false; seen.add(k); return true; })
+        .filter((p, i, a) => !a.slice(0, i).some(q => q.arr <= p.arr && q.dep >= p.dep))   // 比較晚出發又比較早到的方案就把這個蓋掉
+        .slice(0, 4);
+    }
+
+    const nmP = v => v.k === 'r' ? H.stName(v.id) : v.id;
+    function segView(g) {
+      if (g.walk) return h('li', { class: 'walk' }, h('span', { class: 'bus-walk' }, '步行'), h('span', null, H.stById[g.b] ? '公車站牌 → 車站' : '車站 → 公車站牌'), h('span', null, '約 ' + XW + ' 分'));
+      if (g.bus) return g.r.legs.map(l => l.walk ? h('li', { class: 'walk' }, h('span', { class: 'bus-walk' }, '步行'), nm(l.from), h('span', null, ' → '), nm(l.to), h('span', null, '約 ' + XW + ' 分'))
+        : h('li', null, badge(l.p.r.no), h('span', null, hm(l.dep) + ' '), nm(l.p.stops[l.i]), h('span', null, ' → ' + hm(l.arr) + ' '), nm(l.p.stops[l.j]),
+          h('span', { class: 'dir' }, h('span', null, '公車'), '・', h('span', null, l.n + ' 站・' + yen(l.fare)))));
+      return g.j.legs.map(lg => {
+        const s0 = lg.stops[0], sN = lg.stops[lg.stops.length - 1];
+        if (lg.walk) return h('li', { class: 'walk' }, h('span', { class: 'bus-walk' }, '步行'), nm(H.stName(lg.walk.from || s0.station)), h('span', null, ' → '), nm(H.stName(lg.walk.to || sN.station)));
+        return h('li', null, h('span', { class: 'bus-rail' }, HK.typeTag ? HK.typeTag(lg.sv) : null),
+          h('span', null, hm(s0.dep / 60) + ' '), nm(H.stName(s0.station)), h('span', null, ' → ' + hm(sN.arr / 60) + ' '), nm(H.stName(sN.station)),
+          h('span', { class: 'dir' }, h('span', null, lg.sv.routeName), '・', h('span', null, H.destOf(lg.sv, lg.board) + '行'), '・', h('span', null, (lg.stops.length - 1) + ' 站')));
+      });
+    }
+
+    let from = 'b:' + (D.stops['谷山團地'] ? '谷山團地' : Object.keys(D.stops)[0]);
+    const kat = H.stations.find(x => x.zh === '勝守');
+    let to = kat ? 'r:' + kat.id : 'b:' + Object.keys(D.stops)[1];
+    const a = placeSelect(from, 'mxFrom'), b = placeSelect(to, 'mxTo');
+    const tIn = h('input', { type: 'time', value: hm(nowMin()), id: 'mxTime' });
+    const out = h('div', { class: 'bus-res' });
+    const go = () => {
+      const A = parse(a.value), B = parse(b.value);
+      const [hh, mm] = (tIn.value || '00:00').split(':').map(Number);
+      let t0 = hh * 60 + mm;
+      out.replaceChildren();
+      if (a.value === b.value) { out.append(h('p', null, '出發與抵達是同一個地點。')); return; }
+      // 最多查 3 次：每次從上一個方案的出發時間後一分鐘再查，排出接下來的幾個方案
+      const ps = [], T0 = performance.now();
+      let tq = t0;
+      for (let k = 0; k < 3; k++) {
+        const r = plans(A, B, tq);
+        r.forEach(p => { if (!ps.some(q => q.dep === p.dep && q.arr === p.arr)) ps.push(p); });
+        if (!r.length || performance.now() - T0 > 1200) break;
+        tq = Math.min(...r.map(p => p.dep)) + 1;
+      }
+      ps.sort((x, y) => x.dep - y.dep || x.arr - y.arr);
+      const keep = ps.filter((p, i) => !ps.some((q, j) => j !== i && q.dep >= p.dep && q.arr <= p.arr && (q.dep > p.dep || q.arr < p.arr))).slice(0, 4);
+      if (!keep.length) { out.append(h('p', null, '找不到可以到達的方案。請換一個時間或地點再查查看。')); return; }
+      keep.forEach(p => out.append(h('div', { class: 'bus-opt' },
+        h('div', { class: 'bus-opt-head' }, h('b', null, hm(p.dep) + ' → ' + hm(p.arr)), h('span', null, '約 ' + Math.round(p.arr - p.dep) + ' 分'),
+          h('span', null, p.segs.some(g => g.rail) ? (p.segs.some(g => g.bus) ? '鉄道＋公車' : '鉄道') : '公車'), h('span', { class: 'fare' }, yen(p.fare))),
+        h('ol', { class: 'bus-legs' }, p.segs.map(segView)))));
+      out.append(h('p', { class: 'mb-note' }, '鉄道與公車的票價分開計算後合計（鉄道依搭乘區間的普通運費；公車依各段站數）。車站與公車站牌之間以步行 3 分計算。'));
+    };
+    el.append(h('h3', { class: 'mb-h3' }, '鉄道・公車 轉乘查詢'),
+      h('form', { class: 'mb-f', onsubmit: e => { e.preventDefault(); go(); } },
+        h('div', null, h('label', { for: 'mxFrom' }, '出發'), a),
+        h('span', { class: 'arrow', 'aria-hidden': 'true' }, '→'),
+        h('div', null, h('label', { for: 'mxTo' }, '抵達'), b),
+        h('div', null, h('label', { for: 'mxTime' }, '出發時間'), tIn),
+        h('button', { type: 'submit', class: 'bus-go' }, '查詢')),
+      out);
+    go();
   }
 
   /* ───────── 交通局頁「公車」分頁 ───────── */
@@ -414,21 +622,22 @@
     const card = h('div', { class: 'mb-card' });
     card.append(h('h2', null, h('span', { class: 'en' }, 'City bus'), '公車'),
       h('p', { class: 'lead' }, '光瀨市交通局的市營公車，以みつせ、戸宮、花倉街道、東平倉、紫市、名島港、勝守、十万浦市、上羽神別為中心運行。'),
-      h('p', { class: 'mb-note' }, '營運時間 04:00～24:30。06:00～09:00 與 15:00～19:00 每 15 分一班，09:00～15:00 每 30 分一班，其餘時段每 45 分一班。可以使用 HIKACARD。'));
+      h('p', { class: 'mb-note' }, '營運時間 04:00～24:30。06:00～09:00 與 15:00～19:00 每 15 分一班，09:00～15:00 每 30 分一班，其餘時段每 45 分一班。可以使用 HIKACARD。'),
+      h('p', { class: 'mb-note' }, '標示「每小時 1 班」的是次要路線，整天大約每 60 分一班。'));
     const body = h('div', null, h('p', null, '公車資料載入中…'));
     card.append(body);
     el.append(card);
     load().then(() => {
       body.replaceChildren();
       const q = new URLSearchParams(location.search);
-      const secs = [['search', '班次查詢'], ['stops', '站牌時刻表'], ['routes', '路線一覽'], ['map', '路線圖']];
+      const secs = [['search', '班次查詢'], ['multi', '鉄道轉乘'], ['stops', '站牌時刻表'], ['routes', '路線一覽'], ['map', '路線圖']];
       let cur = q.get('stop') ? 'stops' : 'search';
       const nav = h('div', { class: 'mb-seg bus-seg', role: 'group' });
       const host = h('div');
       const draw = () => {
         nav.replaceChildren(...secs.map(([k, l]) => h('button', { type: 'button', 'aria-pressed': String(k === cur), onclick: () => { cur = k; draw(); } }, l)));
         host.replaceChildren();
-        ({ search: viewSearch, stops: e => viewStops(e, q.get('stop')), routes: viewRoutes, map: viewMap })[cur](host);
+        ({ search: viewSearch, multi: e => viewMulti(e, H), stops: e => viewStops(e, q.get('stop')), routes: viewRoutes, map: viewMap })[cur](host);
       };
       draw();
       body.append(nav, host);

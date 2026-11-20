@@ -70,6 +70,43 @@ for r in D['routes']:
         c = corr.setdefault(key, {'a': min(a, b), 'b': max(a, b), 'mids': mids})
         if len(mids) > len(c['mids']): c['mids'] = mids
 
+# 2.10.1：減少轉角——走廊兩端差一點點就對齊的，把其中一站移到同一欄（或同一列），
+# 只在「整體彎折的走廊數變少」而且不撞到別站時才移（順序可能小幅改變，換來好讀）。
+def bent(a, b): return CX[a] != CX[b] and CY[a] != CY[b]
+nbr = {a: set() for a in ANCH}
+for c in corr.values(): nbr[c['a']].add(c['b']); nbr[c['b']].add(c['a'])
+def span(arr, i, j):
+    lo, hi = sorted([i, j]); return sum(arr[lo:hi])
+for it in range(6):
+    moved = 0
+    cl = sorted(corr.values(), key=lambda c: span(gx, CX[c['a']], CX[c['b']]) + span(gy, CY[c['a']], CY[c['b']]))
+    for c in cl:
+        a, b = c['a'], c['b']
+        if not bent(a, b): continue
+        dx = span(gx, CX[a], CX[b]); dy = span(gy, CY[a], CY[b])
+        tries = []
+        if dx <= max(3, 0.6 * dy): tries += [('x', a, b), ('x', b, a)]
+        if dy <= max(3, 0.6 * dx): tries += [('y', a, b), ('y', b, a)]
+        best = None
+        for ax_, m, t in tries:          # 把 m 移到 t 的欄／列
+            A = CX if ax_ == 'x' else CY
+            old = A[m]
+            before = sum(bent(m, o) for o in nbr[m])
+            A[m] = A[t]
+            after = sum(bent(m, o) for o in nbr[m])
+            clash = any(CX[o] == CX[m] and CY[o] == CY[m] for o in ANCH if o != m)
+            # 不可以壓扁成同一點、也不可以跟鄰站重疊
+            gain = before - after
+            A[m] = old
+            if clash or gain <= 0: continue
+            cost = len(nbr[m])
+            if best is None or (gain, -cost) > (best[0], -best[1]): best = (gain, cost, ax_, m, t)
+        if best:
+            _, _, ax_, m, t = best
+            (CX if ax_ == 'x' else CY)[m] = (CX if ax_ == 'x' else CY)[t]; moved += 1
+    if not moved: break
+print('bent corridors', sum(bent(c['a'], c['b']) for c in corr.values()), '/', len(corr))
+
 # 走廊太短（補滿站擠在一起）時，把兩站之間最寬的那個欄距／列距加大，重排幾輪
 NEED = 0.9   # 每個站間至少 0.9 格
 for it in range(12):
@@ -77,7 +114,7 @@ for it in range(12):
     for c in corr.values():
         a, b = c['a'], c['b']
         (ax, ay), (bx, by) = G[a], G[b]
-        L = abs(bx - ax) + abs(by - ay); need = NEED * (len(c['mids']) + 1)
+        L = abs(bx - ax) + abs(by - ay); need = max(2, NEED * (len(c['mids']) + 1))   # 重點站之間至少 2 格，站名才放得下
         if L + 1e-9 >= need: continue
         add = math.ceil(need - L)
         if abs(CX[a] - CX[b]) >= abs(CY[a] - CY[b]) and CX[a] != CX[b]:
