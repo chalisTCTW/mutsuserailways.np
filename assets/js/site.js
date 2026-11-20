@@ -146,6 +146,7 @@
       out.append(h('h2', { class: 'h2', style: 'margin-top:22px' }, H.codeBadges(sid), st.zh, st.en ? h('small', null, st.en) : null));
       if (HK.sdEntry && HK.sdEntry(st.zh)) out.append(h('p', { style: 'margin:0 0 10px' }, h('a', { class: 'btn sm', href: HK.stationHref(H, st.zh) }, '車站介紹（照片・月台・附近景點與餐廳）')));
       out.append(HK.ttPanel(H, sid));
+      if (HK.Bus) out.append(HK.Bus.stationPanel(st.zh));   // 2.10.0：這一站附近的公車
     }
     draw();
   }
@@ -486,5 +487,5 @@
   })();
   /* 2.5.0：頁尾顯示入口網站版本，方便確認瀏覽器載入的是不是新檔案（診斷頁：check.html） */
   window.HK_PORTAL_VERSION = '2.6.1';
-  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.9.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
+  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.10.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
 })();

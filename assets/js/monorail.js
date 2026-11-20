@@ -496,7 +496,8 @@
     { id: 'stations', zh: '車站介紹', en: 'Stations', fn: tabStations },
     { id: 'guide', zh: '乘車指南', en: 'Guide', fn: tabGuide },
     { id: 'fleet', zh: '車輛介紹', en: 'Fleet', fn: tabFleet },
-    { id: 'ic', zh: 'HIKACARD', en: 'IC card', fn: tabIC }
+    { id: 'ic', zh: 'HIKACARD', en: 'IC card', fn: tabIC },
+    { id: 'bus', zh: '公車', en: 'City bus', fn: (H, M, el) => (HK.Bus ? HK.Bus.tab(H, M, el) : el.append(h('div', { class: 'mb-card' }, h('p', null, '公車資料暫時無法顯示。')))) }   // 2.10.0
   ];
 
   async function boot() {
