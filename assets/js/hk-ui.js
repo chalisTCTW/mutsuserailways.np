@@ -229,6 +229,10 @@
         edgeEls.forEach(e => { const k = e.p.a < e.p.b ? e.p.a + '|' + e.p.b : e.p.b + '|' + e.p.a; e.line.classList.toggle('on', on && edgeKeys && edgeKeys.has(k)); e.casing.classList.toggle('on', on && edgeKeys && edgeKeys.has(k)); });
       },
       mark(id, cls) { stEls.forEach((g, k) => g.classList.toggle(cls, k === id)); },
+      /** 2.9.0：替一組邊（a|b）加上 class（HIKACARD 不能使用的區間畫成灰色虛線用）。 */
+      markEdges(edgeKeys, cls) {
+        edgeEls.forEach(e => { const k = e.p.a < e.p.b ? e.p.a + '|' + e.p.b : e.p.b + '|' + e.p.a; const on = !!edgeKeys && edgeKeys.has(k); e.line.classList.toggle(cls, on); e.casing.classList.toggle(cls, on); });
+      },
       /** 以時刻表推算的列車位置。list 來自 H.activeTrains。 */
       setTrains(list, onClick) {
         gTr.replaceChildren();

@@ -1,0 +1,51 @@
+/* 2.9.0：HIKACARD 介紹區塊（guide.html 與 monorail.html 共用）。 */
+.hc { --hc-accent: #003da8; --hc-ink: #1d2733; --hc-mut: #5f7085; --hc-line: #dfe6ee; margin: 34px 0 0; color: var(--hc-ink); }
+.hc-head { margin-bottom: 18px; }
+.hc-en { margin: 0; font-size: 12px; letter-spacing: .24em; color: var(--hc-accent); font-weight: 700; }
+.hc-head h2 { margin: 4px 0 8px; font-size: 30px; letter-spacing: .06em; border: 0; padding: 0; }
+.hc-lead { margin: 0; max-width: 46em; line-height: 1.8; }
+.hc-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 6px 0 20px; }
+.hc-card { margin: 0; }
+.hc-card img { display: block; width: 100%; height: auto; border-radius: 4.2% / 6.6%; box-shadow: 0 10px 24px rgba(10, 30, 60, .18); }
+.hc-card figcaption { margin-top: 10px; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.hc-card figcaption span { color: var(--hc-mut); font-size: 13px; }
+.hc-price { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--hc-line); border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 22px; }
+.hc-price > div { padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; }
+.hc-price > div + div { border-left: 1px solid var(--hc-line); }
+.hc-price .k { font-size: 13px; color: var(--hc-mut); }
+.hc-price .v { font-size: 22px; font-weight: 700; color: var(--hc-accent); }
+.hc-how { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 22px; align-items: start; margin-bottom: 24px; }
+.hc-photo { margin: 0; }
+.hc-photo img { display: block; width: 100%; height: auto; border-radius: 12px; }
+.hc-photo figcaption { margin-top: 8px; font-size: 13px; color: var(--hc-mut); }
+.hc-steps { margin: 0; padding: 0; list-style: none; counter-reset: hc; display: flex; flex-direction: column; gap: 12px; }
+.hc-steps li { counter-increment: hc; position: relative; padding: 12px 14px 12px 52px; border: 1px solid var(--hc-line); border-radius: 12px; background: #fff; display: flex; flex-direction: column; gap: 4px; line-height: 1.7; }
+.hc-steps li::before { content: counter(hc); position: absolute; left: 14px; top: 12px; width: 26px; height: 26px; border-radius: 50%; background: var(--hc-accent); color: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.hc-ng, .hc-buy { margin-bottom: 22px; }
+.hc-ng h3, .hc-buy h3 { margin: 0 0 10px; font-size: 19px; }
+.hc-nglist { margin: 0 0 8px; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.hc-nglist li { padding: 6px 12px; border-radius: 999px; background: #f1f3f6; border: 1px dashed #9aa3ad; font-size: 14px; }
+.hc-nglist li b { margin-right: 6px; }
+.hc-note { font-size: 13px; color: var(--hc-mut); line-height: 1.7; }
+.hc-map { margin-top: 10px; }
+.hc-lg { display: inline-block; width: 30px; height: 6px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+.hc-lg.ok { background: var(--g1, #1f6b54); }
+.hc-lg.ng { background: repeating-linear-gradient(90deg, #a3abb4 0 6px, transparent 6px 10px); }
+/* 路線圖：不能使用的區間 → 灰色虛線；高速鉄道全線不能用 → 高速鉄道的線也改成灰色虛線 */
+.rmap .e-line.ic-ng { stroke: #a3abb4 !important; stroke-dasharray: 7 6; }
+.rmap .e-casing.ic-ng { stroke: #fff !important; }
+.rmap.ic-hs-ng .hs-line { stroke: #a3abb4 !important; stroke-dasharray: 7 6; }
+.hc-buygrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 14px; }
+.hc-buygrid > div { border: 1px solid var(--hc-line); border-radius: 12px; padding: 14px 16px; background: #fff; }
+.hc-buygrid p { margin: 6px 0 0; line-height: 1.7; }
+.hc-counters { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.hc-counters li { padding: 4px 10px; border-radius: 6px; background: #eef3fb; font-size: 14px; }
+@media (max-width: 760px) {
+  .hc-cards { grid-template-columns: minmax(0, 1fr); max-width: 420px; }
+  .hc-price { grid-template-columns: minmax(0, 1fr); }
+  .hc-price > div + div { border-left: 0; border-top: 1px solid var(--hc-line); }
+  .hc-how, .hc-buygrid { grid-template-columns: minmax(0, 1fr); }
+}
+.mapbox .legend i.hc-lg { display: inline-block; width: 30px; height: 6px; border: 0; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+.mapbox .legend i.hc-lg.ok { background: var(--g1, #1f6b54); }
+.mapbox .legend i.hc-lg.ng { background: repeating-linear-gradient(90deg, #a3abb4 0 6px, transparent 6px 10px); }

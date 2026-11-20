@@ -228,3 +228,34 @@ html[data-size="s"] .mb-body { font-size: 14.5px; }
 html[lang="en"] .mb-tab .en,
 html[lang="en"] .mb-card > h2 .en,
 html[lang="en"] .mb-idx .en { display: none; }
+
+/* ── 2.9.0：車站介紹（站點 LOGO・說明・照片）── */
+.mb-line2 li { padding-bottom: 14px; }
+.mb-line2 li .pin { top: 25px; }
+.mb-line2 li.xfer .pin { top: 22px; }
+.mb-line2 li:first-child::before { top: 31px; }
+.mb-line2 li:last-child::before { height: 31px; }
+.mb-st { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; padding-top: 6px; }
+.mb-st-body { flex: 1 1 240px; min-width: 0; }
+.mb-logo-st { flex: none; width: 52px; height: 52px; border-radius: 50%; background: #1f6fd0; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 3px rgba(255,255,255,.35); }
+.mb-logo-st svg { width: 34px; height: 34px; }
+.mb-logo-st.txt { font-size: 22px; font-weight: 700; }
+.mb-logo-st.future { background: #fff; color: #8c99a8; border: 3px dashed #b6c1cd; box-shadow: none; }
+.mb-line li.future::before { background: repeating-linear-gradient(180deg, #b6c1cd 0 8px, transparent 8px 14px); }
+.mb-line li.future .pin { border-color: #b6c1cd; border-style: dashed; }
+.mb-line li.future .nm { color: var(--mb-mut); }
+.mb-st-txt { margin: 6px 0 0; font-size: 14.5px; line-height: 1.75; }
+.mb-st-notice { margin: 8px 0 0; padding: 8px 12px; border-radius: 10px; background: #fff6e5; border: 1px solid #f1d29a; font-size: 13.5px; line-height: 1.7; color: #6b4a10; }
+.mb-st-notice b { display: inline-block; margin-right: 8px; padding: 0 7px; border-radius: 6px; background: #c77d0a; color: #fff; font-size: 12px; }
+.mb-st-pic { flex: 0 1 260px; margin: 0; }
+.mb-st-pic img { display: block; width: 100%; height: auto; border-radius: var(--mb-r); border: 1px solid var(--mb-line); }
+@media (max-width: 760px) { .mb-st-pic { flex-basis: 100%; } }
+
+/* ── 2.9.0：懸垂式單軌圖解 ── */
+.mb-h3 { margin: 22px 0 10px; font-size: 18px; color: var(--mb0); }
+.mb-diagram { position: relative; margin: 0 0 16px; border: 1px solid var(--mb-line); border-radius: var(--mb-r); overflow: hidden; background: #f5faff; }
+.mb-diagram svg { display: block; width: 100%; height: auto; }
+.mb-dg-l { position: absolute; font-size: 13px; font-weight: 700; color: var(--mb0); background: rgba(255,255,255,.88); padding: 2px 6px; border-radius: 6px; white-space: nowrap; }
+.mb-diagram figcaption { padding: 10px 14px 12px; font-size: 13.5px; line-height: 1.7; color: var(--mb-ink); border-top: 1px solid var(--mb-line); background: #fff; }
+@media (max-width: 760px) { .mb-dg-l { font-size: 10.5px; white-space: normal; max-width: 26%; } }

@@ -38,7 +38,8 @@
     // 實際步行距離若不同，請改這個數字（這組連線同時用在查詢規劃路線，也用在路線圖判斷「轉乘站」畫法）。
     walkLinks: [{ a: '中央戸宮', b: '大學前', sec: 360 }, { a: '幸村', b: '新光瀨', sec: 360 },
       /* 2.6.0 單軌的站外轉乘。紫市是同一座車站（鉄道與單軌共用），不需要列在這裡。 */
-      { a: 'スカイツリー公園', b: 'みつせ', sec: 300 }, { a: '船井大島城跡前', b: '船井大島', sec: 300 }],
+      { a: 'スカイツリー公園', b: 'みつせ', sec: 300 }, { a: '船井大島城跡前', b: '船井大島', sec: 300 },
+      /* 2.9.0：八幡通〜天鳥八幡（約 130 m）。 */ { a: '八幡通', b: '天鳥八幡', sec: 240 }],
     minTransferSec: 120,           // 轉乘最短時間（快照有值時以快照為準）
     zoneOverride: {},              // { "車站中文名": 分區編號 }：遊戲內沒設分區時，可在這裡補
     typeMarks: {},                 // 時刻表格子裡的種別略稱；沒寫的種別用種別名稱的第一個字。例：{ '環状快速': '環' }
@@ -363,7 +364,7 @@
     /* ── 轉乘搜尋（Connection Scan） ──
      * 0.21.0：可指定經由車站（via）、可排除必須指定席的列車（noReserved，即特急）、可步行轉乘（walkLinks），
      * 並限制轉乘次數與單次等待。 */
-    const normZh = z => String(z || '').replace(/戶/g, '戸');
+    const normZh = z => String(z || '').replace(/戶/g, '戸').replace(/瀬/g, '瀨');   // 2.9.0：多見瀬／多見瀨 視為同一站
     const walkMap = new Map();
     (CFG.walkLinks || []).forEach(w => {
       const A = stations.find(s => normZh(s.zh).startsWith(normZh(w.a))), B = stations.find(s => normZh(s.zh).startsWith(normZh(w.b)));

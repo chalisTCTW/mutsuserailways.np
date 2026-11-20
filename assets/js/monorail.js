@@ -51,7 +51,17 @@
     front: ['front', '停靠月台的單軌列車先頭部'],
     cityscape: ['cityscape', '市區上空的單軌列車'],
     viaduct: ['viaduct', '城跡旁的高架軌道梁'],
-    town: ['town', '商店街上方的單軌列車']
+    town: ['town', '商店街上方的單軌列車'],
+    // 2.9.0：前輩提供的照片（B 八幡通、F 船井大島城跡前、G 栗田、H 剪票口；其餘作裝飾）
+    street: ['street', '十字路口上空的單軌軌道梁'],
+    'st-hachiman': ['st-hachiman', '八幡通站的高架月台與兩列 CITYMOVER'],
+    sunset: ['sunset', '夕陽下從正下方仰望的懸垂式單軌'],
+    platform: ['platform', '月台上的單軌列車先頭部與發車案內'],
+    river: ['river', '河岸上空的兩條軌道梁'],
+    'st-funai': ['st-funai', '船井大島城跡前站的月台門'],
+    'st-kurita': ['st-kurita', '栗田站與遠方的天守'],
+    'ride-gate': ['ride-gate', '單軌車站的剪票口'],
+    tower: ['tower', '夜空下的流星樹']
   };
   const img = (key, cls) => {
     const [f, alt] = PHOTO[key];
@@ -91,7 +101,7 @@
       out.push({ at: nm(onMono), kind: 'walk', to: nm(other), sec: w.sec, lines: transfersAt(H, other) });
     });
     (CFG.monoExtraTransfers || []).forEach(x => {
-      if (!x || !x.station || seen.has(x.station)) return;
+      if (!x || !x.station || seen.has(x.station) || [...seen].some(k => normSt(k) === normSt(x.station))) return;   // 2.9.0：多見瀬／多見瀨 視為同一站
       seen.add(x.station);
       out.push({ at: x.station, kind: 'future', lines: x.lines || [] });
     });
@@ -147,7 +157,8 @@
       ['時刻表', 'Timetable', '時', 'timetable'],
       ['票價', 'Fares', '¥', 'fare'],
       ['路線圖・車站介紹', 'Stations', '駅', 'stations'],
-      ['乘車指南', 'Guide', '案', 'guide']
+      ['乘車指南', 'Guide', '案', 'guide'],
+      ['HIKACARD', 'IC card', 'IC', 'ic']
     ];
     const box = text('div', 'mb-idx');
     items.forEach(([zh, en, ico, id]) => {
@@ -280,36 +291,78 @@
   }
 
   /* ───────── 駅案內 ───────── */
+  /* 2.9.0：站點 LOGO（每站一個極簡圖示，取材自站名或周邊地標；參考東部丘陵線的做法）。
+   * 64×64 的 SVG 線條，顏色跟著 currentColor；沒有登錄的站顯示站名第一個字。 */
+  const LOGO = {
+    '紫市': '<circle cx="32" cy="19" r="7"/><circle cx="44.4" cy="28" r="7"/><circle cx="39.6" cy="42.5" r="7"/><circle cx="24.4" cy="42.5" r="7"/><circle cx="19.6" cy="28" r="7"/><circle cx="32" cy="32" r="3"/>',
+    '紫市工業団地': '<path d="M10 50 V30 L20 36 V30 L30 36 V30 L40 36 V16 H48 V50 Z"/><path d="M16 44 H22 M28 44 H34"/>',
+    '栗田': '<path d="M32 13 C22 23 14 30 14 40 C14 47 22 51 32 51 C42 51 50 47 50 40 C50 30 42 23 32 13 Z"/><path d="M15 41 C24 44 40 44 49 41"/>',
+    '船井大島城跡前': '<path d="M18 52 V42 H46 V52"/><path d="M13 42 L21 34 H43 L51 42"/><path d="M24 34 V28 H40 V34"/><path d="M20 28 L28 20 H36 L44 28"/><path d="M32 20 V13"/>',
+    '病院前': '<path d="M26 14 H38 V26 H50 V38 H38 V50 H26 V38 H14 V26 H26 Z"/>',
+    'スカイツリー公園': '<path d="M32 16 L25 52 M32 16 L39 52 M27.5 42 H36.5 M29.5 30 H34.5"/><circle cx="32" cy="12" r="3"/><path d="M38 9 L52 3 M40 14 L50 11"/>',
+    '多見瀨': '<path d="M8 24 q6 -7 12 0 t12 0 t12 0 t12 0"/><path d="M8 34 q6 -7 12 0 t12 0 t12 0 t12 0"/><path d="M8 44 q6 -7 12 0 t12 0 t12 0 t12 0"/>',
+    '西見沼': '<path d="M8 40 H56"/><path d="M14 40 A10 10 0 0 1 34 40"/><path d="M44 40 V20 M50 40 V25"/><ellipse cx="44" cy="20" rx="2" ry="5"/><ellipse cx="50" cy="25" rx="2" ry="5"/><path d="M14 48 H30 M36 48 H48"/>',
+    '八幡通': '<path d="M10 17 Q32 23 54 17"/><path d="M15 26 H49"/><path d="M21 19 V52 M43 19 V52"/><path d="M32 20 V26"/>',
+    '箱野': '<path d="M32 12 L51 22 V44 L32 54 L13 44 V22 Z"/><path d="M13 22 L32 32 L51 22 M32 32 V54"/>',
+    '箱野山口': '<path d="M6 50 L24 20 L34 35 L42 25 L58 50 Z"/><path d="M28 50 C30 44 34 42 32 36" stroke-dasharray="3 4"/>'
+  };
+  const normSt = z => String(z || '').replace(/瀬/g, '瀨').replace(/\s+/g, '');
+  function logo(zh, cls) {
+    const box = h('span', { class: 'mb-logo-st' + (cls ? ' ' + cls : ''), 'aria-hidden': 'true' });
+    const inner = LOGO[normSt(zh)];
+    if (!inner) { box.textContent = String(zh || '').slice(0, 1); box.classList.add('txt'); return box; }
+    box.innerHTML = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+    return box;
+  }
+
   function tabStations(H, M, el) {
+    const CFG = (root.HK && root.HK.CFG) || root.HK_CONFIG || {};
+    const info = CFG.monoStationInfo || {};
+    const infoOf = zh => info[zh] || info[Object.keys(info).find(k => normSt(k) === normSt(zh))] || null;
+    const future = (CFG.monoFuture || []).filter(zh => !M.order.some(id => normSt(H.stName(id)) === normSt(zh)));
+    const total = M.order.length + future.length;
     const card = text('div', 'mb-card');
     card.append(h('h2', null, text('span', 'en', 'Route map & stations'), '路線圖・車站介紹'),
-      text('p', 'lead', M.lineName + '　' + (M.order.length ? H.stName(M.order[0]) + '　〜　' + H.stName(M.order[M.order.length - 1]) : '') + '　全線 ' + M.order.length + ' 站'),
-      photoBand('town', '單軌沿著市街地上空行駛，車站都直接連到地面的商店街。'));
-    const ul = text('ul', 'mb-line');
+      text('p', 'lead', M.lineName + '　' + (M.order.length ? H.stName(M.order[0]) + '　〜　' + H.stName(M.order[M.order.length - 1]) : '') + '　營業中 ' + M.order.length + ' 站' + (future.length ? '（延伸區間 ' + future.length + ' 站建設中，全線 ' + total + ' 站）' : '')),
+      text('p', 'mb-note', '每一站都有自己的站點標誌，取材自站名或車站周邊的地標，在月台與站名標上都看得到。'));
+    const xfAll = transferList(H, M);
+    const ul = text('ul', 'mb-line mb-line2');
     M.order.forEach(id => {
       const st = H.stById[id];
-      const xf = transfersAt(H, id);
+      const zh = st ? st.zh : id;
+      const xf = xfAll.filter(t => normSt(t.at) === normSt(zh));
       const codes = H.codes ? H.codes(id) : [];
-      ul.append(h('li', { class: xf.length ? 'xfer' : '' },
+      const inf = infoOf(zh);
+      const li = h('li', { class: xf.length ? 'xfer' : '' },
         text('span', 'pin'),
-        h('div', null,
-          h('span', { class: 'nm' }, codes.length ? h('span', { class: 'mb-code' }, H.codeText(id)) : null, st ? st.zh : id),
-          st && st.en ? text('span', 'en', st.en) : null),
-        xf.length ? text('div', 'sub', '轉乘：' + xf.join('、')) : null));
+        h('div', { class: 'mb-st' },
+          logo(zh),
+          h('div', { class: 'mb-st-body' },
+            h('span', { class: 'nm' }, codes.length ? h('span', { class: 'mb-code' }, H.codeText(id)) : null, zh),
+            st && st.en ? text('span', 'en', st.en) : null,
+            xf.length ? text('div', 'sub', '轉乘：' + xf.map(transferText).join('、')) : null,
+            inf && inf.text ? text('p', 'mb-st-txt', inf.text) : null,
+            inf && inf.notice ? h('p', { class: 'mb-st-notice' }, h('b', null, '整修公告'), inf.notice) : null),
+          inf && inf.photo && PHOTO[inf.photo] ? h('figure', { class: 'mb-st-pic' }, img(inf.photo)) : null));
+      ul.append(li);
     });
-    const xf = transferList(H, M);
-    if (xf.length) {
+    future.forEach(zh => ul.append(h('li', { class: 'future' },
+      text('span', 'pin'),
+      h('div', { class: 'mb-st' }, logo(zh, 'future'),
+        h('div', { class: 'mb-st-body' }, h('span', { class: 'nm' }, zh), text('div', 'sub', '延伸區間・建設中'))))));
+    if (!M.order.length) card.append(text('div', 'mb-empty', '快照裡還沒有單軌路線。在遊戲（MTR）裡把路線類型設成「輕軌（LIGHT_RAIL）」並重新匯出快照後，這裡就會出現。'));
+    else card.append(ul);
+    if (xfAll.length) {
       const note = text('div', 'mb-note');
       note.append(h('b', null, '與光瀨都市鉄道的轉乘'));
       const xul = text('ul', 'mb-xfer');
-      xf.forEach(t => xul.append(h('li', null,
+      xfAll.forEach(t => xul.append(h('li', null,
         h('span', { class: 'nm' }, transferText(t)),
         t.lines.length ? text('span', 'ln', t.lines.join('、')) : null)));
       note.append(xul);
       card.append(note);
     }
-    if (!M.order.length) card.append(text('div', 'mb-empty', '快照裡還沒有單軌路線。在遊戲（MTR）裡把路線類型設成「輕軌（LIGHT_RAIL）」並重新匯出快照後，這裡就會出現。'));
-    else card.append(ul);
+    card.append(photoBand('river', '河岸上空的軌道梁。冬天的傍晚，兩條軌道梁一起倒映在河面上。'));
     el.append(card);
   }
 
@@ -321,7 +374,7 @@
       h('div', { class: 'mb-card' },
         h('h2', null, text('span', 'en', 'First time riding'), '第一次搭乘的旅客'),
         h('ol', null,
-          h('li', null, '在自動售票機或閘門感應 IC 卡進站。'),
+          h('li', null, '在自動售票機購買車票，或在剪票口感應 HIKACARD 進站。'),
           h('li', null, '月台的發車案內會顯示終點站與「即將進站／○分後」。'),
           h('li', null, '單軌為懸垂式，車輛懸吊在軌道梁下方行駛，起步與停止較平穩。'),
           h('li', null, '到站後再次感應 IC 卡出站；票價於出站時結算。'))),
@@ -336,7 +389,7 @@
         h('table', { class: 'mb-tb' },
           h('tbody', null,
             h('tr', null, h('th', null, '普通車票'), h('td', null, '全線均一 ¥290（小人半額）。')),
-            h('tr', null, h('th', null, 'IC 卡'), h('td', null, '與光瀨都市鉄道共通，轉乘不需重新購票。')),
+            h('tr', null, h('th', null, 'IC 卡'), h('td', null, 'HIKACARD（¥1,500，內含儲值 ¥500）。與光瀨都市鉄道共通，進出站感應即可。', h('a', { href: '#ic' }, '詳細介紹'))),
             h('tr', null, h('th', null, '一日券'), h('td', null, '¥800。當日單軌全線不限次數搭乘，於各站售票機發售。')),
             h('tr', null, h('th', null, '定期券'), h('td', null, '通勤・通學定期於各站窗口辦理。')))),
         text('div', 'mb-note', '光瀨都市鉄道的一日券・三日券・五日券・七日券與地區周遊券，全部都含單軌的無限搭乘，不需另外購票。線上訂票僅適用於鉄道的指定席列車；單軌全車自由席，不需劃位。')));
@@ -344,22 +397,75 @@
   }
 
   /* ───────── 車両紹介 ───────── */
+  /** 2.9.0：懸垂式單軌的構造圖解（SVG，文字可翻譯）。 */
+  function suspendedDiagram() {
+    const fig = h('figure', { class: 'mb-diagram' });
+    const svg = '<svg viewBox="0 0 640 360" role="img" aria-label="懸垂式單軌的構造：軌道梁在上，台車在梁內行駛，車體吊在下方">' +
+      '<rect x="0" y="0" width="640" height="360" fill="#f5faff"/>' +
+      // 支柱
+      '<path d="M96 350 V70 H250" fill="none" stroke="#8a97a8" stroke-width="18" stroke-linejoin="round"/>' +
+      // 軌道梁（下方開口的箱型）
+      '<path d="M250 52 H430 V128 H352 V112 H404 V68 H276 V112 H328 V128 H250 Z" fill="#5f6f82"/>' +
+      // 台車＋車輪
+      '<rect x="292" y="80" width="96" height="22" rx="4" fill="#15559c"/>' +
+      '<circle cx="306" cy="76" r="9" fill="#1d2733"/><circle cx="374" cy="76" r="9" fill="#1d2733"/>' +
+      '<circle cx="284" cy="92" r="6" fill="#1d2733"/><circle cx="396" cy="92" r="6" fill="#1d2733"/>' +
+      // 懸垂連結
+      '<rect x="331" y="102" width="18" height="52" fill="#15559c"/>' +
+      // 車體
+      '<rect x="252" y="154" width="176" height="150" rx="34" fill="#ffffff" stroke="#15559c" stroke-width="6"/>' +
+      '<rect x="270" y="186" width="58" height="44" rx="8" fill="#cfe2f6"/><rect x="352" y="186" width="58" height="44" rx="8" fill="#cfe2f6"/>' +
+      '<rect x="252" y="252" width="176" height="10" fill="#15559c"/>' +
+      // 月台
+      '<rect x="440" y="282" width="190" height="22" fill="#c8d3df"/><rect x="440" y="226" width="10" height="56" fill="#9fb0c3"/>' +
+      // 標註線
+      '<g stroke="#0a2b59" stroke-width="2" fill="none"><path d="M430 60 H470"/><path d="M388 90 H470"/><path d="M349 128 H470"/><path d="M428 200 H470" transform="translate(0,0)"/><path d="M96 200 H150"/></g>' +
+      '</svg>';
+    fig.innerHTML = svg;
+    const lab = (x, y, t, anchor) => h('span', { class: 'mb-dg-l', style: 'left:' + x + '%;top:' + y + '%' + (anchor === 'r' ? ';transform:translate(-100%,-50%)' : ';transform:translate(0,-50%)') }, t);
+    fig.append(
+      lab(74.5, 16.7, '軌道梁：下方開口的鋼製箱型梁'),
+      lab(74.5, 25, '台車：走行輪與案內輪都藏在梁裡'),
+      lab(74.5, 35.6, '懸垂連結：把車體吊在台車下方'),
+      lab(74.5, 55.6, '車體'),
+      lab(24.5, 55.6, '支柱'),
+      h('figcaption', null, '懸垂式單軌的車輛吊在軌道梁「下方」行駛。車輪在梁內，不受雨雪影響，也不會碰到地面的車流；轉彎時車體會自然地微微擺動。'));
+    return fig;
+  }
+
   function tabFleet(H, M, el) {
+    const CFG = (root.HK && root.HK.CFG) || root.HK_CONFIG || {};
+    const F = CFG.monoFleet || {};
+    const row = (k, v) => v ? h('tr', null, h('th', null, k), h('td', null, v)) : null;
     const card = text('div', 'mb-card');
     card.append(h('h2', null, text('span', 'en', 'Rolling stock'), '車輛介紹'),
-      text('p', 'lead', '懸垂式單軌車輛。前頭部標記為 HIKARISE CITY MOVER。'),
+      text('p', 'lead', (F.model || '懸垂式單軌車輛') + '。前頭部標記為 HIKARISE CITY MOVER。'),
       h('figure', { class: 'mb-shot big' }, img('front'),
         h('figcaption', null, '停靠月台的先頭部。車頭下方標記 HIKARISE CITY MOVER。')),
-      h('div', { class: 'mb-shots' },
-        h('figure', { class: 'mb-shot' }, img('cityscape'), h('figcaption', null, '市區上空。軌道梁沿著街區上方延伸。')),
-        h('figure', { class: 'mb-shot' }, img('viaduct'), h('figcaption', null, '懸垂式軌道梁。車輛懸吊於梁下行駛。')),
-        h('figure', { class: 'mb-shot' }, img('town'), h('figcaption', null, '商店街上方。車站直接連到地面層。'))),
       h('table', { class: 'mb-tb', style: 'margin-top:14px' },
         h('tbody', null,
-          h('tr', null, h('th', null, '方式'), h('td', null, '懸垂式單軌（Suspended monorail）')),
-          h('tr', null, h('th', null, '塗裝'), h('td', null, '白色車體＋藍色腰帶')),
-          h('tr', null, h('th', null, '座席'), h('td', null, '橫向座席＋縱向長椅')),
-          h('tr', null, h('th', null, '案內顯示'), h('td', null, '車內 LCD・月台 LCD（ATOS 連動）')))));
+          row('形式', F.model),
+          row('營運速度', F.speed),
+          row('編組', F.cars),
+          row('最大乘載人數', F.capacity),
+          row('登場年', F.debut),
+          row('方式', '懸垂式單軌（Suspended monorail）'),
+          row('塗裝', '白色車體＋藍色腰帶'),
+          row('案內顯示', '車內 LCD・月台 LCD（ATOS 連動）'))),
+      h('h3', { class: 'mb-h3' }, '懸垂式單軌是什麼？'),
+      suspendedDiagram(),
+      h('div', { class: 'mb-shots' },
+        h('figure', { class: 'mb-shot' }, img('sunset'), h('figcaption', null, '從正下方看懸垂式單軌：車體吊在軌道梁下。')),
+        h('figure', { class: 'mb-shot' }, img('platform'), h('figcaption', null, '月台上的先頭部與發車案內。')),
+        h('figure', { class: 'mb-shot' }, img('street'), h('figcaption', null, '十字路口上空的軌道梁。'))));
+    el.append(card);
+  }
+
+  /* ───────── HIKACARD ───────── */
+  function tabIC(H, M, el) {
+    const card = text('div', 'mb-card');
+    if (root.HK.hikacardSection) card.append(root.HK.hikacardSection(H, { side: 'mono' }));
+    else card.append(h('p', null, 'HIKACARD 的介紹暫時無法顯示。'));
     el.append(card);
   }
 
@@ -389,7 +495,8 @@
     { id: 'fare', zh: '票價', en: 'Fares', fn: tabFare },
     { id: 'stations', zh: '車站介紹', en: 'Stations', fn: tabStations },
     { id: 'guide', zh: '乘車指南', en: 'Guide', fn: tabGuide },
-    { id: 'fleet', zh: '車輛介紹', en: 'Fleet', fn: tabFleet }
+    { id: 'fleet', zh: '車輛介紹', en: 'Fleet', fn: tabFleet },
+    { id: 'ic', zh: 'HIKACARD', en: 'IC card', fn: tabIC }
   ];
 
   async function boot() {

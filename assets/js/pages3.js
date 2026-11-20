@@ -21,7 +21,7 @@
   function viewGuide(H, root) {
     const sf = seatFee(H), st = standFee(H);
     root.append(h('p', { class: 'lead' }, '第一次搭乘光瀨都市鉄道？這裡整理了各種別的差別、座席與票券、避免搭錯車的方法，以及常見問題。'),
-      h('nav', { class: 'lchips sjump', 'aria-label': '本頁內容' }, h('a', { class: 'lchipbtn', href: '#guide' }, '乘車指南'), h('a', { class: 'lchipbtn', href: '#faq' }, '常見問題')));
+      h('nav', { class: 'lchips sjump', 'aria-label': '本頁內容' }, h('a', { class: 'lchipbtn', href: '#guide' }, '乘車指南'), h('a', { class: 'lchipbtn', href: '#hikacard' }, 'HIKACARD'), h('a', { class: 'lchipbtn', href: '#faq' }, '常見問題')));
 
     /* ── 乘車指南 ── */
     const g = h('div', { id: 'guide' });
@@ -91,6 +91,8 @@
       h('p', { class: 'note', style: 'margin-top:12px' }, '目前運行中的種別與時刻表上的標示：'),
       h('div', { class: 'ttbox' }, typeTags.length ? typeTags : h('p', { class: 'note' }, '目前沒有資料。'))));
     root.append(g);
+    // 2.9.0：交通局 IC 卡 HIKACARD（跟 monorail.html 共用 hikacard.js）
+    if (HK.hikacardSection) { try { root.append(HK.hikacardSection(H, { side: 'rail' })); } catch (e) { /* 失敗時略過 */ } }
 
     /* ── 常見問題 ── */
     const Q = (q, ...a) => h('details', { class: 'faqi' }, h('summary', null, q), h('div', { class: 'faqa' }, ...a));
