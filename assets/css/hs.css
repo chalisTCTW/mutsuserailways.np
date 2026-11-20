@@ -87,3 +87,22 @@
 .hs-stpic { margin: 0 0 14px; } .hs-stpic img { aspect-ratio: 16 / 8; }
 .hs-card p + p { margin-top: 8px; }
 .hs-more { display: inline-block; margin-top: 14px; font-weight: 700; font-size: 14px; color: var(--hs); text-decoration: none; border-bottom: 2px solid var(--hs); padding-bottom: 1px; } .hs-more::after { content: " →"; }
+
+/* 2.8.0：花宮天照開業・新站咲海・清音溫泉納入——10 站（汐崎～新岩沢），各站間距 11.1111%。
+   汐崎～新勝守是上羽本線區間，高速鉄道直通運轉中（實線、灰綠）；「部分班次停靠」的站用虛線圈。 */
+.hs-track-30 { min-width: 1440px; }
+.hs-track-30 .hs-seg.ext2 { width: 33.3333%; height: 12px; top: 60px; border-top: 0; border-radius: 6px; background: #6f8f84; }
+.hs-track-30 .hs-seg.a { left: 33.3333%; width: 22.2222%; }
+.hs-track-30 .hs-seg.b { left: 55.5556%; width: 44.4444%; }
+.hs-track-30 .hs-train { left: 0; animation-name: hs-run30; animation-duration: 22s; }
+@keyframes hs-run30 { from { left: 0; } to { left: calc(100% - 104px); } }
+.hs-st.part i { border-style: dashed; border-width: 5px; }
+.hs-legend .part { width: 16px; height: 16px; border-radius: 50%; border: 3px dashed var(--hs); background: #fff; }
+.hs-track-30 ~ .hs-legend .ext2, .hs-legend .ext2 { border-top: 0; height: 10px; border-radius: 5px; background: #6f8f84; }
+.hs-ms { border: 1px solid var(--hair, #e4e1d8); border-radius: 14px; padding: 20px 22px; background: linear-gradient(135deg, #fff 0%, #fff7f2 100%); }
+.hs-ms-stops { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0; margin-bottom: 14px; font-weight: 700; }
+.hs-ms-stops span { display: inline-flex; align-items: center; font-size: 15px; }
+.hs-ms-stops span + span::before { content: ''; display: inline-block; width: 26px; height: 4px; margin: 0 6px; background: #b7325b; border-radius: 2px; }
+.hs-ms-stops span.skip { color: #9aa39f; font-weight: 500; font-size: 13px; }
+.hs-ms-stops span.hl { color: #b7325b; }
+.hs-ms-spec { margin-top: 6px; }

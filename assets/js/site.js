@@ -121,7 +121,7 @@
     // 1.1.0：高速鉄道往東平倉方向的班次，車站時刻表固定標示「東平倉・新岩沢 方面」（地圖外的假想延伸；
     // 前輩指定，只套用這一個方向，反方向仍用一般的終點命名）。
     const hx = H.cfg.hsExt;
-    if (sv.isHS && hx && hx.towardLabel && H.stName(dest) === hx.afterZh) return { key: 'hsext|' + hx.afterZh, label: hx.towardLabel + '　方面' };
+    if (sv.isHS && hx && hx.towardLabel && (hx.towardFrom || [hx.afterZh]).includes(H.stName(dest))) return { key: 'hsext|' + hx.towardLabel, label: hx.towardLabel + '　方面' };   // 2.8.0：終點東平倉／花宮天照的下行都開往新岩沢
     // 0.21.0：方向由「這班車實際的下一個停靠站」決定（過去用到終點的最短路徑，環快這類繞行的班次會被分到相反方向）
     let nextSt = dest; for (let k = (e.i || 0) + 1; k < sv.stops.length; k++) if (sv.stops[k].pax !== false) { nextSt = sv.stops[k].station; break; }
     const p = H.shortestPath(sid, nextSt);
@@ -486,5 +486,5 @@
   })();
   /* 2.5.0：頁尾顯示入口網站版本，方便確認瀏覽器載入的是不是新檔案（診斷頁：check.html） */
   window.HK_PORTAL_VERSION = '2.6.1';
-  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.7.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
+  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.8.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
 })();

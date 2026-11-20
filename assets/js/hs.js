@@ -26,12 +26,15 @@
     if (!window.HK || !window.HK.load) return;
     const H = await window.HK.load();
     const stN = nm => H.stations.find(s => s.zh === nm);
-    const a = stN('新勝守'), b = stN('東平倉');
-    const hsDeps = st => st ? H.departures(st.id).filter(e => e.sv.isHS && e.t >= 4 * 3600 && e.t < 86400) : [];   // 深夜 0 時台的班次不算「首班」：從清晨 4 時起算到當天最後一班
-    const A = hsDeps(a), B = hsDeps(b);
-    const ext = H.hsExtDuration ? H.hsExtDuration('東平倉', '新岩沢') : 0;
-    // 新勝守→東平倉（同一班車上的時間）
-    let core = 0; if (A.length) { const sv = A[0].sv, st = sv.stops; core = st[st.length - 1].arr - st[0].dep; }
+    // 2.8.0：地圖內的終點從東平倉延伸到花宮天照；一日往返＝新勝守⇄花宮天照（真正班次）＋花宮天照⇄新岩沢（地圖外設定）
+    const a = stN('新勝守'), b = stN((CFG.hsExt && CFG.hsExt.afterZh) || '東平倉');
+    const ext = b && H.hsExtDuration ? H.hsExtDuration(b.zh, '新岩沢') : 0;
+    // 同一班車上「從 x 到 y」的班次（停靠站裡 x 在 y 前面）
+    const through = (x, y) => H.svcs.filter(sv => { if (!sv.isHS) return false; const i = sv.stops.findIndex(s => s.station === x.id && s.pax !== false), j = sv.stops.findIndex(s => s.station === y.id && s.pax !== false); return i >= 0 && j > i; });
+    const depsVia = (x, y) => { if (!x || !y) return []; const ok = new Set(through(x, y)); return H.departures(x.id).filter(e => ok.has(e.sv) && e.t >= 4 * 3600 && e.t < 86400); };   // 深夜 0 時台的班次不算「首班」
+    const legSec = (sv, x, y) => { const i = sv.stops.findIndex(s => s.station === x.id), j = sv.stops.findIndex(s => s.station === y.id); return (sv.stops[j].arr != null ? sv.stops[j].arr : sv.stops[j].dep) - sv.stops[i].dep; };
+    const A = depsVia(a, b), B = depsVia(b, a);
+    const core = A.length ? legSec(A[0].sv, a, b) : 0;
     const dur = core + ext;
     const t = (id, v) => { const el = $(id); if (el) el.textContent = v; };
     if (A.length && dur) {
@@ -39,17 +42,42 @@
       t('#hs-first', hmOf(first));
       t('#hs-dur', L(`約 ${Math.round(dur / 60)} 分`, `約${Math.round(dur / 60)}分`, `about ${Math.round(dur / 60)} min`));
       if (B.length) {
-        const retLast = B[B.length - 1].t - ext, svB = B[0].sv, coreB = svB.stops[svB.stops.length - 1].arr - svB.stops[0].dep;
+        const retLast = B[B.length - 1].t - ext, coreB = legSec(B[B.length - 1].sv, b, a);
         t('#hs-ret', hmOf(retLast));
         t('#hs-ret2', L(`約 ${hmOf(retLast + ext + coreB)} 抵達新勝守（新勝守末班發車 ${hmOf(last)}）`, `${hmOf(retLast + ext + coreB)} ごろ新勝守着（新勝守発の最終は ${hmOf(last)}）`, `arrives at Shin-Katsumori about ${hmOf(retLast + ext + coreB)} (last departure from Shin-Katsumori: ${hmOf(last)})`));
         const stay = retLast - (first + dur);
         if (stay > 0) t('#hs-stay', L(`最長約 ${Math.floor(stay / 3600)} 小時`, `最長 約${Math.floor(stay / 3600)}時間`, `up to ~${Math.floor(stay / 3600)} h`));
       }
     }
+    // 2.8.0：特急みさこ（速達種別）——停靠站一覽與所要時間，從快照的班次算出來
+    (function () {
+      const box = $('#hs-ms-stops'); if (!box) return;
+      const isMs = sv => sv.isHS && /みさこ/.test(String((sv.member && (sv.member.number || sv.member.rawName)) || '') + String((sv.route && sv.route.number) || ''));
+      const down = H.svcs.filter(isMs).find(sv => { const iT = sv.stops.findIndex(s => H.stName(s.station) === '東平倉'), iS = sv.stops.findIndex(s => H.stName(s.station) === '新光瀨'); return iT > iS && iS >= 0; });
+      const line = ['汐崎', '清音溫泉', '上羽神別', '新勝守', '新光瀨', '東平倉', '咲海', '花宮天照', '豐守', '新岩沢'];
+      const stopsZh = down ? down.stops.filter(s => s.pax !== false).map(s => H.stName(s.station)) : ['汐崎', '清音溫泉', '上羽神別', '新光瀨', '東平倉', '花宮天照'];
+      const extStops = (H.hsExtStops || []).filter(e => !(e.skip || []).some(k => k === 'みさこ')).map(e => e.zh);
+      const tr = x => (window.HK_I18N && window.HK_I18N.t) ? window.HK_I18N.t(x) : x;
+      box.replaceChildren(...line.map(zh => {
+        const sp = document.createElement('span'), stop = stopsZh.includes(zh) || extStops.includes(zh);
+        sp.className = stop ? (zh === '清音溫泉' ? 'hl' : '') : 'skip';
+        sp.textContent = tr(zh) + (stop ? '' : L('（通過）', '（通過）', ' (pass)'));
+        return sp;
+      }));
+      mark(box);
+      const durEl = $('#hs-ms-dur');
+      if (down && durEl) {
+        const st = down.stops, a0 = st[0], z = st[st.length - 1];
+        const core = (z.arr != null ? z.arr : z.dep) - a0.dep, extS = H.hsExtDuration ? H.hsExtDuration(H.stName(z.station), '新岩沢') : 0;
+        const mins = Math.round((core + extS) / 60);
+        durEl.textContent = L(`${tr(H.stName(a0.station))}→新岩沢 約 ${mins} 分`, `${tr(H.stName(a0.station))}→新岩沢 約${mins}分`, `${tr(H.stName(a0.station))} → Shin-Iwasawa about ${mins} min`);
+        mark(durEl);
+      }
+    })();
     // 票價（1.9.0：指定席特急券分「商務車廂」「一般車廂」兩個價，不再是單一數字）
     const rows = $('#hs-fares'), bizFee = (CFG.hsBusinessFee != null) ? CFG.hsBusinessFee : 1600;
     if (rows && H.hsFareExt) {
-      ['新勝守', '新光瀨', '東平倉'].forEach(nm => {
+      ((CFG.hsExt && CFG.hsExt.real) || ['新勝守', '新光瀨', '東平倉']).forEach(nm => {   // 2.8.0：含咲海・花宮天照
         const f = H.hsFareExt(nm, '新岩沢'); if (!f) return;
         const tr = document.createElement('tr'), c = (txt, extra) => { const td = document.createElement('td'); td.textContent = txt; if (extra) td.append(extra); return td; };
         const name = document.createElement('td'); name.textContent = nm + ' ⇄ 新岩沢';
@@ -102,11 +130,27 @@
       const hsSvs = allGroups.filter(x => /高速鉄道/.test(x.name)).flatMap(x => x.svs);
       if (hsSvs.length) {
         const buckets = [[], []]; // 0 = 下行（往東平倉，含直通上羽神別・汐崎）／1 = 上行（往新勝守）
+        // 2.8.0：方向改用「東平倉在新光瀨之後」判斷（下行的終點現在可能是東平倉或花宮天照）
         hsSvs.forEach(sv => {
-          const hp = sv.stops.findIndex(s => H.stName(s.station) === '東平倉');
-          buckets[hp === sv.stops.length - 1 ? 0 : 1].push(sv);
+          const iT = sv.stops.findIndex(s => H.stName(s.station) === '東平倉'), iS = sv.stops.findIndex(s => H.stName(s.station) === '新光瀨');
+          buckets[iT >= 0 && iS >= 0 && iT > iS ? 0 : 1].push(sv);
         });
         const templateOf = list => list.reduce((a, b) => (b.stops.filter(s => s.pax !== false).length > a.stops.filter(s => s.pax !== false).length ? b : a));
+        /* 2.8.0：時刻表的車站列＝所有班型停靠站的聯集（みさこ停清音溫泉、とりさわ停咲海・花宮天照，任何一個班型都不是全部）。
+         * 插入規則：插在「這個班型的下一個、已經在表裡的站」前面；沒有的話插在上一站後面。 */
+        const stationRows = list => {
+          const order = templateOf(list).stops.filter(s => s.pax !== false).map(s => s.station);
+          list.forEach(sv => {
+            const seq = sv.stops.filter(s => s.pax !== false).map(s => s.station);
+            seq.forEach((id, k) => {
+              if (order.includes(id)) return;
+              const nx = seq.slice(k + 1).find(x => order.includes(x));
+              if (nx != null) order.splice(order.indexOf(nx), 0, id);
+              else { const pv = seq.slice(0, k).reverse().find(x => order.includes(x)); order.splice(pv != null ? order.indexOf(pv) + 1 : order.length, 0, id); }
+            });
+          });
+          return order;
+        };
         const ownOffset = (sv, j) => { const t0 = sv.stops[0].dep; return (j === sv.stops.length - 1 ? sv.stops[j].arr : sv.stops[j].dep) - t0; };
         function mergedRuns(list) {
           const tmpl = templateOf(list), runs = [];
@@ -119,7 +163,7 @@
           return { tmpl, runs };
         }
         function mergedTable(list) {
-          const { tmpl, runs } = mergedRuns(list), rows = tmpl.stops.filter(s => s.pax !== false);
+          const { runs } = mergedRuns(list), rows = stationRows(list).map(id => ({ station: id }));
           if (!runs.length) { const p = document.createElement('p'); p.className = 'note'; p.textContent = L('本日沒有班次。', '本日の運行はありません。', 'No service today.'); return p; }
           const hsAt = k => k && Math.floor(runs[k].t / 3600) !== Math.floor(runs[k - 1].t / 3600) ? ' hs' : '';
           const head = document.createElement('tr'); head.appendChild(document.createElement('th')).textContent = L('車站', '駅', 'Station');
@@ -131,8 +175,11 @@
             tr.appendChild(th);
             runs.forEach((r, k) => {
               const td = document.createElement('td'); td.className = 'c' + hsAt(k);
-              const j = r.sv.stops.findIndex(x => x.station === s.station);
-              td.textContent = j >= 0 ? hmOf(r.t + ownOffset(r.sv, j)) : '－';
+              const j = r.sv.stops.findIndex(x => x.station === s.station && x.pax !== false);
+              // 2.8.0：班次經過這一帶但不停（例如みさこ通過新勝守）顯示「レ」，根本不經過顯示「－」
+              const served = rows.map(x => r.sv.stops.some(y => y.station === x.station && y.pax !== false));
+              const i0 = served.indexOf(true), i1 = served.lastIndexOf(true), iMe = rows.indexOf(s);
+              td.textContent = j >= 0 ? hmOf(r.t + ownOffset(r.sv, j)) : (iMe > i0 && iMe < i1 ? 'レ' : '－');
               tr.appendChild(td);
             });
             tbody.appendChild(tr);
@@ -165,7 +212,7 @@
           const dl = window.HK.dirLabel(H, templateOf(list));
           // 起訖站名先逐一查表再放進句子（句子本身的英文是寫死的，不會再被整句翻譯）
           const dlT = (window.HK_I18N && window.HK_I18N.t) ? dl.split(' → ').map(x => window.HK_I18N.t(x.trim())).join(' → ') : dl;
-          p.textContent = L(`${dlT}。已合併直通上羽本線的班次並按時間排列；各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號，短程班次對不到的站顯示「－」。`, `${dlT}。上羽線直通の列車も合わせて時刻順に表示。各駅の発車時刻（終点は到着時刻）、1列＝1本。欄名は列車番号、短距離の列車が通らない駅は「－」。`, `${dlT}. Through-service trains to the Ueha Main Line are merged in and sorted by time. Departure time at each stop (arrival at the terminus); one column per run; "－" marks a stop a shorter run doesn't reach.`);
+          p.textContent = L(`${dlT}。已合併直通上羽本線的班次並按時間排列；各站的發車時刻（終點站為到達時刻），一欄是一班車；欄名為班次號；「レ」＝通過（不停車），「－」＝該班次不經過。`, `${dlT}。上羽線直通の列車も合わせて時刻順に表示。各駅の発車時刻（終点は到着時刻）、1列＝1本。欄名は列車番号。「レ」＝通過、「－」＝その列車は経由しません。`, `${dlT}. Through-service trains to the Ueha Main Line are merged in and sorted by time. Departure time at each stop (arrival at the terminus); one column per run; "レ" = passes without stopping, "－" = the run doesn't serve that section.`);
           mid.replaceChildren(h3, p, mergedTable(list));
           bottom.replaceChildren();
           const allT = []; list.forEach(sv => window.HK.depTimes(H, sv).forEach(t => allT.push(t))); allT.sort((a, b) => a - b);

@@ -272,6 +272,8 @@
       return (H.stById[id] || stById[id] || { zh: '?' }).zh;
     };
     /* 車站編碼（0.26.0）：id → ['H05','KU01']；徽章用路線色。沒有編碼的車站回傳空陣列／null，畫面維持原樣。 */
+    // 2.8.0：CFG.codeOverride（站名 → 編碼陣列）優先於快照；快照已經是同樣的編碼時等於沒做事
+    if (CFG.codeOverride) stations.concat(net.stations).forEach(st => { const ov = CFG.codeOverride[st.zh]; if (Array.isArray(ov) && ov.length) st.codes = ov.slice(); });
     H.codes = id => ((H.stById[id] || stById[id] || {}).codes) || [];
     H.codeColor = c => { const m = String(c).match(/^[A-Z]+/); const cc = (CFG.codeColors || {}); return (m && (cc[c] || cc[m[0]])) || '#6b7280'; };
     H.codeBadges = id => { const cs = H.codes(id); if (!cs.length) return null; const w = document.createElement('span'); w.className = 'scodes'; cs.forEach(c => { const b = document.createElement('b'); b.className = 'scode'; b.textContent = c; b.style.background = H.codeColor(c); b.style.color = '#fff'; w.append(b); }); return w; };
@@ -565,6 +567,18 @@
       const seq = sv.stops.filter(s => s.pax !== false).map(s => s.station);
       for (let i = 0; i < seq.length - 1; i++) { if (seq[i] === seq[i + 1]) continue; const k = pairKey(seq[i], seq[i + 1]); if (!hsPairs.has(k)) hsPairs.set(k, { a: seq[i], b: seq[i + 1] }); }
     });
+    // 2.8.0：高速鉄道各種別（とりさわ各站停車・みさこ速達）幾乎走同一條路徑——速達種別的跳站連線
+    // （例如 東平倉→花宮天照 跳過咲海、新光瀨→上羽神別 跳過新勝守），只要有別的高速鉄道班次逐站經過，就不另外畫一條線，
+    // 地圖上合併成同一條「万瀨高速鉄道線」。
+    {
+      const hsSeqs = svcs.filter(sv => sv.isHS).map(sv => sv.stops.filter(s => s.pax !== false).map(s => s.station));
+      for (const [k, e] of [...hsPairs]) {
+        for (const seq of hsSeqs) {
+          const i = seq.indexOf(e.a), j = seq.indexOf(e.b);
+          if (i >= 0 && j >= 0 && Math.abs(i - j) > 1) { hsPairs.delete(k); break; }
+        }
+      }
+    }
     H.hsEdges = [...hsPairs.values()].map(e => { const a = H.stById[e.a], b = H.stById[e.b]; return a && b ? { a: e.a, b: e.b, len: Math.hypot(a.x - b.x, a.z - b.z) } : null; }).filter(Boolean);
     const hsStationIds = new Set(); svcs.filter(sv => sv.isHS).forEach(sv => sv.stops.forEach(s => { if (s.pax !== false) hsStationIds.add(s.station); }));
     const normalStationIds = new Set(); svcs.filter(sv => !sv.isHS).forEach(sv => sv.stops.forEach(s => { if (s.pax !== false) normalStationIds.add(s.station); }));
@@ -585,7 +599,7 @@
       (ext.real || []).forEach(zh => { const st = stations.find(s => s.zh === zh); if (st) H.hsQueryStations.push({ id: st.id, zh, real: true }); });
       let prevZh = ext.afterZh;
       ext.stops.forEach(e => {
-        const entry = { id: 'hsext:' + e.zh, zh: e.zh, en: e.en || '', real: false, km: e.km || 0, min: e.min || 0, zoneBoundary: !!e.zoneBoundary, prevZh };
+        const entry = { id: 'hsext:' + e.zh, zh: e.zh, en: e.en || '', real: false, km: e.km || 0, min: e.min || 0, zoneBoundary: !!e.zoneBoundary, skip: e.skip || [], prevZh };   // 2.8.0：skip＝不停的種別
         H.hsExtStops.push(entry); H.hsQueryStations.push(entry); prevZh = e.zh;
       });
       // 1.1.2：延伸站的英文站名（site-config.js 的 en 欄位）也要登記進 i18n 的站名對照表，
@@ -713,8 +727,11 @@
       if (rev) { seq = seq.slice().reverse(); segSec = segSec.slice().reverse(); }
       let t = depSec;
       const stops = [{ station: seq[0].id, dep: t }];
+      // 2.8.0：通過站（例如みさこ不停豐守）——時間照算，但不列入停靠站
+      const passes = st => !!gou && (st.skip || []).some(k => String(gou).indexOf(k) >= 0);
       for (let i = 1; i < seq.length; i++) {
         t += segSec[i - 1];
+        if (i < seq.length - 1 && passes(seq[i])) continue;
         stops.push(i === seq.length - 1 ? { station: seq[i].id, arr: t } : { station: seq[i].id, arr: t, dep: t });
       }
       // sv.stops 跟 leg.stops 用同一份陣列——H.destOf／H.reserveInfo 等既有函式都是照「sv 本身也有完整停靠站序列」

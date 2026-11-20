@@ -4627,5 +4627,19 @@ window.HK_I18N_DICT = {
 "新中央線白藏山線直通": ["新中央線白藏山線直通", "Shin-Chuo Line / Shirakurayama Line through service"],
 "輸入站名搜尋…": ["駅名を入力して検索…", "Type a station name or code…"],
 "找不到符合的車站": ["該当する駅が見つかりません", "No matching stations"],
-"單軌（光瀨市交通局）": ["モノレール（光瀨市交通局）", "Monorail (Hikarise City Transportation Bureau)"]
+"單軌（光瀨市交通局）": ["モノレール（光瀨市交通局）", "Monorail (Hikarise City Transportation Bureau)"],
+"高速鉄道的各種別（特急とりさわ・特急みさこ）都走同一條路線。新勝守至東平倉由光瀨都市鉄道管轄，東平倉至新岩沢由白令鉄道管轄；汐崎至新勝守為上羽本線區間，高速鉄道直通運轉。所有下行列車都開往新岩沢。": ["高速鉄道の各種別（特急とりさわ・特急みさこ）はすべて同じ路線を走ります。新勝守～東平倉は光瀨都市鉄道、東平倉～新岩沢は白令鉄道の管轄です。汐崎～新勝守は上羽本線の区間で、高速鉄道が直通運転しています。下り列車はすべて新岩沢行きです。", "All high-speed services (Ltd. Exp. Torisawa and Ltd. Exp. Misako) share the same line. Shin-Katsumori–Tohekura is operated by Hikarise Urban Railway and Tohekura–Shin-Iwasawa by Hakurei Railway; Shiozaki–Shin-Katsumori is the Kamihane Line section, with through high-speed service. Every down train runs to Shin-Iwasawa."],
+"部分班次停靠": ["一部列車のみ停車", "Some trains stop"],
+"下行列車終點": ["下り列車の終点", "Terminus of down trains"],
+"上羽本線區間・高速鉄道直通（汐崎～新勝守）": ["上羽本線区間・高速鉄道直通（汐崎～新勝守）", "Kamihane Line section, high-speed through service (Shiozaki–Shin-Katsumori)"],
+"特急みさこ，直達清音溫泉": ["特急みさこ、清音温泉へ直通", "Ltd. Exp. Misako — straight to Seion Onsen"],
+"新種別「特急みさこ」開始運行。みさこ是速達種別，不停新勝守、咲海、豐守，從新岩沢・花宮天照一路直通上羽本線，並停靠清音溫泉——高速鉄道第一次直接把溫泉街連起來。": ["新種別「特急みさこ」が運行を開始しました。みさこは速達種別で、新勝守・咲海・豐守には停車せず、新岩沢・花宮天照から上羽本線へ直通し、清音温泉に停車します。高速鉄道が初めて温泉街と直接つながりました。", "The new Ltd. Exp. Misako is now running. As the fast service it skips Shin-Katsumori, Seiumi and Toyomori, runs from Shin-Iwasawa and Hanamiya-Tensho straight onto the Kamihane Line, and stops at Seion Onsen — the first time high-speed rail links directly to the onsen town."],
+"不停車": ["通過駅", "Passes"],
+"新岩沢・花宮天照・東平倉・新光瀨・上羽神別・清音溫泉・汐崎": ["新岩沢・花宮天照・東平倉・新光瀨・上羽神別・清音温泉・汐崎", "Shin-Iwasawa, Hanamiya-Tensho, Tohekura, Shin-Hikarise, Kamibetsu, Seion Onsen, Shiozaki"],
+"豐守・咲海・新勝守": ["豐守・咲海・新勝守", "Toyomori, Seiumi, Shin-Katsumori"],
+"特急とりさわ為各站停車，停靠咲海與豐守；清音溫泉另有上羽本線各停可以到達。搭配「上羽・天鳥三日券」入住清音溫泉更划算。": ["特急とりさわは各駅に停車し、咲海・豐守にも止まります。清音温泉へは上羽本線の各停でも行けます。「上羽・天鳥3日券」と組み合わせて清音温泉に泊まるとさらにお得です。", "Ltd. Exp. Torisawa stops at every station, including Seiumi and Toyomori; Seion Onsen is also served by Kamihane Line locals. Pair it with the Kamihane & Amatori 3-Day Pass for an onsen stay."],
+"預訂特急みさこ的指定席特急券。": ["特急みさこの指定席特急券を予約できます。", "Book reserved-seat express tickets for the Misako."],
+"清音溫泉周邊": ["清音温泉周辺", "Around Seion Onsen"],
+"溫泉街、清音大社與港町的景點介紹。": ["温泉街・清音大社・港町の見どころ紹介。", "The onsen town, Seion Taisha and harbour-town sights."],
+"開業": ["開業", "Now open"]
 };
