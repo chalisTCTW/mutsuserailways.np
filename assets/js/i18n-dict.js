@@ -4624,5 +4624,8 @@ window.HK_I18N_DICT = {
 "市區上空的單軌列車": ["市街地の上空を走る單軌列車", "A monorail train above the city centre"],
 "城跡旁的高架軌道梁": ["城跡のそばの高架軌道桁", "The elevated beam beside the castle ruins"],
 "商店街上方的單軌列車": ["商店街の上空を走る單軌列車", "A monorail train above the shopping street"],
-"新中央線白藏山線直通": ["新中央線白藏山線直通", "Shin-Chuo Line / Shirakurayama Line through service"]
+"新中央線白藏山線直通": ["新中央線白藏山線直通", "Shin-Chuo Line / Shirakurayama Line through service"],
+"輸入站名搜尋…": ["駅名を入力して検索…", "Type a station name or code…"],
+"找不到符合的車站": ["該当する駅が見つかりません", "No matching stations"],
+"單軌（光瀨市交通局）": ["モノレール（光瀨市交通局）", "Monorail (Hikarise City Transportation Bureau)"]
 };

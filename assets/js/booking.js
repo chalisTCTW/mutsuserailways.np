@@ -43,10 +43,17 @@
   function booking(H, root) {
     const realRoot = root; root = h('div', { class: 'bk-route' });
     const q = new URLSearchParams(location.search);
-    const opts = H.stations.map(st => h('option', { value: st.id }, st.zh));
-    const fSel = h('select', { 'aria-label': '出發站' }, opts.map(o => o.cloneNode(true))), tSel = h('select', { 'aria-label': '抵達站' }, opts.map(o => o.cloneNode(true)));
-    const vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...opts.map(o => o.cloneNode(true))]);
-    tSel.selectedIndex = Math.min(1, H.stations.length - 1);
+    let fSel, tSel, vSel;
+    if (HK.stationPicker) {   // 2.7.0：可打字搜尋、分組的車站選單
+      fSel = HK.stationPicker(H, { label: '出發站' }); tSel = HK.stationPicker(H, { label: '抵達站' });
+      vSel = HK.stationPicker(H, { label: '經由', allowEmpty: '（不指定）' });
+      tSel.value = (() => { const g = HK.stationGroups(H); return ((g.groups[0] && g.groups[0].stations[0]) || g.pinned[0] || H.stations[0]).id; })();
+    } else {   // 備援：瀏覽器還留著舊版 hk-ui.js 快取時
+      const opts = H.stations.map(st => h('option', { value: st.id }, st.zh));
+      fSel = h('select', { 'aria-label': '出發站' }, opts.map(o => o.cloneNode(true))); tSel = h('select', { 'aria-label': '抵達站' }, opts.map(o => o.cloneNode(true)));
+      vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...opts.map(o => o.cloneNode(true))]);
+      tSel.selectedIndex = Math.min(1, H.stations.length - 1);
+    }
     if (q.get('via') && H.stById[q.get('via')]) vSel.value = q.get('via');
     const today = new Date(), pad = n => String(n).padStart(2, '0');
     const dIn = h('input', { type: 'date', value: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}` });

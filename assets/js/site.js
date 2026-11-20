@@ -10,11 +10,23 @@
   const DAY = 86400;
   const yen = n => '¥' + Number(n).toLocaleString('en-US');
 
+  /* 2.7.0：車站選單換成 HKc.stationPicker()（可打字搜尋、依路線字母＋北到南分組、みつせ預設最前、單軌獨立一區）。 */
   function stationSelect(H, id, label, onChange) {
+    if (HKc.stationPicker) return HKc.stationPicker(H, { id, label, onChange });
+    // 備援：瀏覽器還留著舊版 hk-ui.js 快取時，先用原生選單，不讓頁面壞掉
     const sel = h('select', { 'aria-label': label }, H.stations.map(st => h('option', { value: st.id }, (H.codeText(st.id) ? H.codeText(st.id) + ' ' : '') + st.zh)));
     if (id) sel.value = id;
     if (onChange) sel.addEventListener('change', () => onChange(sel.value));
     return sel;
+  }
+  /** 挑一個跟 excludeId 不同的車站，給「抵達站」之類欄位當初始預設值（不是地理或路線上的講究，純粹要跟出發站不一樣）。 */
+  function otherDefaultStation(H, excludeId) {
+    if (!HKc.stationGroups) { const alt = H.stations.find(s => s.id !== excludeId); return alt ? alt.id : ''; }
+    const g = HKc.stationGroups(H);
+    const pick = (g.groups[0] && g.groups[0].stations[0]) || g.pinned[0] || H.stations[0];
+    if (pick && pick.id !== excludeId) return pick.id;
+    const alt = H.stations.find(s => s.id !== excludeId);
+    return alt ? alt.id : (pick && pick.id) || '';
   }
   const field = (label, el) => h('label', { class: 'f' }, h('span', null, label), el);
   /** 調度（離峰・深夜・收車）時顯示給旅客的說明。 */
@@ -48,12 +60,12 @@
       field('車站', Object.assign(stationSelect(H, null, '車站'), { name: 's' })), h('span'), h('button', { class: 'btn', type: 'submit' }, '查詢時刻表'));
     const now = H.nowSec(), nowStr = hm(now);
     const fromSel = Object.assign(stationSelect(H, null, '出發站'), { name: 'from' }), toSel = Object.assign(stationSelect(H, null, '抵達站'), { name: 'to' });
-    if (H.stations.length > 1) toSel.selectedIndex = Math.min(H.stations.length - 1, 1);
+    if (H.stations.length > 1) toSel.value = otherDefaultStation(H, fromSel.value);
     const bodyRt = h('form', { action: 'timetable.html', method: 'get', class: 'v2' }, h('input', { type: 'hidden', name: 'tab', value: 'route' }),
       field('出發站', fromSel), field('抵達站', toSel), field('出發時刻', h('input', { type: 'time', name: 't', value: nowStr })), h('button', { class: 'btn', type: 'submit' }, '查詢'));
     // 線上訂票：把起訖站與出發時刻帶到 booking.html（booking.js 讀 from／to／t，兩站都有就直接搜尋）
     const bkFrom = Object.assign(stationSelect(H, null, '出發站'), { name: 'from' }), bkTo = Object.assign(stationSelect(H, null, '抵達站'), { name: 'to' });
-    if (H.stations.length > 1) bkTo.selectedIndex = Math.min(H.stations.length - 1, 1);
+    if (H.stations.length > 1) bkTo.value = otherDefaultStation(H, bkFrom.value);
     const bodyBk = h('form', { action: 'booking.html', method: 'get', class: 'v2' },
       field('出發站', bkFrom), field('抵達站', bkTo), field('出發時刻', h('input', { type: 'time', name: 't', value: nowStr })), h('button', { class: 'btn', type: 'submit' }, '搜尋班次並訂票'));
     const tabBar = h('div', { class: 'tabs', role: 'tablist' });
@@ -215,12 +227,14 @@
     // 查詢字串裡的 from／to 也可能是假想站的 id（'hsext:花宮天照' 這種），H.stById 查不到，要另外檢查。
     const hsInit = q.get('hs') === '1';
     const validSt = id => !!H.stById[id] || (hsInit && H.hsQueryStations.some(s => s.id === id && !s.real));
-    const from = q.get('from') && validSt(q.get('from')) ? q.get('from') : H.stations[0].id;
-    const to = q.get('to') && validSt(q.get('to')) ? q.get('to') : H.stations[Math.min(1, H.stations.length - 1)].id;
+    const dfltFrom = ((HKc.stationGroups && HKc.stationGroups(H).pinned[0]) || H.stations[0]).id;
+    const from = q.get('from') && validSt(q.get('from')) ? q.get('from') : dfltFrom;
+    const to = q.get('to') && validSt(q.get('to')) ? q.get('to') : otherDefaultStation(H, dfltFrom);
     const tv = q.get('t') || hm(H.nowSec());
     const fSel = stationSelect(H, null, '出發站'), tSel = stationSelect(H, null, '抵達站'), tIn = h('input', { type: 'time', value: tv });
     const via = q.get('via') && H.stById[q.get('via')] ? q.get('via') : '';
-    const vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...H.stations.map(st => h('option', { value: st.id, selected: st.id === via }, st.zh))]);
+    const vSel = HKc.stationPicker ? HKc.stationPicker(H, { id: via, label: '經由', allowEmpty: '（不指定）' })
+      : h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...H.stations.map(st => h('option', { value: st.id, selected: st.id === via }, st.zh))]);
     const noRes = h('input', { type: 'checkbox', checked: q.get('nores') === '1' });
     const useHS = h('input', { type: 'checkbox', checked: hsInit });
     // 先依 useHS 目前的狀態把假想延伸站加進選單，再設定選到的值——順序不能反過來，
@@ -355,7 +369,8 @@
   }
 
   function viewFare(H, root) {
-    const fSel = stationSelect(H, q.get('from') && H.stById[q.get('from')] ? q.get('from') : H.stations[0].id, '出發站'), tSel = stationSelect(H, q.get('to') && H.stById[q.get('to')] ? q.get('to') : H.stations[Math.min(1, H.stations.length - 1)].id, '抵達站');
+    const dfltF = ((HKc.stationGroups && HKc.stationGroups(H).pinned[0]) || H.stations[0]).id;
+    const fSel = stationSelect(H, q.get('from') && H.stById[q.get('from')] ? q.get('from') : dfltF, '出發站'), tSel = stationSelect(H, q.get('to') && H.stById[q.get('to')] ? q.get('to') : otherDefaultStation(H, dfltF), '抵達站');
     const out = h('div', { style: 'margin-top:18px' });
     const form = h('form', { class: 'finder', onsubmit: e => { e.preventDefault(); go(); } }, h('div', { style: 'display:grid;grid-template-columns:1fr 1fr auto;gap:10px 12px;align-items:end;padding:14px 16px' }, field('出發站', fSel), field('抵達站', tSel), h('button', { class: 'btn', type: 'submit' }, '計算票價')));
     const C = H.cfg;
@@ -471,5 +486,5 @@
   })();
   /* 2.5.0：頁尾顯示入口網站版本，方便確認瀏覽器載入的是不是新檔案（診斷頁：check.html） */
   window.HK_PORTAL_VERSION = '2.6.1';
-  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.6.1'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
+  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.7.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
 })();
