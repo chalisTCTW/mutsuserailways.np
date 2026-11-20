@@ -40,7 +40,8 @@
     if (A.length && dur) {
       const first = A[0].t, last = A[A.length - 1].t;
       t('#hs-first', hmOf(first));
-      t('#hs-dur', L(`約 ${Math.round(dur / 60)} 分`, `約${Math.round(dur / 60)}分`, `about ${Math.round(dur / 60)} min`));
+      const dm = Math.round(dur / 60), dh = Math.floor(dm / 60), dmm = dm % 60;   // 2.8.1：超過 1 小時顯示「1 小時 37 分」
+      t('#hs-dur', dh ? L(`約 ${dh} 小時 ${dmm} 分`, `約${dh}時間${dmm}分`, `about ${dh} h ${dmm} min`) : L(`約 ${dm} 分`, `約${dm}分`, `about ${dm} min`));
       if (B.length) {
         const retLast = B[B.length - 1].t - ext, coreB = legSec(B[B.length - 1].sv, b, a);
         t('#hs-ret', hmOf(retLast));
@@ -49,28 +50,79 @@
         if (stay > 0) t('#hs-stay', L(`最長約 ${Math.floor(stay / 3600)} 小時`, `最長 約${Math.floor(stay / 3600)}時間`, `up to ~${Math.floor(stay / 3600)} h`));
       }
     }
-    // 2.8.0：特急みさこ（速達種別）——停靠站一覽與所要時間，從快照的班次算出來
+    // 2.8.1：路線圖合併成一張「停車駅案内」——車站橫向排列，每個種別一條平行線，圓點＝停車、沒有圓點＝通過。
+    // 車站順序、各種別的停車站都從快照的班次算（下行方向），地圖外延伸段（豐守・新岩沢）照 site-config 的 hsExt.stops／skip。
     (function () {
-      const box = $('#hs-ms-stops'); if (!box) return;
-      const isMs = sv => sv.isHS && /みさこ/.test(String((sv.member && (sv.member.number || sv.member.rawName)) || '') + String((sv.route && sv.route.number) || ''));
-      const down = H.svcs.filter(isMs).find(sv => { const iT = sv.stops.findIndex(s => H.stName(s.station) === '東平倉'), iS = sv.stops.findIndex(s => H.stName(s.station) === '新光瀨'); return iT > iS && iS >= 0; });
-      const line = ['汐崎', '清音溫泉', '上羽神別', '新勝守', '新光瀨', '東平倉', '咲海', '花宮天照', '豐守', '新岩沢'];
-      const stopsZh = down ? down.stops.filter(s => s.pax !== false).map(s => H.stName(s.station)) : ['汐崎', '清音溫泉', '上羽神別', '新光瀨', '東平倉', '花宮天照'];
-      const extStops = (H.hsExtStops || []).filter(e => !(e.skip || []).some(k => k === 'みさこ')).map(e => e.zh);
+      const box = $('#hs-pat'); if (!box) return;
       const tr = x => (window.HK_I18N && window.HK_I18N.t) ? window.HK_I18N.t(x) : x;
-      box.replaceChildren(...line.map(zh => {
-        const sp = document.createElement('span'), stop = stopsZh.includes(zh) || extStops.includes(zh);
-        sp.className = stop ? (zh === '清音溫泉' ? 'hl' : '') : 'skip';
-        sp.textContent = tr(zh) + (stop ? '' : L('（通過）', '（通過）', ' (pass)'));
-        return sp;
-      }));
-      mark(box);
-      const durEl = $('#hs-ms-dur');
-      if (down && durEl) {
-        const st = down.stops, a0 = st[0], z = st[st.length - 1];
-        const core = (z.arr != null ? z.arr : z.dep) - a0.dep, extS = H.hsExtDuration ? H.hsExtDuration(H.stName(z.station), '新岩沢') : 0;
-        const mins = Math.round((core + extS) / 60);
-        durEl.textContent = L(`${tr(H.stName(a0.station))}→新岩沢 約 ${mins} 分`, `${tr(H.stName(a0.station))}→新岩沢 約${mins}分`, `${tr(H.stName(a0.station))} → Shin-Iwasawa about ${mins} min`);
+      const iS = sv => sv.stops.findIndex(s => H.stName(s.station) === '新光瀨'), iT = sv => sv.stops.findIndex(s => H.stName(s.station) === '東平倉');
+      const hsAll = H.svcs.filter(sv => sv.isHS), downs = hsAll.filter(sv => iS(sv) >= 0 && iT(sv) > iS(sv));
+      if (!downs.length) return;
+      // 車站順序：所有下行班次停靠站的聯集（插在「下一個已知站」之前）
+      const order = [];
+      downs.slice().sort((a, b) => b.stops.length - a.stops.length).forEach(sv => {
+        const seq = sv.stops.filter(s => s.pax !== false).map(s => s.station);
+        seq.forEach((id, k) => {
+          if (order.includes(id)) return;
+          const nx = seq.slice(k + 1).find(x => order.includes(x));
+          if (nx != null) order.splice(order.indexOf(nx), 0, id);
+          else { const pv = seq.slice(0, k).reverse().find(x => order.includes(x)); order.splice(pv != null ? order.indexOf(pv) + 1 : order.length, 0, id); }
+        });
+      });
+      const ext = H.hsExtStops || [];
+      const cols = order.map(id => ({ id, zh: H.stName(id), real: true })).concat(ext.map(e => ({ id: e.id, zh: e.zh, real: false, e })));
+      // 種別：依班次別名（member.number 去掉「特急」）分組；顏色用路線色
+      const nick = sv => String(sv.member.number || '').replace(/特急/g, '').trim() || sv.routeName;
+      const types = [];
+      downs.concat(hsAll.filter(sv => !downs.includes(sv))).forEach(sv => {
+        const k = nick(sv); let t = types.find(x => x.k === k);
+        if (!t) types.push(t = { k, name: String(sv.member.number || sv.routeName), color: sv.color, stops: new Set() });
+        sv.stops.forEach(s => { if (s.pax !== false) t.stops.add(s.station); });
+      });
+      const anc = cols.find(c => c.zh === ((CFG.hsExt && CFG.hsExt.afterZh) || '花宮天照'));
+      // 到得了花宮天照的種別，延伸段照開（skip 指定的種別通過豐守）
+      types.forEach(t => { if (anc && t.stops.has(anc.id)) ext.forEach(e => { if (!(e.skip || []).some(x => t.k.indexOf(x) >= 0)) t.stops.add(e.id); }); });
+      const N = cols.length, X = i => (N > 1 ? i / (N - 1) * 100 : 50) + '%';
+      const el = (tag, cls, css) => { const d = document.createElement(tag); if (cls) d.className = cls; if (css) d.style.cssText = css; return d; };
+      const inner = el('div', 'hs-pat-in');
+      // 管轄帶（最上面一條細線）
+      const ci = zh => cols.findIndex(c => c.zh === zh);
+      [['ext2', 0, ci('新勝守')], ['a', ci('新勝守'), ci('東平倉')], ['b', ci('東平倉'), N - 1]].forEach(([c, a, b]) => {
+        if (a < 0 || b < 0 || b <= a) return;
+        inner.append(el('div', 'hs-pat-band ' + c, `left:${X(a)};width:calc(${X(b)} - ${X(a)})`));
+      });
+      // 各種別一條線
+      types.forEach((t, r) => {
+        const idx = cols.map((c, i) => t.stops.has(c.id) ? i : -1).filter(i => i >= 0); if (!idx.length) return;
+        const y = 34 + r * 46;
+        const lab = el('div', 'hs-pat-lab', `top:${y - 11}px;background:${t.color}`); lab.textContent = tr(t.name); mark(lab); inner.append(lab);
+        inner.append(el('div', 'hs-pat-line', `top:${y}px;left:${X(idx[0])};width:calc(${X(idx[idx.length - 1])} - ${X(idx[0])});background:${t.color}`));
+        cols.forEach((c, i) => {
+          if (i < idx[0] || i > idx[idx.length - 1]) return;
+          inner.append(el('i', t.stops.has(c.id) ? 'hs-pat-dot' : 'hs-pat-pass', `top:${y}px;left:${X(i)};--c:${t.color}`));
+        });
+      });
+      // 車站名＋轉乘標示
+      const chips = { '新勝守': [['g', '可轉乘新幹線'], ['y', '高速鉄道・一般鐵路轉乘']], '新光瀨': [['y', '步行轉乘']], '東平倉': [['g', '可直接轉乘']], '新岩沢': [['k', '下行列車終點'], ['o', '轉乘秋葉鉄道']] };
+      const yName = 34 + types.length * 46 + 4;
+      cols.forEach((c, i) => {
+        inner.append(el('div', 'hs-pat-guide', `left:${X(i)};height:${yName - 18}px`));
+        const a = el('a', 'hs-pat-st', `left:${X(i)};top:${yName}px`);
+        a.href = c.real ? 'station.html?n=' + encodeURIComponent(c.zh) : '#hs-tr';
+        const b = document.createElement('b'); b.textContent = tr(c.zh); a.append(b);
+        (chips[c.zh] || []).forEach(([k, txt]) => { const sp = el('span', 'hs-chip ' + k); sp.textContent = tr(txt); a.append(sp); });
+        mark(a); inner.append(a);
+      });
+      inner.style.height = (yName + 110) + 'px';
+      box.replaceChildren(inner);
+      // みさこ的所要時間（起點→新岩沢）
+      const ms = types.find(t => /みさこ/.test(t.k)), durEl = $('#hs-ms-dur');
+      const msDown = downs.find(sv => /みさこ/.test(nick(sv)));
+      if (ms && msDown && durEl) {
+        const st = msDown.stops, a0 = st[0], z = st[st.length - 1];
+        const m = Math.round(((z.arr != null ? z.arr : z.dep) - a0.dep + (H.hsExtDuration ? H.hsExtDuration(H.stName(z.station), '新岩沢') : 0)) / 60), hh = Math.floor(m / 60), mm = m % 60;
+        const f = L(hh ? `${hh} 小時 ${mm} 分` : `${m} 分`, hh ? `${hh}時間${mm}分` : `${m}分`, hh ? `${hh} h ${mm} min` : `${m} min`);
+        durEl.textContent = L(`${tr(H.stName(a0.station))}→新岩沢 約 ${f}`, `${tr(H.stName(a0.station))}→新岩沢 約${f}`, `${tr(H.stName(a0.station))} → Shin-Iwasawa about ${f}`);
         mark(durEl);
       }
     })();
@@ -164,6 +216,14 @@
         }
         function mergedTable(list) {
           const { runs } = mergedRuns(list), rows = stationRows(list).map(id => ({ station: id }));
+          // 2.8.1：地圖外延伸段（花宮天照—豐守—新岩沢）也列進時刻表：下行接在花宮天照之後、上行排在花宮天照之前。
+          // 時刻＝該班在花宮天照的時刻 ± 延伸段的站間時間（site-config 的 hsExt.stops）；みさこ通過豐守顯示「レ」。
+          const anchorZh = (CFG.hsExt && CFG.hsExt.afterZh) || '花宮天照', anchorSt = stN(anchorZh);
+          const down = list === buckets[0];
+          if (anchorSt && H.hsExtStops && H.hsExtStops.length && rows.some(x => x.station === anchorSt.id)) {
+            const vrows = H.hsExtStops.map(e => ({ station: e.id, virt: e }));
+            if (down) rows.push(...vrows); else rows.unshift(...vrows.slice().reverse());
+          }
           if (!runs.length) { const p = document.createElement('p'); p.className = 'note'; p.textContent = L('本日沒有班次。', '本日の運行はありません。', 'No service today.'); return p; }
           const hsAt = k => k && Math.floor(runs[k].t / 3600) !== Math.floor(runs[k - 1].t / 3600) ? ' hs' : '';
           const head = document.createElement('tr'); head.appendChild(document.createElement('th')).textContent = L('車站', '駅', 'Station');
@@ -171,13 +231,22 @@
           const tbody = document.createElement('tbody');
           rows.forEach(s => {
             const tr = document.createElement('tr'), th = document.createElement('th'); th.scope = 'row';
-            const bd = H.codeBadges(s.station); if (bd) th.appendChild(bd); th.append(document.createTextNode(H.stName(s.station)));
+            const bd = s.virt ? null : H.codeBadges(s.station); if (bd) th.appendChild(bd); th.append(document.createTextNode(s.virt ? s.virt.zh : H.stName(s.station)));
             tr.appendChild(th);
             runs.forEach((r, k) => {
               const td = document.createElement('td'); td.className = 'c' + hsAt(k);
+              if (s.virt) {   // 延伸段：用這班在花宮天照的時刻推算
+                const jA = r.sv.stops.findIndex(x => x.station === anchorSt.id && x.pax !== false);
+                if (jA < 0) { td.textContent = '－'; tr.appendChild(td); return; }
+                const tA = r.t + ownOffset(r.sv, jA), sec = H.hsExtDuration(anchorZh, s.virt.zh);
+                const skip = (s.virt.skip || []).some(x => String(r.gou || '').indexOf(x) >= 0 || String(r.sv.member.number || '').indexOf(x) >= 0);
+                const isEnd = s.virt === H.hsExtStops[H.hsExtStops.length - 1];
+                td.textContent = skip && !isEnd ? 'レ' : hmOf(down ? tA + sec : tA - sec);
+                tr.appendChild(td); return;
+              }
               const j = r.sv.stops.findIndex(x => x.station === s.station && x.pax !== false);
               // 2.8.0：班次經過這一帶但不停（例如みさこ通過新勝守）顯示「レ」，根本不經過顯示「－」
-              const served = rows.map(x => r.sv.stops.some(y => y.station === x.station && y.pax !== false));
+              const served = rows.map(x => !x.virt && r.sv.stops.some(y => y.station === x.station && y.pax !== false));
               const i0 = served.indexOf(true), i1 = served.lastIndexOf(true), iMe = rows.indexOf(s);
               td.textContent = j >= 0 ? hmOf(r.t + ownOffset(r.sv, j)) : (iMe > i0 && iMe < i1 ? 'レ' : '－');
               tr.appendChild(td);

@@ -318,7 +318,7 @@
         // 退回用路線全名當分組鍵，維持原本各自獨立編號的行為，不受影響。
         const up = upOf(sv), k = (numNick || full) + '|' + (up ? 1 : 0);
         let g = groups.get(k); if (!g) groups.set(k, g = { full, up, list: [], nick: numNick ? numStr : '' });
-        sv.depot.departures.forEach(D => g.list.push({ tod: ((Math.round(D + sv.stops[0].dep) % DAY) + DAY) % DAY, idx: sv.idx }));
+        sv.depot.departures.forEach(D => g.list.push({ tod: ((Math.round(D + (sv.dep0 != null ? sv.dep0 : sv.stops[0].dep)) % DAY) + DAY) % DAY, idx: sv.idx }));   // 2.8.1：虛擬延長的班次照遊戲內起點編號
       });
       groups.forEach(g => {
         g.list.sort((a, b) => a.tod - b.tod || a.idx - b.idx);
@@ -328,7 +328,7 @@
       });
     })();
     /** 某班（sv、base＝該日起點車庫發車時刻）的號；不是特急回傳空字串。 */
-    H.gouOf = (sv, base) => gouTable.get(sv.idx + '|' + (((Math.round(base + sv.stops[0].dep) % DAY) + DAY) % DAY)) || '';
+    H.gouOf = (sv, base) => gouTable.get(sv.idx + '|' + (((Math.round(base + (sv.dep0 != null ? sv.dep0 : sv.stops[0].dep)) % DAY) + DAY) % DAY)) || '';
 
     /* ── 全日班次（前後各一天，處理跨午夜）與連線 ── */
     const conns = [], trips = [], events = new Map();

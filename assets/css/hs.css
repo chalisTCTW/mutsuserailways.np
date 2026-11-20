@@ -106,3 +106,19 @@
 .hs-ms-stops span.skip { color: #9aa39f; font-weight: 500; font-size: 13px; }
 .hs-ms-stops span.hl { color: #b7325b; }
 .hs-ms-spec { margin-top: 6px; }
+
+/* 2.8.1：停車駅案内（路線圖合併成一張）：每個種別一條平行線，圓點＝停車、細刻度＝通過。 */
+.hs-pat { margin: 34px 70px 0 150px; min-width: 1300px; }
+.hs-pat-in { position: relative; }
+.hs-pat-band { position: absolute; top: 0; height: 6px; border-radius: 3px; background: var(--hs); }
+.hs-pat-band.ext2 { background: #6f8f84; } .hs-pat-band.b { background: repeating-linear-gradient(90deg, var(--hs2) 0 10px, var(--hs3) 10px 15px); }
+.hs-pat-lab { position: absolute; left: -142px; width: 118px; height: 22px; line-height: 22px; border-radius: 11px; color: #fff; font-size: 12.5px; font-weight: 700; text-align: center; letter-spacing: .04em; white-space: nowrap; overflow: hidden; }
+.hs-pat-line { position: absolute; height: 8px; margin-top: -4px; border-radius: 4px; }
+.hs-pat-dot, .hs-pat-pass { position: absolute; display: block; transform: translate(-50%, -50%); }
+.hs-pat-dot { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 6px solid var(--c); box-sizing: border-box; z-index: 2; }
+.hs-pat-pass { width: 4px; height: 16px; border-radius: 2px; background: #fff; opacity: .85; z-index: 2; }
+.hs-pat-guide { position: absolute; top: 14px; width: 0; border-left: 1px dashed #c9d3cf; z-index: 0; }
+.hs-pat-st { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; white-space: nowrap; color: inherit; text-decoration: none; }
+.hs-pat-st b { font-size: 16px; font-weight: 700; } .hs-pat-st:hover b { color: var(--hs); }
+.hs-legend .dot { width: 16px; height: 16px; border-radius: 50%; border: 5px solid var(--hs); background: #fff; box-sizing: border-box; }
+.hs-legend .pass { width: 34px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--hs) 0 15px, #fff 15px 19px, var(--hs) 19px); }

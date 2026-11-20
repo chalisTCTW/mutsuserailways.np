@@ -4641,5 +4641,10 @@ window.HK_I18N_DICT = {
 "預訂特急みさこ的指定席特急券。": ["特急みさこの指定席特急券を予約できます。", "Book reserved-seat express tickets for the Misako."],
 "清音溫泉周邊": ["清音温泉周辺", "Around Seion Onsen"],
 "溫泉街、清音大社與港町的景點介紹。": ["温泉街・清音大社・港町の見どころ紹介。", "The onsen town, Seion Taisha and harbour-town sights."],
-"開業": ["開業", "Now open"]
+"開業": ["開業", "Now open"],
+"高速鉄道的各種別（特急とりさわ・特急みさこ）都走同一條路線，下圖用平行的線條分別標出各種別的停車站。新勝守至東平倉由光瀨都市鉄道管轄，東平倉至新岩沢由白令鉄道管轄；汐崎至新勝守為上羽本線區間，高速鉄道直通運轉。所有下行列車都開往新岩沢。": ["高速鉄道の各種別（特急とりさわ・特急みさこ）はすべて同じ路線を走ります。下の図では種別ごとに平行な線で停車駅を示しています。新勝守～東平倉は光瀨都市鉄道、東平倉～新岩沢は白令鉄道の管轄です。汐崎～新勝守は上羽本線の区間で、高速鉄道が直通運転しています。下り列車はすべて新岩沢行きです。", "All high-speed services (Ltd. Exp. Torisawa and Ltd. Exp. Misako) share the same line; the diagram below shows each service's stops as a separate parallel line. Shin-Katsumori–Tohekura is operated by Hikarise Urban Railway and Tohekura–Shin-Iwasawa by Hakurei Railway; Shiozaki–Shin-Katsumori is the Kamihane Line section, with through high-speed service. Every down train runs to Shin-Iwasawa."],
+"停車": ["停車", "Stops"],
+"特急とりさわ": ["特急とりさわ", "Ltd. Exp. Torisawa"],
+"特急みさこ": ["特急みさこ", "Ltd. Exp. Misako"],
+"高速鉄道的各種別（特急とりさわ・特急みさこ）都走同一條路線，下圖用平行的線條分別標出各種別的停車站。新勝守至東平倉由光瀨都市鉄道管轄，東平倉至新岩沢由白令鉄道管轄；汐崎至新勝守為上羽本線區間，高速鉄道直通運轉。開到花宮天照的列車會繼續開往新岩沢，其餘列車以東平倉為終點。": ["高速鉄道の各種別（特急とりさわ・特急みさこ）はすべて同じ路線を走ります。下の図では種別ごとに平行な線で停車駅を示しています。新勝守～東平倉は光瀨都市鉄道、東平倉～新岩沢は白令鉄道の管轄です。汐崎～新勝守は上羽本線の区間で、高速鉄道が直通運転しています。花宮天照まで運転する列車は新岩沢まで直通し、その他の列車は東平倉止まりです。", "All high-speed services (Ltd. Exp. Torisawa and Ltd. Exp. Misako) share the same line; the diagram below shows each service's stops as a separate parallel line. Shin-Katsumori–Tohekura is operated by Hikarise Urban Railway and Tohekura–Shin-Iwasawa by Hakurei Railway; Shiozaki–Shin-Katsumori is the Kamihane Line section, with through high-speed service. Trains that run to Hanamiya-Tensho continue to Shin-Iwasawa; the others terminate at Tohekura."]
 };
