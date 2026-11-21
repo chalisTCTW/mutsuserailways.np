@@ -1,0 +1,325 @@
+{
+ "note": "車站→行政區→地方 對照。地方（regions）是大區域判定，不是正式行政區。stations 的 key 是車站中文名；transfer 是「轉乘車站」清單（含步行轉乘），供餐廳數量下限檢查使用。",
+ "regions": [
+  {
+   "id": "city",
+   "zh": "市內",
+   "ja": "市内",
+   "en": "City Center"
+  },
+  {
+   "id": "kamiha",
+   "zh": "上羽地方",
+   "ja": "上羽地方",
+   "en": "Kamiha Region"
+  },
+  {
+   "id": "tentori",
+   "zh": "天鳥地方",
+   "ja": "天鳥地方",
+   "en": "Tentori Region"
+  },
+  {
+   "id": "hekura",
+   "zh": "平倉地方",
+   "ja": "平倉地方",
+   "en": "Hekura Region"
+  },
+  {
+   "id": "obagawa",
+   "zh": "尾羽川地方",
+   "ja": "尾羽川地方",
+   "en": "Ohanegawa Region"
+  },
+  {
+   "id": "gohara",
+   "zh": "五原地方",
+   "ja": "五原地方",
+   "en": "Gohara Region"
+  }
+ ],
+ "districts": [
+  {
+   "id": "tomiya",
+   "region": "city",
+   "zh": "戸宮區",
+   "ja": "戸宮区",
+   "en": "Tomiya Ward",
+   "full": {
+    "zh": "光瀨市戸宮區",
+    "ja": "光瀬市戸宮区",
+    "en": "Tomiya Ward, Hikarise City"
+   }
+  },
+  {
+   "id": "hanakura",
+   "region": "city",
+   "zh": "花倉區",
+   "ja": "花倉区",
+   "en": "Hanakura Ward",
+   "full": {
+    "zh": "光瀨市花倉區",
+    "ja": "光瀬市花倉区",
+    "en": "Hanakura Ward, Hikarise City"
+   }
+  },
+  {
+   "id": "minuma",
+   "region": "city",
+   "zh": "見沼區",
+   "ja": "見沼区",
+   "en": "Minuma Ward",
+   "full": {
+    "zh": "光瀨市見沼區",
+    "ja": "光瀬市見沼区",
+    "en": "Minuma Ward, Hikarise City"
+   }
+  },
+  {
+   "id": "kurita",
+   "region": "city",
+   "zh": "栗田區",
+   "ja": "栗田区",
+   "en": "Kurita Ward",
+   "full": {
+    "zh": "光瀨市栗田區",
+    "ja": "光瀬市栗田区",
+    "en": "Kurita Ward, Hikarise City"
+   }
+  },
+  {
+   "id": "shirakurayama",
+   "region": "city",
+   "zh": "白藏山區",
+   "ja": "白蔵山区",
+   "en": "Shirakurayama Ward",
+   "full": {
+    "zh": "光瀨市白藏山區",
+    "ja": "光瀬市白蔵山区",
+    "en": "Shirakurayama Ward, Hikarise City"
+   }
+  },
+  {
+   "id": "shiozaki",
+   "region": "kamiha",
+   "zh": "汐崎市",
+   "ja": "汐崎市",
+   "en": "Shiozaki City",
+   "full": {
+    "zh": "光瀨郡汐崎市",
+    "ja": "光瀬郡汐崎市",
+    "en": "Shiozaki City, Hikarise District"
+   }
+  },
+  {
+   "id": "namibetsu",
+   "region": "kamiha",
+   "zh": "波別町",
+   "ja": "波別町",
+   "en": "Namibetsu Town",
+   "full": {
+    "zh": "光瀨郡波別町",
+    "ja": "光瀬郡波別町",
+    "en": "Namibetsu Town, Hikarise District"
+   }
+  },
+  {
+   "id": "izoshima",
+   "region": "tentori",
+   "zh": "磯島町",
+   "ja": "磯島町",
+   "en": "Izoshima Town",
+   "full": {
+    "zh": "光瀨郡磯島町",
+    "ja": "光瀬郡磯島町",
+    "en": "Izoshima Town, Hikarise District"
+   }
+  },
+  {
+   "id": "katsumori",
+   "region": "tentori",
+   "zh": "勝守市",
+   "ja": "勝守市",
+   "en": "Katsumori City",
+   "full": {
+    "zh": "光瀨郡勝守市",
+    "ja": "光瀬郡勝守市",
+    "en": "Katsumori City, Hikarise District"
+   }
+  },
+  {
+   "id": "murasaki",
+   "region": "tentori",
+   "zh": "紫市",
+   "ja": "紫市",
+   "en": "Murasaki City",
+   "full": {
+    "zh": "光瀨郡紫市",
+    "ja": "光瀬郡紫市",
+    "en": "Murasaki City, Hikarise District"
+   }
+  },
+  {
+   "id": "tentorizaki",
+   "region": "tentori",
+   "zh": "天鳥崎町",
+   "ja": "天鳥崎町",
+   "en": "Amatorizaki Town",
+   "full": {
+    "zh": "光瀨郡天鳥崎町",
+    "ja": "光瀬郡天鳥崎町",
+    "en": "Amatorizaki Town, Hikarise District"
+   }
+  },
+  {
+   "id": "hekura",
+   "region": "hekura",
+   "zh": "平倉市",
+   "ja": "平倉市",
+   "en": "Hekura City",
+   "full": {
+    "zh": "十万浦郡平倉市",
+    "ja": "十万浦郡平倉市",
+    "en": "Hekura City, Jumanmura District"
+   }
+  },
+  {
+   "id": "najima",
+   "region": "obagawa",
+   "zh": "名島市",
+   "ja": "名島市",
+   "en": "Najima City",
+   "full": {
+    "zh": "光瀨郡名島市",
+    "ja": "光瀬郡名島市",
+    "en": "Najima City, Hikarise District"
+   }
+  },
+  {
+   "id": "magarie",
+   "region": "obagawa",
+   "zh": "曲江町",
+   "ja": "曲江町",
+   "en": "Magarie Town",
+   "full": {
+    "zh": "光瀨郡曲江町",
+    "ja": "光瀬郡曲江町",
+    "en": "Magarie Town, Hikarise District"
+   }
+  },
+  {
+   "id": "yukimura",
+   "region": "obagawa",
+   "zh": "幸村",
+   "ja": "幸村",
+   "en": "Yukimura",
+   "full": {
+    "zh": "光瀨郡幸村",
+    "ja": "光瀬郡幸村",
+    "en": "Yukimura, Hikarise District"
+   }
+  },
+  {
+   "id": "matsuzawa",
+   "region": "gohara",
+   "zh": "松澤町",
+   "ja": "松沢町",
+   "en": "Matsuzawa Town",
+   "full": {
+    "zh": "十万浦郡松澤町",
+    "ja": "十万浦郡松沢町",
+    "en": "Matsuzawa Town, Jumanmura District"
+   }
+  }
+ ],
+ "stations": {
+  "上羽安來": "namibetsu",
+  "浦川": "minuma",
+  "川雨": "hekura",
+  "古道": "katsumori",
+  "石知海岸": "katsumori",
+  "東松沢": "matsuzawa",
+  "戸宮": "tomiya",
+  "東平倉": "hekura",
+  "鷹取大野": "minuma",
+  "日平": "murasaki",
+  "尾羽高校前": "magarie",
+  "みつせ": "kurita",
+  "多見瀨": "minuma",
+  "見沼/府厅前": "minuma",
+  "谷山": "minuma",
+  "汐崎": "shiozaki",
+  "新勝守": "katsumori",
+  "天鳥新浦": "magarie",
+  "紫市": "murasaki",
+  "山口町": "shirakurayama",
+  "南汐崎": "shiozaki",
+  "西花倉": "hanakura",
+  "六石": "tomiya",
+  "大學前": "tomiya",
+  "船井大島": "kurita",
+  "南九里": "shirakurayama",
+  "勝守水沢公園": "katsumori",
+  "ひがしいち": "minuma",
+  "中徳田": "namibetsu",
+  "花倉街道": "hanakura",
+  "曲江": "magarie",
+  "尾羽": "magarie",
+  "名島さくら台": "najima",
+  "浦津": "izoshima",
+  "太府田": "hekura",
+  "名島港": "najima",
+  "清音溫泉": "namibetsu",
+  "九里橋三丁目": "shirakurayama",
+  "村下遺跡": "hekura",
+  "松沢国際空港": "matsuzawa",
+  "川跡高原": "katsumori",
+  "白藏山": "shirakurayama",
+  "上羽神別": "namibetsu",
+  "岩田": "hekura",
+  "幸村/新光瀨": "yukimura",
+  "入山": "matsuzawa",
+  "中村": "tomiya",
+  "天鳥八幡": "minuma",
+  "波別": "namibetsu",
+  "栗田町": "kurita",
+  "天鳥崎中央": "tentorizaki",
+  "咲海研究学園都市": "hekura",
+  "荒木": "izoshima",
+  "新光瀨": "yukimura",
+  "北品郡": "namibetsu",
+  "本磯島": "izoshima",
+  "中央戸宮/光大前": "tomiya",
+  "村関": "kurita",
+  "平倉公園西": "hekura",
+  "南紫市日平": "murasaki",
+  "勝守": "katsumori",
+  "良栖信號場": "shiozaki",
+  "北倉間": "minuma",
+  "十万浦市": "magarie",
+  "村下": "hekura",
+  "古道みどり野": "katsumori",
+  "スカイツリー公園": "kurita",
+  "西見沼": "minuma",
+  "箱野": "shirakurayama",
+  "箱野山口": "shirakurayama",
+  "八幡通": "minuma",
+  "病院前": "minuma"
+ },
+ "transfer": [
+  "みつせ",
+  "花倉街道",
+  "栗田町",
+  "戸宮",
+  "谷山",
+  "西花倉",
+  "船井大島",
+  "大學前",
+  "白藏山",
+  "東平倉",
+  "新勝守",
+  "新光瀨",
+  "幸村/新光瀨",
+  "中央戸宮/光大前"
+ ]
+}

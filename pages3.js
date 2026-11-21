@@ -21,7 +21,7 @@
   function viewGuide(H, root) {
     const sf = seatFee(H), st = standFee(H);
     root.append(h('p', { class: 'lead' }, '第一次搭乘光瀨都市鉄道？這裡整理了各種別的差別、座席與票券、避免搭錯車的方法，以及常見問題。'),
-      h('nav', { class: 'lchips sjump', 'aria-label': '本頁內容' }, h('a', { class: 'lchipbtn', href: '#guide' }, '乘車指南'), h('a', { class: 'lchipbtn', href: '#faq' }, '常見問題')));
+      h('nav', { class: 'lchips sjump', 'aria-label': '本頁內容' }, h('a', { class: 'lchipbtn', href: '#guide' }, '乘車指南'), h('a', { class: 'lchipbtn', href: '#hikacard' }, 'HIKACARD'), h('a', { class: 'lchipbtn', href: '#faq' }, '常見問題')));
 
     /* ── 乘車指南 ── */
     const g = h('div', { id: 'guide' });
@@ -91,6 +91,8 @@
       h('p', { class: 'note', style: 'margin-top:12px' }, '目前運行中的種別與時刻表上的標示：'),
       h('div', { class: 'ttbox' }, typeTags.length ? typeTags : h('p', { class: 'note' }, '目前沒有資料。'))));
     root.append(g);
+    // 2.9.0：交通局 IC 卡 HIKACARD（跟 monorail.html 共用 hikacard.js）
+    if (HK.hikacardSection) { try { root.append(HK.hikacardSection(H, { side: 'rail' })); } catch (e) { /* 失敗時略過 */ } }
 
     /* ── 常見問題 ── */
     const Q = (q, ...a) => h('details', { class: 'faqi' }, h('summary', null, q), h('div', { class: 'faqa' }, ...a));
@@ -107,7 +109,7 @@
       Q('兒童與長者有折扣嗎？', h('p', null, '12 歲以下與 60 歲以上的乘車券為大人的一半（四捨五入到整數）。指定席券與立席特急券不打折。')),
       Q('指定席券與立席特急券是多少錢？', h('p', null, `指定席券 ${yen(sf)}；特急的立席特急券為指定席的一半（${yen(st)}），不保證有座位，也不能選座位。特快只有 1・2 号車是指定席，3 号車以後為自由席，不用另外付費。`)),
       Q('哪些列車需要指定席？', h('p', null, '特急為全車指定席；特快的 1・2 号車為指定席。各停、快速、環狀快速都是全車自由席。')),
-      Q('有周遊券或優惠套票嗎？', h('p', null, '有。往返機場的旅客可以使用「一日券」（1,500 円）、「三日券」（4,500 円）、「五日券」（7,000 円）與「七日券」（9,600 円），期間內可無限次搭乘光瀨都市鉄道的自由席列車；搭乘指定席列車時只需另付指定席費用。七日券已含指定席座席費與高速鉄道 2 往復。詳細請見', link('airport.html', '機場聯外交通'), '。')),
+      Q('有周遊券或優惠套票嗎？', h('p', null, '有。往返機場的旅客可以使用「一日券」（1,500 円）、「三日券」（4,500 円）、「五日券」（7,000 円）與「七日券」（9,600 円），期間內可無限次搭乘光瀨都市鉄道的自由席列車，並且全部都含光瀨都市單軌（市交通局）的無限搭乘；搭乘指定席列車時只需另付指定席費用。七日券已含指定席座席費與高速鉄道 2 往復。詳細請見', link('airport.html', '機場聯外交通'), '。')),
       Q('在哪裡買指定席券？', h('p', null, '可以到', link('booking.html', '線上訂票'), '選擇列車與座位。')),
       h('h3', { class: 'h3' }, '乘車'),
       Q('時刻表上「特」「快」「環」是什麼意思？', h('p', null, '那是種別的略稱：不是各停、快速的列車，會以種別名稱的第一個字標示（例如特急＝「特」、特快＝「特」、環狀快速＝「環」）。各停不標示。完整的種別請看列車名稱。')),
@@ -181,7 +183,7 @@
     if (ap && center) { const f = H.fare(ap.id, center.id); if (f) { const one = f.yen, rt = one * 2; fareLine = { one, rt }; } }
     root.append(sec('優惠套票　一日券・三日券・五日券・七日券', 'Visitor Passes',
       h('p', null, '專為旅客準備的套票。購買後，在使用期間內可以無限次搭乘光瀨都市鉄道的自由席列車；搭乘指定席列車時，只需要另外付指定席費用（不需再付乘車券）。七日券已含指定席座席費，並含高速鉄道 2 往復。'),
-      h('div', { class: 'pass-grid static' }, HK.passes.list.map(p => HK.passes.card(p, { seatFee: sf }))),
+      h('div', { class: 'pass-grid static' }, HK.passes.list.filter(p => !p.reg).map(p => HK.passes.card(p, { seatFee: sf }))),
       fareLine ? h('p', { class: 'note' }, `參考：${ap.zh}～${center.zh} 單程乘車券 ${yen(fareLine.one)}、來回 ${yen(fareLine.rt)}。一日券（${yen(1500)}）大約搭 ${Math.ceil(1500 / fareLine.one)} 次這樣的單程就回本；三日券（${yen(4500)}）約 ${Math.ceil(4500 / fareLine.one)} 次。以每天往返市區與景點計算，通常很划算。`) : null,
       h('p', { class: 'note' }, h('a', { href: 'booking.html#pass' }, '到線上訂票，開立模擬套票'), '　套票的實際販售方式與販售地點，將於本網站公告。')));
     root.append(sec('注意事項', null, h('ul', { class: 'spoints' },
@@ -220,6 +222,17 @@
     const dyn = h('div');
     root.append(sec('停靠站與時刻', 'Stops and times', dyn));
     (function () {
+      // 2.11.0：改用設備介紹同一套元件——こばな・スーパーこばな合併、上下行切換、通過站標示、停車駅一覽
+      if (HK.groupsOf && HK.lineBlockTop) {
+        const groups = HK.groupsOf(H), g = groups.find(x => /こばな/.test(x.name));
+        if (g) {
+          let di = 0; const top = h('div'), bottom = h('div');
+          const draw = () => { HK.lineBlockTop(H, groups, g, di, top, k => { di = k; draw(); }); bottom.replaceChildren(); HK.lineBlockBottom(H, groups, g, di, bottom); };
+          draw();
+          dyn.append(top, bottom, h('p', null, h('a', { class: 'btn ghost', href: 'routes.html?s=kobana' }, '全日時刻表（設備與服務介紹）'), ' ', h('a', { class: 'btn ghost', href: 'timetable.html' }, '時刻表')));
+          return;
+        }
+      }
       const sv = H.svcs.find(s => /こばな/.test(s.routeName));
       if (!sv) { dyn.append(h('p', null, '主要停靠站：勝守、天鳥崎、本磯島。詳細的停靠站與時刻會在時刻表資料更新後顯示在這裡。'), h('p', null, h('a', { class: 'btn ghost', href: 'timetable.html' }, '前往時刻表'))); return; }
       const all = H.svcs.filter(s => s.routeName === sv.routeName), tt = depTimes(H, sv), pax = paxStops(sv);
