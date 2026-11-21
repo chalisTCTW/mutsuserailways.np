@@ -4795,5 +4795,14 @@ window.HK_I18N_DICT = {
 "只有 ${names} 行駛": ["{0} のみ運行", "Only {0} runs here"],
 "全日時刻表（設備與服務介紹）": ["終日時刻表（設備・サービス紹介）", "Full timetable (Services)"],
 "${st} 站前": ["{0}駅前", "In front of {0} Sta."],
-"近 ${st} 站（約 ${d}）": ["{0}駅の近く（約{1}）", "Near {0} Sta. (approx. {1})"]
+"近 ${st} 站（約 ${d}）": ["{0}駅の近く（約{1}）", "Near {0} Sta. (approx. {1})"],
+"科學工業園區旁的車站，也是若宮地區的主要車站。上下班時間有很多往返園區的通勤旅客。": ["科学工業園区に隣接する駅で、若宮地区の主要駅です。朝夕は園区へ通う通勤客で混雑します。", "A station beside the science and industrial park and the main station of the Wakamiya area. Busy with park commuters at rush hours."],
+"倉浦市區線延伸段（谷山－清水若宮）的終點站，位在光瀨市谷山區與平倉市的交界附近。": ["倉浦市区線延伸区間（谷山〜清水若宮）の終点で、光瀬市谷山区と平倉市の境界付近にあります。", "Terminus of the Kurauracity Line extension (Taniyama–Shimizu-Wakamiya), near the border of Taniyama Ward and Heikura City."],
+"站前有公車轉乘區，高架的玻璃大廳可以看到整個站前廣場。": ["駅前にはバス乗り場があり、高架のガラス張りコンコースから駅前広場を見渡せます。", "There is a bus interchange in front of the station; the elevated glass concourse overlooks the station plaza."],
+"晴天下清水若宮站的站房、高架玻璃大廳與公車轉乘區的雨棚": ["晴天の清水若宮駅の駅舎、高架のガラス張りコンコースとバス乗り場の屋根", "Shimizu-Wakamiya Station building, elevated glass concourse and bus-stop canopy on a clear day"],
+"站房與公車轉乘區": ["駅舎とバス乗り場", "Station building and bus interchange"],
+"科學工業園區方面": ["科学工業園区方面", "Science & industrial park"],
+"若宮市街、公車轉乘區": ["若宮市街・バス乗り場", "Wakamiya town, bus interchange"],
+"公車轉乘區": ["バス乗り場", "Bus interchange"],
+"剪票口": ["改札口", "Ticket gates"]
 };

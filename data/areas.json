@@ -100,6 +100,18 @@
    }
   },
   {
+   "id": "taniyama",
+   "region": "city",
+   "zh": "谷山區",
+   "ja": "谷山区",
+   "en": "Taniyama Ward",
+   "full": {
+    "zh": "光瀨市谷山區",
+    "ja": "光瀬市谷山区",
+    "en": "Taniyama Ward, Hikarise City"
+   }
+  },
+  {
    "id": "shiozaki",
    "region": "kamiha",
    "zh": "汐崎市",
@@ -304,7 +316,11 @@
   "箱野": "shirakurayama",
   "箱野山口": "shirakurayama",
   "八幡通": "minuma",
-  "病院前": "minuma"
+  "病院前": "minuma",
+  "西若宮": "taniyama",
+  "八坂": "taniyama",
+  "清水西山": "taniyama",
+  "清水若宮": "taniyama"
  },
  "transfer": [
   "みつせ",
