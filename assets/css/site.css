@@ -839,3 +839,14 @@ header.sh .gnav li.admin a { padding: 6px 10px; }
 .tkC-no { font-size: 9px; color: var(--muted); text-align: center; }
 .tk.tkC .tk-bar { margin: 4px 0 0; }
 @media print { .tk-set { break-inside: avoid; } }
+
+/* 2.11.0：停車／通過・部分停車・合併時刻表 */
+.stoptbl td.tm.smk { text-align: center; color: var(--g1); font-size: 15px; width: 3em; }
+.stoptbl tr.pass td.tm.smk { color: #9aa7a1; }
+.stoptbl tr.part td.dot i { border-style: solid; }
+.stoptbl small.pnote { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 999px; background: #f3f6f4; color: #5b6d66; font-size: 11.5px; }
+.matrix td.ps { color: #9aa7a1; }
+.matrix td.pt { color: var(--g1); }
+.fulltt td.ps { color: #a3aea9; }
+.fulltt tr.pass th.stk { color: #7d8a84; font-weight: 400; }
+.fulltt th small.vr { display: block; font-size: 10.5px; font-weight: 400; color: #5b6d66; white-space: nowrap; }

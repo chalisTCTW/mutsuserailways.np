@@ -4781,5 +4781,19 @@ window.HK_I18N_DICT = {
 "出發與抵達是同一個地點。": ["出発地と到着地が同じです。", "Origin and destination are the same."],
 "找不到可以到達的方案。請換一個時間或地點再查查看。": ["到着できるルートが見つかりません。時刻や場所を変えてお調べください。", "No route found. Try another time or place."],
 "鉄道與公車的票價分開計算後合計（鉄道依搭乘區間的普通運費；公車依各段站數）。車站與公車站牌之間以步行 3 分計算。": ["運賃は鉄道とバスを別々に計算して合計しています（鉄道は乗車区間の普通運賃、バスは区間ごとの停留所数）。駅とバス停の間は徒歩3分で計算しています。", "Rail and bus fares are calculated separately and added (rail: regular fare for the section ridden; bus: by stops per leg). Station ↔ bus stop transfers assume a 3-minute walk."],
-"${n} 站": ["{0}駅", "{0} stops"]
+"${n} 站": ["{0}駅", "{0} stops"],
+"輸入車站或站牌名稱（漢字・假名・拼音）": ["駅名・停留所名を入力（漢字・かな・ローマ字）", "Type a station or stop name (kanji, kana or romaji)"],
+"輸入站牌名稱（漢字・假名・拼音）": ["停留所名を入力（漢字・かな・ローマ字）", "Type a stop name (kanji, kana or romaji)"],
+"找不到符合的地點。可以換個寫法，或改選其他行政區。": ["該当する場所が見つかりません。表記を変えるか、別の行政区をお選びください。", "No matching place. Try another spelling or district."],
+"${a}站前": ["{0}駅前", "In front of {0} Station"],
+"合併顯示：${names}。": ["統合表示：{0}。", "Shown together: {0}."],
+"●＝停車，◐＝部分班次停車，レ＝通過。通過的站是依路網上兩個停靠站之間經過的車站推算。": ["●＝停車、◐＝一部の列車が停車、レ＝通過。通過駅は路線網上の停車駅間を経由する駅から推定しています。", "● = stops, ◐ = some trains stop, レ = passes. Passed stations are inferred from the network between stops."],
+"停車駅一覽（各種別比較）": ["停車駅一覧（種別比較）", "Stopping pattern by service type"],
+"●＝停車，◐＝部分班次停車，｜＝通過，空白＝不經過。兩個方向合計。欄名可以點選，到路線資訊看那個種別。": ["●＝停車、◐＝一部の列車が停車、｜＝通過、空欄＝経由しない。上下線の合計です。列名を押すとその種別の情報へ移動します。", "● = stops, ◐ = some trains stop, | = passes, blank = not served. Both directions combined. Tap a column name to view that service."],
+"部分班次停車": ["一部の列車が停車", "Some trains stop"],
+"${names} 停車": ["{0} 停車", "{0} stops"],
+"只有 ${names} 行駛": ["{0} のみ運行", "Only {0} runs here"],
+"全日時刻表（設備與服務介紹）": ["終日時刻表（設備・サービス紹介）", "Full timetable (Services)"],
+"${st} 站前": ["{0}駅前", "In front of {0} Sta."],
+"近 ${st} 站（約 ${d}）": ["{0}駅の近く（約{1}）", "Near {0} Sta. (approx. {1})"]
 };

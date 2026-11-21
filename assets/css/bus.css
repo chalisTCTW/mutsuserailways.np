@@ -69,3 +69,17 @@
 .bus-legs li.walk { color: #5f7085; }
 .bus-rail { display: inline-flex; min-width: 46px; margin-right: 8px; }
 .bus-rail:empty { display: none; }
+/* 2.11.0：站牌選擇（行政區＋打字查詢） */
+.bus-pick { display: grid; gap: 6px; min-width: min(280px, 100%); }
+.bus-qwrap { position: relative; }
+.bus-q { width: 100%; box-sizing: border-box; font: inherit; padding: 9px 12px; border: 1px solid #dceaf7; border-radius: 10px; background: #fff; color: inherit; }
+.bus-dsel { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 8px; border: 1px solid #dceaf7; background: #f5faff; color: #0a2b59; max-width: 100%; }
+.bus-sug { position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin: 4px 0 0; padding: 4px; list-style: none; background: #fff; border: 1px solid #dceaf7; border-radius: 12px; box-shadow: 0 10px 26px rgba(10, 43, 89, .14); max-height: 320px; overflow: auto; }
+.bus-sug li { padding: 7px 10px; border-radius: 8px; cursor: pointer; display: grid; gap: 1px; }
+.bus-sug li[aria-selected="true"], .bus-sug li:hover { background: #e4f0fc; }
+.bus-sug li b { font-weight: inherit; color: #0a2b59; }
+.bus-sug li small { color: #5f7085; font-size: 12px; line-height: 1.4; }
+.bus-sug li.none { cursor: default; color: #5f7085; font-size: 13px; background: none; }
+.mb-f > div:has(> .bus-pick) { flex: 1 1 300px; min-width: 0; }
+.bus-pick { width: 100%; }
+@media (max-width: 640px) { .mb-f > div:has(> .bus-pick) { flex-basis: 100%; } .mb-f:has(.bus-pick) .arrow { display: none; } }

@@ -165,6 +165,94 @@
   /* ───────── 共用的小元件 ───────── */
   const badge = no => h('span', { class: 'bus-no', style: 'background:' + colorOf(no) }, routeLabel({ no }));
   const xferChip = s => { const st = D.stops[s] && D.stops[s].st; return st ? h('span', { class: 'bus-xf' }, h('span', null, '轉乘'), ' ', h('span', null, st)) : null; };
+  /* ───────── 2.11.0：站牌選擇＝行政區篩選＋打字查詢 ─────────
+   * 行政區沿用入口網站的 data/areas.json（車站→行政區→地方）。站牌歸到「離它最近、有登錄行政區的車站」所在的行政區，
+   * 也記下最近的車站與距離，讓外地人看得出站牌在哪一帶。打字可以用漢字、假名（比對附近車站名）或英文拼音。 */
+  let AR = null, INFO = null, HCUR = null;
+  const LG = () => { const l = (document.documentElement.lang || 'zh').toLowerCase(); return l.startsWith('ja') ? 'ja' : l.startsWith('en') ? 'en' : 'zh'; };
+  const aL = o => (o && (o[LG()] || o.zh)) || '';
+  const fold = x => String(x || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[\s\-‐・·()（）]/g, '')
+    .replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60)).replace(/戶/g, '戸').replace(/瀬/g, '瀨').replace(/[廳厅]/g, '厅');
+  function prepAreas(H) {
+    if (INFO) return Promise.resolve();
+    return fetch('data/areas.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => null).then(A => {
+      AR = A; INFO = new Map();
+      const dz = new Map(((A && A.districts) || []).map(d => [d.id, d])), rz = new Map(((A && A.regions) || []).map(r => [r.id, r]));
+      const distOfSt = zh => { if (!A) return null; const n = norm(zh); const k = Object.keys(A.stations).find(x => norm(x) === n) || Object.keys(A.stations).find(x => n.startsWith(norm(x)) || norm(x).startsWith(n)); return k ? dz.get(A.stations[k]) || null : null; };
+      const sts = H.stations.map(x => ({ x, d: distOfSt(x.zh) }));
+      sts.forEach(o => INFO.set('r:' + o.x.id, { d: o.d, r: o.d ? rz.get(o.d.region) : null }));
+      Object.keys(D.stops).forEach(nm => {
+        const p = D.stops[nm]; let best = null, bd = Infinity, bestD = null, bdd = Infinity;
+        sts.forEach(o => { const dd = Math.hypot(o.x.x - p.x, o.x.z - p.z); if (dd < bd) { bd = dd; best = o.x; } if (o.d && dd < bdd) { bdd = dd; bestD = o.d; } });
+        const linked = p.st ? sts.find(o => norm(o.x.zh) === norm(p.st)) : null;
+        const d = (linked && linked.d) || bestD;
+        INFO.set('b:' + nm, { d, r: d ? rz.get(d.region) : null, near: linked ? linked.x : best, m: linked ? 0 : Math.round(bd / 10) * 10 });
+      });
+    });
+  }
+  const routesAt = nm => D.routes.filter(r => r.stops.includes(nm)).map(r => r.no);
+  /** opts：{ id, value（'b:站牌' 或 'r:車站id'）, stations：是否也能選車站, H, label } → 元素（.value 取值） */
+  function placePicker(opts) {
+    const H = opts.H, withSt = !!opts.stations;
+    let val = opts.value, dist = 'all', hi = -1, items = [];
+    const nameOf = v => v.slice(0, 2) === 'r:' ? (H.stById[v.slice(2)] ? H.stName(v.slice(2)) : v) : v.slice(2);
+    const inp = h('input', { type: 'search', id: opts.id, class: 'bus-q', autocomplete: 'off', placeholder: withSt ? '輸入車站或站牌名稱（漢字・假名・拼音）' : '輸入站牌名稱（漢字・假名・拼音）', value: nameOf(val), role: 'combobox', 'aria-expanded': 'false', 'aria-autocomplete': 'list' });
+    const dsel = h('select', { class: 'bus-dsel', 'aria-label': '行政區' }, h('option', { value: 'all' }, '全部行政區'));
+    ((AR && AR.regions) || []).forEach(r => {
+      const ds = AR.districts.filter(d => d.region === r.id); if (!ds.length) return;
+      const og = h('optgroup', { label: aL(r) }); ds.forEach(d => og.append(h('option', { value: d.id }, aL(d)))); dsel.append(og);
+    });
+    const list = h('ul', { class: 'bus-sug', role: 'listbox', hidden: true });
+    const all = Object.keys(D.stops).map(nm => 'b:' + nm).concat(withSt ? H.stations.map(x => 'r:' + x.id) : []);
+    const hay = new Map(all.map(v => {
+      const I = INFO.get(v) || {}, isR = v.slice(0, 2) === 'r:';
+      const st = isR ? H.stById[v.slice(2)] : null, p = isR ? null : D.stops[v.slice(2)];
+      const bits = isR ? [st.zh, st.en] : [v.slice(2), p.en, I.near && I.near.zh, I.near && I.near.en];
+      if (I.d) bits.push(I.d.zh, I.d.ja, I.d.en);
+      return [v, fold(bits.filter(Boolean).join('|'))];
+    }));
+    const sub = v => {
+      const I = INFO.get(v) || {}, isR = v.slice(0, 2) === 'r:';
+      const parts = [];   // 每一段各自一個文字節點，讓 i18n 的樣板翻得到
+      if (I.d) parts.push(h('span', null, aL(I.d.full || I.d)));
+      if (isR) parts.push(h('span', null, '鉄道・單軌車站'));
+      else {
+        if (I.near) parts.push(h('span', null, I.m ? `近 ${I.near.zh} 站（約 ${I.m >= 1000 ? (I.m / 1000).toFixed(1) + ' km' : I.m + ' m'}）` : `${I.near.zh} 站前`));
+        parts.push(h('span', null, routesAt(v.slice(2)).slice(0, 4).join('・') + '路'));
+      }
+      return parts.flatMap((x, k) => k ? ['｜', x] : [x]);
+    };
+    function render() {
+      const q = fold(inp.value);
+      const inD = v => dist === 'all' || ((INFO.get(v) || {}).d || {}).id === dist;
+      items = all.filter(v => inD(v) && (!q || hay.get(v).includes(q)));
+      // 名稱開頭符合的排前面；車站排在同分的站牌前面
+      // 排序：名稱（含英文名）開頭符合 → 名稱含有 → 只有附近車站／行政區符合；同分時車站排在站牌前面
+      const sc = v => { if (!q) return 0; const n = fold(nameOf(v) + '|' + (v.slice(0, 2) === 'r:' ? (H.stById[v.slice(2)] || {}).en : (D.stops[v.slice(2)] || {}).en)); return n.startsWith(q) || n.includes('|' + q) ? 0 : n.includes(q) ? 1 : 2; };
+      items.sort((x, y) => sc(x) - sc(y) || (y.slice(0, 2) === 'r:') - (x.slice(0, 2) === 'r:') || nameOf(x).localeCompare(nameOf(y), 'ja'));
+      items = items.slice(0, 30); hi = items.length ? 0 : -1;
+      list.replaceChildren(...items.map((v, k) => h('li', { role: 'option', 'aria-selected': String(k === hi), class: v.slice(0, 2) === 'r:' ? 'rail' : '', onmousedown: e => { e.preventDefault(); pick(v); } },
+        h('b', null, v.slice(0, 2) === 'r:' ? [H.codeBadges ? H.codeBadges(v.slice(2)) : null, nameOf(v)] : nameOf(v)), h('small', null, sub(v)))));
+      if (!items.length) list.append(h('li', { class: 'none' }, '找不到符合的地點。可以換個寫法，或改選其他行政區。'));
+      list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    }
+    const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); };
+    function pick(v) { val = v; inp.value = nameOf(v); close(); opts.onChange && opts.onChange(withSt ? v : v.slice(2)); }
+    inp.addEventListener('focus', () => { inp.select(); render(); });
+    inp.addEventListener('input', render);
+    inp.addEventListener('blur', () => setTimeout(() => { close(); inp.value = nameOf(val); }, 120));
+    inp.addEventListener('keydown', e => {
+      if (list.hidden && (e.key === 'ArrowDown' || e.key === 'Enter')) { render(); }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!items.length) return; hi = (hi + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length; [...list.children].forEach((li, k) => li.setAttribute('aria-selected', String(k === hi))); list.children[hi] && list.children[hi].scrollIntoView({ block: 'nearest' }); }
+      else if (e.key === 'Enter' && !list.hidden && hi >= 0 && items[hi]) { e.preventDefault(); pick(items[hi]); }
+      else if (e.key === 'Escape') close();
+    });
+    dsel.addEventListener('change', () => { dist = dsel.value; inp.focus(); render(); });
+    const el = h('div', { class: 'bus-pick' }, dsel, h('div', { class: 'bus-qwrap' }, inp, list));
+    Object.defineProperty(el, 'value', { get: () => (withSt ? val : val.slice(2)) });
+    return el;
+  }
+
   function stopSelect(value, onChange, id) {
     const sel = h('select', { id, class: 'bus-sel' });
     const groups = new Map();
@@ -250,7 +338,7 @@
   function viewStops(el, initial) {
     let stop = initial && D.stops[initial] ? initial : 'みつせ車站西口';
     const body = h('div');
-    const sel = stopSelect(stop, v => { stop = v; draw(); }, 'busStop');
+    const sel = placePicker({ H: HCUR, id: 'busStop', value: 'b:' + stop, onChange: v => { stop = v; draw(); } });
     function draw() {
       body.replaceChildren(h('h4', { class: 'bus-h4' }, nm(stop), xferChip(stop)), stopTimetable(stop));
     }
@@ -262,7 +350,7 @@
   function viewSearch(el) {
     let from = 'みつせ車站西口', to = '白藏山';
     const tIn = h('input', { type: 'time', value: hm(nowMin()), id: 'busTime' });
-    const a = stopSelect(from, v => { from = v; }, 'busFrom'), b = stopSelect(to, v => { to = v; }, 'busTo');
+    const a = placePicker({ H: HCUR, id: 'busFrom', value: 'b:' + from, onChange: v => { from = v; } }), b = placePicker({ H: HCUR, id: 'busTo', value: 'b:' + to, onChange: v => { to = v; } });
     const out = h('div', { class: 'bus-res' });
     const go = () => {
       const [hh, mm] = (tIn.value || '00:00').split(':').map(Number);
@@ -579,7 +667,7 @@
     let from = 'b:' + (D.stops['谷山團地'] ? '谷山團地' : Object.keys(D.stops)[0]);
     const kat = H.stations.find(x => x.zh === '勝守');
     let to = kat ? 'r:' + kat.id : 'b:' + Object.keys(D.stops)[1];
-    const a = placeSelect(from, 'mxFrom'), b = placeSelect(to, 'mxTo');
+    const a = placePicker({ H, id: 'mxFrom', value: from, stations: true }), b = placePicker({ H, id: 'mxTo', value: to, stations: true });
     const tIn = h('input', { type: 'time', value: hm(nowMin()), id: 'mxTime' });
     const out = h('div', { class: 'bus-res' });
     const go = () => {
@@ -627,7 +715,8 @@
     const body = h('div', null, h('p', null, '公車資料載入中…'));
     card.append(body);
     el.append(card);
-    load().then(() => {
+    HCUR = H;
+    load().then(() => prepAreas(H)).then(() => {
       body.replaceChildren();
       const q = new URLSearchParams(location.search);
       const secs = [['search', '班次查詢'], ['multi', '鉄道轉乘'], ['stops', '站牌時刻表'], ['routes', '路線一覽'], ['map', '路線圖']];

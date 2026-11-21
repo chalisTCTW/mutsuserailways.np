@@ -222,6 +222,17 @@
     const dyn = h('div');
     root.append(sec('停靠站與時刻', 'Stops and times', dyn));
     (function () {
+      // 2.11.0：改用設備介紹同一套元件——こばな・スーパーこばな合併、上下行切換、通過站標示、停車駅一覽
+      if (HK.groupsOf && HK.lineBlockTop) {
+        const groups = HK.groupsOf(H), g = groups.find(x => /こばな/.test(x.name));
+        if (g) {
+          let di = 0; const top = h('div'), bottom = h('div');
+          const draw = () => { HK.lineBlockTop(H, groups, g, di, top, k => { di = k; draw(); }); bottom.replaceChildren(); HK.lineBlockBottom(H, groups, g, di, bottom); };
+          draw();
+          dyn.append(top, bottom, h('p', null, h('a', { class: 'btn ghost', href: 'routes.html?s=kobana' }, '全日時刻表（設備與服務介紹）'), ' ', h('a', { class: 'btn ghost', href: 'timetable.html' }, '時刻表')));
+          return;
+        }
+      }
       const sv = H.svcs.find(s => /こばな/.test(s.routeName));
       if (!sv) { dyn.append(h('p', null, '主要停靠站：勝守、天鳥崎、本磯島。詳細的停靠站與時刻會在時刻表資料更新後顯示在這裡。'), h('p', null, h('a', { class: 'btn ghost', href: 'timetable.html' }, '前往時刻表'))); return; }
       const all = H.svcs.filter(s => s.routeName === sv.routeName), tt = depTimes(H, sv), pax = paxStops(sv);
