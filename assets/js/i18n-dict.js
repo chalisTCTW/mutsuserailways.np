@@ -4804,5 +4804,18 @@ window.HK_I18N_DICT = {
 "科學工業園區方面": ["科学工業園区方面", "Science & industrial park"],
 "若宮市街、公車轉乘區": ["若宮市街・バス乗り場", "Wakamiya town, bus interchange"],
 "公車轉乘區": ["バス乗り場", "Bus interchange"],
-"剪票口": ["改札口", "Ticket gates"]
+"剪票口": ["改札口", "Ticket gates"],
+"水澤山動物園": ["水沢山動物園", "Mizusawayama Zoo"],
+"動物園・親子": ["動物園・親子", "Zoo · Family"],
+"夜行生物展與極地生物展是兩大特色，週末開到晚上 21:00。": ["夜行動物展と極地動物展が二大目玉。週末は夜21:00まで開園。", "Famous for its nocturnal and polar animal exhibits; open until 21:00 on weekends."],
+"水澤山動物園位在勝守水沢公園站南出口旁，園區沿著水澤山的山坡展開，木柵欄圍起的步道串起各個展區，山頂還有一座可以眺望園區的涼亭。門票 800 日圓。": ["水沢山動物園は勝守水沢公園駅南口のすぐそば。水沢山の斜面に広がる園内を木柵の小道が結び、山頂には園内を見渡せるあずまやがあります。入園料は800円。", "Mizusawayama Zoo sits right by the south exit of Katsumori-Mizusawa-Koen Station. Fenced paths link the exhibits across the slopes of Mt. Mizusawa, topped by a gazebo overlooking the zoo. Admission is ¥800."],
+"最受歡迎的是「夜行生物展」和「極地生物展」：前者在昏暗的展館裡觀察夜間才活躍的動物，後者則有耐寒的極地動物。每個週末都營業到晚上 21:00，傍晚以後點起燈籠的步道和石橋，很適合下班、放學後順道來散步。": ["人気は「夜行動物展」と「極地動物展」。薄暗い展示館で夜に活動する動物を観察でき、極地展では寒さに強い動物たちに出会えます。毎週末は21:00まで開園し、夕方からはランタンが灯る小道や石橋がきれいで、仕事帰りや放課後の散歩にもぴったりです。", "The highlights are the Nocturnal Animals and Polar Animals exhibits: watch night-active animals in a dimly lit hall, or meet cold-hardy polar species. Open until 21:00 every weekend, when lantern-lit paths and the stone bridge make for a lovely evening stroll after work or school."],
+"勝守水沢公園站南出口旁": ["勝守水沢公園駅南口すぐ", "Right by the south exit of Katsumori-Mizusawa-Koen Sta."],
+"門票 800 日圓": ["入園料800円", "Admission ¥800"],
+"夜行生物展・極地生物展": ["夜行動物展・極地動物展", "Nocturnal & polar animal exhibits"],
+"每週末營業至 21:00，傍晚的燈籠步道很漂亮": ["毎週末21:00まで開園、夕方のランタンの小道がきれい", "Open until 21:00 on weekends; lovely lantern-lit paths at dusk"],
+"從高架線眺望黃昏時點燈的水澤山動物園園區與山頂涼亭": ["高架線から望む夕暮れの水沢山動物園と山頂のあずまや", "Mizusawayama Zoo and its hilltop gazebo at dusk, seen from the elevated line"],
+"從高架線眺望黃昏的園區": ["高架線から望む夕暮れの園内", "The zoo at dusk from the elevated line"],
+"園內點著燈籠的石橋與白樺林步道": ["ランタンが灯る石橋と白樺の小道", "Lantern-lit stone bridge and birch path"],
+"點起燈籠的石橋與白樺步道": ["ランタンが灯る石橋と白樺の小道", "Lantern-lit stone bridge and birch path"]
 };
