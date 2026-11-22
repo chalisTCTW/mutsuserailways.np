@@ -53,7 +53,7 @@
     });
     if (!runs.length) return h('p', { class: 'note' }, '本日沒有班次。');
     runs.sort((a, b) => a.key - b.key);
-    const vr = r => [HK.variantOf(g, r.sv), ends.size > 1 ? '→' + H.stName(r.sv.stops[r.sv.stops.length - 1].station) : ''].filter(Boolean).join(' ');
+    const vr = r => { const v = HK.variantOf(g, r.sv); return [r.gou && v && r.gou.includes(v) ? '' : v, ends.size > 1 ? '→' + H.stName(r.sv.stops[r.sv.stops.length - 1].station) : ''].filter(Boolean).join(' '); };
     const hsep = k => k && Math.floor(runs[k].key / 3600) !== Math.floor(runs[k - 1].key / 3600) ? ' hs' : '';
     const head = h('tr', null, h('th', { class: 'stk' }, '車站'), ...runs.map((r, k) => h('th', { class: 'c' + hsep(k) }, r.gou || hm(r.t), vr(r) ? h('small', { class: 'vr' }, vr(r)) : null)));
     const body = d.rows.map(row => h('tr', { class: row.mark === 'レ' ? 'pass' : null }, h('th', { class: 'stk', scope: 'row' }, H.codeBadges(row.station), H.stName(row.station)),

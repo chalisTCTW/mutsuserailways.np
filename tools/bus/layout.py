@@ -16,6 +16,7 @@ S = D['stops']
 ANCH = set(s for r in ROUTES for s in r['seq'])
 for r in D['routes']:                       # 端點一定是重點站
     ANCH.add(r['stops'][0]); ANCH.add(r['stops'][-1])
+ANCH |= set(D.get('anchors', []))   # 2.13.0：後加的路線（add16.py 等）自己指定的重點站
 ANCH = [a for a in ANCH if a in S]
 ANCHS = set(ANCH)
 

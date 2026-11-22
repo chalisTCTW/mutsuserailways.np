@@ -223,6 +223,9 @@
     const stById = {}; net.stations.forEach(s => stById[s.id] = s);
 
     // 運行中的服務（整修中的路線不顯示在對外網站）
+    // 2.13.0：信號場（例：桂木信號場）不是旅客車站——遊戲裡列車可能在那裡停（待避），入口網站一律當作沒有這一站
+    const hideRe = new RegExp(CFG.hideStationsRe || '信[號号]場$');
+    const hideIds = new Set(net.stations.filter(st => hideRe.test(st.zh || '')).map(st => st.id));
     const svcs = [];
     net.services.forEach((s, idx) => {
       const route = routesByKey[s.route], member = net.members[s.member];
@@ -240,7 +243,7 @@
         || lrtNames.has(route.displayZh || '') || lrtNames.has(route.zh || '') || lrtNames.has(nm.line || ''));
       // 1.1.0：高速鉄道的 tcls 固定給 'hs'（不是一般的 ltd／exp／loc），這樣共用的 .ttag／.mk 樣式才會套到專屬的識別色，
       // 不會被誤判成各停（loc）而顯示成灰框。
-      svcs.push({ idx, isLRT, stops: s.stops.filter(x => !x.op),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
+      svcs.push({ idx, isLRT, stops: s.stops.filter(x => !x.op && !hideIds.has(x.station)),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
     });
     H.svcs = svcs;
     /* 2.3.0：H.edges／L.paths 裡的 svcs 存的是 net.services 的索引（sv.idx），不是 H.svcs 的陣列位置。
@@ -317,15 +320,16 @@
         // 別名，其實是同一個特急車次系統裡「有些只到東平倉、有些直通更遠」的差別，編號要接在一起（1号、3号、5号…連續），
         // 不是各自從 1 號起算。沒有別名的車種（例如一般特急あおさぎ／こばな，member.number 只單純寫「特急」兩個字）
         // 退回用路線全名當分組鍵，維持原本各自獨立編號的行為，不受影響。
-        const up = upOf(sv), k = (numNick || full) + '|' + (up ? 1 : 0);
-        let g = groups.get(k); if (!g) groups.set(k, g = { full, up, list: [], nick: numNick ? numStr : '' });
-        sv.depot.departures.forEach(D => g.list.push({ tod: ((Math.round(D + (sv.dep0 != null ? sv.dep0 : sv.stops[0].dep)) % DAY) + DAY) % DAY, idx: sv.idx }));   // 2.8.1：虛擬延長的班次照遊戲內起點編號
+        // 2.13.0：「通勤あおさぎ」和「あおさぎ」是同一個特急的兩種班型——號碼接在同一個序列（不會兩班都叫 2 号），名稱各自保留「通勤」
+        const up = upOf(sv), k = (numNick || full).replace(/通勤/g, '') + '|' + (up ? 1 : 0);
+        let g = groups.get(k); if (!g) groups.set(k, g = { up, list: [] });
+        const base = numNick ? numStr : full;
+        const nm = base.replace(/特急/g, '').replace(/[\s\u3000]+/g, '') || base.replace(/[\s\u3000]+/g, '');
+        sv.depot.departures.forEach(D => g.list.push({ tod: ((Math.round(D + (sv.dep0 != null ? sv.dep0 : sv.stops[0].dep)) % DAY) + DAY) % DAY, idx: sv.idx, nm }));   // 2.8.1：虛擬延長的班次照遊戲內起點編號
       });
       groups.forEach(g => {
         g.list.sort((a, b) => a.tod - b.tod || a.idx - b.idx);
-        const base = g.nick || g.full;
-        const nm = base.replace(/特急/g, '').replace(/[\s\u3000]+/g, '') || base.replace(/[\s\u3000]+/g, '');
-        g.list.forEach((e, i) => { const key = e.idx + '|' + e.tod; if (!gouTable.has(key)) gouTable.set(key, nm + (g.up ? 2 * (i + 1) : 2 * (i + 1) - 1) + '号'); });
+        g.list.forEach((e, i) => { const key = e.idx + '|' + e.tod; if (!gouTable.has(key)) gouTable.set(key, e.nm + (g.up ? 2 * (i + 1) : 2 * (i + 1) - 1) + '号'); });
       });
     })();
     /** 某班（sv、base＝該日起點車庫發車時刻）的號；不是特急回傳空字串。 */

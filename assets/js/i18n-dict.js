@@ -4850,5 +4850,8 @@ window.HK_I18N_DICT = {
 "月台另一側就是河面和對岸的山林；傍晚時分夕陽映在河面上，方格月台被染成金色，是花川本線延伸段上最受歡迎的拍照地點。": ["ホームの向こうは川面と対岸の山並み。夕方には夕日が川面に映り、市松模様のホームが金色に染まる、花川本線延伸区間でいちばん人気の撮影スポットです。", "Beyond the platform lie the river and wooded hills; at sunset the light on the water turns the checkered platform gold, making it the most popular photo spot on the Hanagawa Line extension."],
 "抽象藝術家 BINDY 設計": ["抽象芸術家 BINDY のデザイン", "Designed by abstract artist BINDY"],
 "黑白方格的月台地面": ["白黒の市松模様のホーム", "Black-and-white checkered platform"],
-"緊鄰滝井川河岸，傍晚的夕陽很美": ["滝井川のすぐそば、夕日がきれい", "Right on the Takii River, beautiful at sunset"]
+"緊鄰滝井川河岸，傍晚的夕陽很美": ["滝井川のすぐそば、夕日がきれい", "Right on the Takii River, beautiful at sunset"],
+"光瀨市交通局的市營公車，以みつせ、戸宮、花倉街道、東平倉、紫市、名島港、勝守、十万浦市、上羽神別、瑞別町為中心運行。": ["光瀬市交通局の市営バスは、みつせ・戸宮・花倉街道・東平倉・紫市・名島港・勝守・十万浦市・上羽神別・瑞別町を中心に運行しています。", "Hikarise City Transportation Bureau's municipal buses run around Mitsuse, Tomiya, Hanakura-Kaido, Tohekura, Murasaki City, Najima Port, Katsumori, Jumanmura City, Kamiha-Kanbetsu and Mizubetsu Town."],
+"瑞別町循環": ["瑞別町循環", "Mizubetsu Town Loop"],
+"瑞別町": ["瑞別町", "Mizubetsu Town"]
 };

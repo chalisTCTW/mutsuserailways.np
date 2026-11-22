@@ -101,7 +101,7 @@
     return out.sort((a, b) => a - b);
   }
   /** 2.11.0：同一個種別、只是停站或終點不同而在遊戲裡拆成兩條路線的，合併成一組一起看（設定在 site-config.js 的 mergeGroups）。 */
-  const MERGE = () => ((window.HK_CONFIG && window.HK_CONFIG.mergeGroups) || [{ name: '特急こばな', re: 'こばな' }, { name: '花川本線特別快速', re: '^花川本線特別快速' }]).map(m => ({ name: m.name, re: new RegExp(m.re) }));
+  const MERGE = () => ((window.HK_CONFIG && window.HK_CONFIG.mergeGroups) || [{ name: '特急こばな', re: 'こばな' }, { name: '花川本線特別快速', re: '^花川本線特別快速' }, { name: '特急あおさぎ', re: 'あおさぎ' }]).map(m => ({ name: m.name, re: new RegExp(m.re) }));
   function groupsOf(H) {
     const m = new Map(), MG = MERGE();
     H.svcs.forEach(sv => {

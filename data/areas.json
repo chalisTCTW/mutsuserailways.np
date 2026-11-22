@@ -242,6 +242,18 @@
     "ja": "十万浦郡松沢町",
     "en": "Matsuzawa Town, Jumanmura District"
    }
+  },
+  {
+   "id": "mizubetsu",
+   "region": "gohara",
+   "zh": "瑞別町",
+   "ja": "瑞別町",
+   "en": "Mizubetsu Town",
+   "full": {
+    "zh": "十万浦郡瑞別町",
+    "ja": "十万浦郡瑞別町",
+    "en": "Mizubetsu Town, Jumanmura District"
+   }
   }
  ],
  "stations": {
@@ -324,7 +336,10 @@
   "桂木": "hekura",
   "南滝井川": "hekura",
   "滝井川": "hekura",
-  "咲海": "hekura"
+  "咲海": "hekura",
+  "海寺町": "mizubetsu",
+  "瑞別": "mizubetsu",
+  "五原千歲": "mizubetsu"
  },
  "transfer": [
   "みつせ",
