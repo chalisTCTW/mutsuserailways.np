@@ -13,7 +13,8 @@
     seatFee: 500,                  // 指定席費用（円）
     seatsPerCar: 40,               // 2100 形每節座位數（2+2）
     // 指定席政策（0.21.0）：特急＝全車指定席（另有立席特急券）；特快＝1・2 号車指定席、3 号車以後自由席。1 号車＝進行方向最前端。
-    reserved: [{ re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }],
+    // 2.14.0：花川本線快速・環狀快速 8 輛編組，4・5 号車指定席（reservedList＝指定席車廂號碼），規則比照特快（不收自由席費、沒有立席特急券）。
+    reserved: [{ re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }, { re: '花川本線快速|環[状狀]快速', cars: 8, mode: 'part', reservedList: [4, 5] }],
     standRatio: 0.5,               // 立席特急券＝指定席費用的比例
     // 1.1.0：高速鐵路（routeType＝HIGH_SPEED）獨立票價制度，不套用一般的分區運費與 CFG.reserved：
     // 票價＝hsFareStep × 跨越的收費區數（沿用一般鐵路同一套分區；至少算跨 1 區）；全車指定席、沒有立席特急券，
@@ -937,15 +938,20 @@
         out = { mode: 'all', cars, reservedCars: cars, seats, fee: CFG.hsSeatFee, bizFee: CFG.hsBusinessFee, bizCars: biz, carSeats, standFee: 0, noStanding: true, perCar: CFG.seatsPerCar, edgeCarSeats: edge };
       } else {
         for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) {
-          const rc = r.mode === 'part' ? r.reservedCars : r.cars;
+          const rc = r.mode === 'part' ? (r.reservedList ? r.reservedList.length : r.reservedCars) : r.cars;
           out = { mode: r.mode || 'all', cars: r.cars, reservedCars: rc, seats: rc * CFG.seatsPerCar, fee: CFG.seatFee, standFee: r.mode === 'part' ? 0 : Math.round(CFG.seatFee * CFG.standRatio), perCar: CFG.seatsPerCar };
+          if (r.reservedList) out.rList = r.reservedList.slice();
           break;
         }
       }
+      // 2.14.0：rList＝指定席車廂號碼（1 起算）、rIdx＝0 起算；head＝指定席是不是從 1 号車連續排下來（舊有的「前 N 節」寫法）。
+      if (out) { if (!out.rList) out.rList = Array.from({ length: out.reservedCars }, (_, i) => i + 1); out.rIdx = out.rList.map(n => n - 1); out.head = out.rList.every((n, i) => n === i + 1); }
       return (sv._ri = out);
     };
     /** 顯示文字：全車指定席／1・2号車指定席。 */
-    H.reserveLabel = function (sv) { const ri = H.reserveInfo(sv); if (!ri) return ''; return ri.mode === 'all' ? '全車指定席' : (ri.reservedCars === 1 ? '1号車' : '1・' + ri.reservedCars + '号車') + '指定席／' + (ri.reservedCars + 1) + '号車以後自由席'; };
+    H.reserveLabel = function (sv) { const ri = H.reserveInfo(sv); if (!ri) return ''; if (ri.mode === 'all') return '全車指定席'; if (!ri.head) return ri.rList.join('・') + '号車指定席／其他車廂自由席'; return (ri.reservedCars === 1 ? '1号車' : '1・' + ri.reservedCars + '号車') + '指定席／' + (ri.reservedCars + 1) + '号車以後自由席'; };
+    /** 2.14.0：自由席車廂的說明（3号車以後／4・5号車以外）。 */
+    H.freeCarsText = function (ri) { return ri.head ? (ri.reservedCars + 1) + '号車以後' : ri.rList.join('・') + '号車以外'; };
     /** 編組節數（顯示用）：指定席種別依規定；其他用車庫內有出庫路徑的側線的編組。 */
     H.carsOf = function (sv) {
       const ri = H.reserveInfo(sv); if (ri) return ri.cars;
