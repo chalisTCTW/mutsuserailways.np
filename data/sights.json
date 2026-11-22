@@ -583,5 +583,35 @@
     ],
     "address": "光瀨郡勝守市水沢町1-1",
     "addressEn": "1-1 Mizusawa-machi, Katsumori City, Hikarise District"
+  },
+  {
+    "id": "minami-takiigawa",
+    "name": "南滝井川站",
+    "kana": "みなみたきいがわえき",
+    "en": "Minami-Takiigawa Station",
+    "station": "南滝井川",
+    "stations": [
+      "南滝井川"
+    ],
+    "tag": "建築・藝術",
+    "lead": "抽象藝術家 BINDY 設計的河畔車站，黑白方格月台一旁就是滝井川。",
+    "body": [
+      "南滝井川站緊鄰滝井川河岸，由抽象藝術家 BINDY 設計。月台地面鋪滿黑白方格，加上透明的玻璃擋板，讓整座車站看起來像一件放在河邊的作品。",
+      "月台另一側就是河面和對岸的山林；傍晚時分夕陽映在河面上，方格月台被染成金色，是花川本線延伸段上最受歡迎的拍照地點。"
+    ],
+    "points": [
+      "抽象藝術家 BINDY 設計",
+      "黑白方格的月台地面",
+      "緊鄰滝井川河岸，傍晚的夕陽很美"
+    ],
+    "photos": [
+      {
+        "src": "assets/photo/st-minamitakiigawa1.webp",
+        "alt": "黃昏時南滝井川站的黑白方格月台、架空線與旁邊的滝井川",
+        "cap": "黑白方格的月台與滝井川"
+      }
+    ],
+    "address": "十万浦郡平倉市南滝井川町",
+    "addressEn": "Minami-Takiigawa-machi, Heikura City, Jumanmura District"
   }
 ]
