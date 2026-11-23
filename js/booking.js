@@ -3,7 +3,8 @@
  *   乘車券＝出發站～抵達站全程的最短路徑算一次（大人；12 歲以下、60 歲以上半價，四捨五入到整數）。
  *   特急＝全車指定席：指定席費用 ¥500，或立席特急券（指定席的一半，不保證有位置、不能選座位）。
  *   特快＝1・2 号車指定席（¥500），3 号車以後自由席（不收指定席費，不保證有位置、不能選座位）。指定席費用不打折。
- *   行程中任何一段可預約就列出完整行程；沒有指定席的種別（環快、快速、各停）只算乘車券。
+ *   2.14.0：花川本線快速・環狀快速＝4・5 号車指定席（¥500），其他車廂自由席，規則比照特快。
+ *   行程中任何一段可預約就列出完整行程；沒有指定席的種別（各停等）只算乘車券。
  * 座位占用為依班次與日期決定的模擬資料，網站不儲存任何訂位。 */
 (function () {
   'use strict';
@@ -43,10 +44,17 @@
   function booking(H, root) {
     const realRoot = root; root = h('div', { class: 'bk-route' });
     const q = new URLSearchParams(location.search);
-    const opts = H.stations.map(st => h('option', { value: st.id }, st.zh));
-    const fSel = h('select', { 'aria-label': '出發站' }, opts.map(o => o.cloneNode(true))), tSel = h('select', { 'aria-label': '抵達站' }, opts.map(o => o.cloneNode(true)));
-    const vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...opts.map(o => o.cloneNode(true))]);
-    tSel.selectedIndex = Math.min(1, H.stations.length - 1);
+    let fSel, tSel, vSel;
+    if (HK.stationPicker) {   // 2.7.0：可打字搜尋、分組的車站選單
+      fSel = HK.stationPicker(H, { label: '出發站' }); tSel = HK.stationPicker(H, { label: '抵達站' });
+      vSel = HK.stationPicker(H, { label: '經由', allowEmpty: '（不指定）' });
+      tSel.value = (() => { const g = HK.stationGroups(H); return ((g.groups[0] && g.groups[0].stations[0]) || g.pinned[0] || H.stations[0]).id; })();
+    } else {   // 備援：瀏覽器還留著舊版 hk-ui.js 快取時
+      const opts = H.stations.map(st => h('option', { value: st.id }, st.zh));
+      fSel = h('select', { 'aria-label': '出發站' }, opts.map(o => o.cloneNode(true))); tSel = h('select', { 'aria-label': '抵達站' }, opts.map(o => o.cloneNode(true)));
+      vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...opts.map(o => o.cloneNode(true))]);
+      tSel.selectedIndex = Math.min(1, H.stations.length - 1);
+    }
     if (q.get('via') && H.stById[q.get('via')]) vSel.value = q.get('via');
     const today = new Date(), pad = n => String(n).padStart(2, '0');
     const dIn = h('input', { type: 'date', value: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}` });
@@ -72,7 +80,7 @@
         h('label', { class: 'f hs-field', style: 'flex-direction:row;display:flex;gap:6px;align-items:center;padding:6px 10px' }, useHS, h('span', null, h('span', { class: 'hs-tag' }, '高速鉄道'), '可以利用高速鐵路（含延伸路段）')),
         h('button', { class: 'btn', type: 'submit' }, '查詢班次')));
     const out = h('div', { class: 'bk-out' });
-    root.append(h('p', { class: 'lead' }, '特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席；高速鐵路為全車指定席（沒有立席特急券，票價另計）。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。'), h('div', { style: 'margin-top:12px' }, form), out);
+    root.append(h('p', { class: 'lead' }, '特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席；花川本線快速・環狀快速為 4・5 号車指定席、其他車廂自由席；高速鐵路為全車指定席（沒有立席特急券，票價另計）。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。'), h('div', { style: 'margin-top:12px' }, form), out);
 
     const pax = () => ({ a: Number(nA.value), c: Number(nC.value), s: Number(nS.value), n: Number(nA.value) + Number(nC.value) + Number(nS.value) });
 
@@ -86,7 +94,7 @@
       const info = { leg, ri, a, b, key: `${date}|${leg.sv.idx}|${((base % DAY) + DAY) % DAY}`, nStops: st.length };
       if (ri && a >= 0 && b > a) {
         info.occ = occupancy(info.key, ri.cars, st.length, s0.dep, ri.carSeats);
-        info.free = 0; for (let ci = 0; ci < ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
+        info.free = 0; for (const ci of ri.rIdx) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
       } else info.ri = ri && a >= 0 && b > a ? ri : null;
       return info;
     }
@@ -101,7 +109,7 @@
       const key = `ext|${s0.station}|${s1.station}|${date}|${((s0.dep % DAY) + DAY) % DAY}`;
       const info = { leg: extLeg, ri, a: 0, b: nStops - 1, key, nStops };
       info.occ = occupancy(key, ri.cars, nStops, s0.dep, ri.carSeats);
-      info.free = 0; for (let ci = 0; ci < ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, info.a, info.b)) info.free++; });
+      info.free = 0; for (const ci of ri.rIdx) info.occ[ci].forEach(segs => { if (isFree(segs, info.a, info.b)) info.free++; });
       return info;
     }
 
@@ -117,7 +125,7 @@
       info.a = a; info.b = b; info.nStops = b + 1;
       info.key = base.key + '|x' + extLeg.stops[atEnd ? extLeg.stops.length - 1 : 0].station;
       info.occ = occupancy(info.key, base.ri.cars, info.nStops, merged.stops[0].dep, base.ri.carSeats);
-      info.free = 0; for (let ci = 0; ci < base.ri.reservedCars; ci++) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
+      info.free = 0; for (const ci of base.ri.rIdx) info.occ[ci].forEach(segs => { if (isFree(segs, a, b)) info.free++; });
       return info;
     }
 
@@ -195,6 +203,7 @@
         h('span', { class: 'tm' }, `${HK.hm(c.j.dep)} → ${HK.hm(c.j.arr)}`),
         h('span', { style: 'display:inline-flex;gap:4px;flex-wrap:wrap' }, ...c.legs.map(l => HK.typeTag(l.leg.sv))),
         h('span', { class: 'nm', style: 'flex:1 1 220px' }, c.legs.map(l => l.leg.sv.routeName + (l.leg.gou ? ' ' + l.leg.gou : '')).join(' ＋ ')),
+        h('span', { class: 'cars' }, c.legs.map(l => H.carsLabel(l.leg.sv)).filter((v, i, a) => a.indexOf(v) === i).join('／')),   // 2.15.0
         h('span', { class: 'cars' }, tr ? `轉乘 ${tr} 次` : '直達'),
         h('span', { class: 'yen' }, yen(c.tf.adult) + '〜')))); });
       out.append(ul, h('p', { class: 'note' }, '價格為大人 1 位的乘車券；指定席／立席費用在下一步依各段選擇加算。'));
@@ -203,7 +212,7 @@
 
     // 1.9.0：有商務車廂（ri.bizCars）的班次（目前只有高速鉄道），預設選一般車廂、車廂 tab 停在第一節非商務車廂。
     function firstCarIdx(ri, cls) {
-      if (!ri || !ri.bizCars || !ri.bizCars.length) return 0;
+      if (!ri || !ri.bizCars || !ri.bizCars.length) return ri && ri.rIdx ? ri.rIdx[0] : 0;
       const bizSet = new Set(ri.bizCars.map(n => n - 1));
       for (let c = 0; c < ri.cars; c++) { if (bizSet.has(c) === (cls === 'biz')) return c; }
       return 0;
@@ -240,7 +249,7 @@
       S.c.legs.forEach((l, i) => {
         const st = S.legs[i], sv = l.leg.sv, s0 = l.leg.stops[0], sN = l.leg.stops[l.leg.stops.length - 1];
         if (l.leg.walk) box.append(h('div', { class: 'note', style: 'margin:6px 0' }, `徒歩連絡：${H.stName(l.leg.walk.from)} → ${H.stName(l.leg.walk.to)}（約 ${Math.round(l.leg.walk.sec / 60)} 分）`));
-        const head = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:10px' }, HK.typeTag(sv), h('strong', null, sv.routeName), l.leg.gou ? h('span', { class: 'gou' }, l.leg.gou) : null, h('span', null, `${HK.hm(s0.dep)} ${H.stName(s0.station)} → ${HK.hm(sN.arr)} ${H.stName(sN.station)}`), h('span', { class: 'note', style: 'margin:0' }, H.reserveLabel(sv) || '指定席なし'));
+        const head = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:10px' }, HK.typeTag(sv), h('strong', null, sv.routeName), l.leg.gou ? h('span', { class: 'gou' }, l.leg.gou) : null, h('span', null, `${HK.hm(s0.dep)} ${H.stName(s0.station)} → ${HK.hm(sN.arr)} ${H.stName(sN.station)}`), h('span', { class: 'note', style: 'margin:0' }, H.carsLabel(sv)), h('span', { class: 'note', style: 'margin:0' }, H.reserveLabel(sv) || '指定席なし'));   // 2.15.0：實際編組
         const blk = h('section', { style: 'border:1px solid var(--line,#d6e0db);border-radius:10px;padding:10px 12px;margin-bottom:8px' }, head);
         if (!l.ri) {
           blk.append(h('p', { class: 'note' }, 'この種別は指定席がありません。乘車券のみで乘車できます。'));
@@ -259,10 +268,10 @@
         }
         // 1.1.0：高速鐵路沒有立席特急券（noStanding）——只有指定席這一個選項，不能像特急那樣買站票逃過空位不足。
         if (l.ri.mode === 'all' && !l.ri.noStanding) opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'stand' ? '' : 'ghost'), onclick: choose('stand') }, `立席特急券 ${yen(l.ri.standFee)}／位（座位なし）`));
-        else if (l.ri.mode === 'part') opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'free' ? '' : 'ghost'), onclick: choose('free') }, `自由席 ${yen(0)}（${l.ri.reservedCars + 1}号車以後・座位なし）`));
+        else if (l.ri.mode === 'part') opts.push(h('button', { type: 'button', class: 'btn sm ' + (st.mode === 'free' ? '' : 'ghost'), onclick: choose('free') }, (l.ri.head ? `自由席 ${yen(0)}（${l.ri.reservedCars + 1}号車以後・座位なし）` : `自由席 ${yen(0)}（${l.ri.rList.join('・')}号車以外・座位なし）`)));
         blk.append(h('div', { style: 'display:flex;flex-wrap:wrap;gap:8px;margin:8px 0' }, ...opts));
         if (st.mode === 'stand') blk.append(h('p', { class: 'note' }, '立席特急券は座位が保証されません。座位の指定はできません。'));
-        if (st.mode === 'free') blk.append(h('p', { class: 'note' }, `自由席は座位が保証されません。座位の指定はできません。（${l.ri.reservedCars + 1}～${l.ri.cars}号車）`));
+        if (st.mode === 'free') blk.append(h('p', { class: 'note' }, (l.ri.head ? `自由席は座位が保証されません。座位の指定はできません。（${l.ri.reservedCars + 1}～${l.ri.cars}号車）` : `自由席は座位が保証されません。座位の指定はできません。（${l.ri.rList.join('・')}号車以外）`)));
         if (st.mode === 'seat') blk.append(seatPicker(l, st, P));
         box.append(blk);
       });
@@ -281,13 +290,13 @@
     function seatPicker(l, st, P) {
       const ri = l.ri, wrap = h('div'), carTabs = h('div', { class: 'bk-cars' }), grid = h('div', { class: 'bk-grid' }), info = h('div', { class: 'bk-info' });
       wrap.append(carTabs, grid, info, h('div', { class: 'bk-legend' }, h('span', null, h('i', { class: 'st free' }), '空位'), h('span', null, h('i', { class: 'st sel' }), '已選'), h('span', null, h('i', { class: 'st taken' }), '已被預約')),
-        h('p', { class: 'note' }, '1 号車＝進行方向最前端。' + (ri.mode === 'part' ? `指定席為 1～${ri.reservedCars} 号車。` : '')));
-      const cars = l.occ.slice(0, ri.reservedCars);
+        h('p', { class: 'note' }, h('span', null, '1 号車＝進行方向最前端。'), ri.mode === 'part' ? h('span', null, ri.head ? `指定席為 1～${ri.reservedCars} 号車。` : `指定席為 ${ri.rList.join('・')} 号車。`) : null));
+      const cars = l.occ;   // 2.14.0：用完整車廂陣列，tab 只列指定席車廂（ri.rIdx，例如 4・5 号車）
       // 1.9.0：有商務車廂時，車廂 tab 只顯示目前選擇的那一種（商務＝ri.bizCars、一般＝其餘），不能混選；
       // 商務車廂（1+2）用 3 欄、走道在第 1 欄之後，一般車廂（2+2）維持原本 4 欄、走道在第 2 欄之後。
       const bizSet = new Set((ri.bizCars || []).map(n => n - 1));
       function d2() {
-        const tabIdx = bizSet.size ? cars.map((_, i) => i).filter(i => (st.cls === 'biz') === bizSet.has(i)) : cars.map((_, i) => i);
+        const tabIdx = bizSet.size ? ri.rIdx.filter(i => (st.cls === 'biz') === bizSet.has(i)) : ri.rIdx.slice();
         if (!tabIdx.includes(st.car)) st.car = tabIdx[0];
         carTabs.replaceChildren(...tabIdx.map(ci => {
           const car = cars[ci], free = car.filter(sg => isFree(sg, l.a, l.b)).length, mine = st.seats.filter(x => x.car === ci).length;
@@ -343,7 +352,7 @@
       S.c.legs.forEach((l, i) => {
         if (!l.ri) return;
         const st = S.legs[i], sv = l.leg.sv, s0 = l.leg.stops[0], sN = l.leg.stops[l.leg.stops.length - 1];
-        const seat = st.mode === 'seat' ? st.seats.map(x => seatName(x.car, x.k, l.ri)).join('、') + (st.cls === 'biz' ? '（商務車廂）' : '') : st.mode === 'stand' ? '立席（座位なし）' : `自由席（${l.ri.reservedCars + 1}号車以後）`;
+        const seat = st.mode === 'seat' ? st.seats.map(x => seatName(x.car, x.k, l.ri)).join('、') + (st.cls === 'biz' ? '（商務車廂）' : '') : st.mode === 'stand' ? '立席（座位なし）' : `自由席（${H.freeCarsText(l.ri)}）`;
         ex.push({ no: noFor('ex' + i), col: sv.isHS ? HSC : 'var(--g1)', kind: '特急券', en: 'EXPRESS TICKET', hs: !!sv.isHS, sub: sv.routeName, from: H.stName(s0.station), to: H.stName(sN.station), fromEn: enOf(s0.station), toEn: enOf(sN.station), subEn: pretty((l.leg.sv.route && l.leg.sv.route.en) || ''), modeEn: modeEnOf(st.mode), seatBi: st.mode === 'seat' ? h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, st.seats.map(x => seatName(x.car, x.k, l.ri)).join('、')), h('span', { class: 'en', lang: 'en' }, st.seats.map(x => seatEn(x.car, x.k, l.ri)).join(', '))) : h('span', { class: 'bi' }, h('span', { class: 'ja', lang: 'ja' }, seat), h('span', { class: 'en', lang: 'en' }, st.mode === 'stand' ? 'Standing (no seat)' : 'Non-reserved seating')), dep: HK.hm(s0.dep), arr: HK.hm(sN.arr), date, sv, gou: l.leg.gou || '', mode: modeLabel(l, st.mode), seat, fee: yen(legFee(l, st)), n: P.n, stops: l.leg.stops.length - 1 });
       });
 

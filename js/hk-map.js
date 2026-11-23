@@ -524,8 +524,41 @@
     // 每條邊兩端的方向：度數 2 的站取一條軸（線筆直穿過），其餘每條邊各自取最近方向且不重複
     const dirI = new Array(m).fill(-1), dirJ = new Array(m).fill(-1);
     const DOT = (d, dx, dy) => DIRS8[d][0] * dx + DIRS8[d][1] * dy;
+    // 2.7.0：override 可以多給第三個值＝車站的「線路方向」（DIRS8 的編號 0–7）。兩端都有指定方向的邊，
+    // 直接用指定方向出發／抵達，讓轉角精準落在兩站之間（環狀線「轉角只在站間中點」的要求）。
+    // 第三個值也可以是物件：{ "*": 線路方向, "鄰站中文名": 往那一站出發的方向 }——指名的鄰站優先，
+    // 用在環狀線以外、需要指定轉角方向的路線（例：天鳥八幡往紫市一律往南出發）。
+    const ovd = opts.override || {}, n8 = d => ((d | 0) % 8 + 8) % 8;
+    const ovx = i => { const o = ovd[st[i].zh]; const t = o && o.length > 2 ? o[2] : null; if (t == null) return { hd: -1, m: null }; if (typeof t === 'object') return { hd: t['*'] != null ? n8(t['*']) : -1, m: t }; return { hd: n8(t), m: null }; };
+    const hdOf = i => ovx(i).hd;
     for (let v = 0; v < n; v++) {
       const a = adj[v]; if (!a.length) continue;
+      const { hd: hv, m: mv } = ovx(v), used0 = new Set(), rest = [];
+      if (hv >= 0 || mv) {
+        for (const x of a) {
+          const nm = st[x.to].zh;
+          let d;
+          if (mv && mv[nm] != null) d = n8(mv[nm]);
+          else if (hv >= 0 && hdOf(x.to) >= 0) { const q = hp[x.to]; d = DOT(hv, q[0] - hp[v][0], q[1] - hp[v][1]) >= 0 ? hv : (hv + 4) % 8; }
+          else { rest.push(x); continue; }
+          used0.add(d);
+          if (E[x.k].i === v) dirI[x.k] = d; else dirJ[x.k] = (d + 4) % 8;
+        }
+        if (rest.length < a.length) {
+          for (const x of rest) {
+            const q = hp[x.to];
+            let d = Math.round(angIdx(q[0] - hp[v][0], q[1] - hp[v][1])) % 8;
+            if (used0.has(d)) for (let off = 1; off <= 4; off++) {
+              const c1 = (d + off) % 8, c2 = (d + 8 - off) % 8;
+              if (!used0.has(c1)) { d = c1; break; }
+              if (!used0.has(c2)) { d = c2; break; }
+            }
+            used0.add(d);
+            if (E[x.k].i === v) dirI[x.k] = d; else dirJ[x.k] = (d + 4) % 8;
+          }
+          continue;
+        }
+      }
       if (a.length === 2) {
         const p1 = hp[a[0].to], p2 = hp[a[1].to];
         const ax = Math.round(angIdx(p2[0] - p1[0], p2[1] - p1[1])) % 8;

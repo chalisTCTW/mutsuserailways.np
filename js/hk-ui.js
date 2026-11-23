@@ -229,6 +229,10 @@
         edgeEls.forEach(e => { const k = e.p.a < e.p.b ? e.p.a + '|' + e.p.b : e.p.b + '|' + e.p.a; e.line.classList.toggle('on', on && edgeKeys && edgeKeys.has(k)); e.casing.classList.toggle('on', on && edgeKeys && edgeKeys.has(k)); });
       },
       mark(id, cls) { stEls.forEach((g, k) => g.classList.toggle(cls, k === id)); },
+      /** 2.9.0：替一組邊（a|b）加上 class（HIKACARD 不能使用的區間畫成灰色虛線用）。 */
+      markEdges(edgeKeys, cls) {
+        edgeEls.forEach(e => { const k = e.p.a < e.p.b ? e.p.a + '|' + e.p.b : e.p.b + '|' + e.p.a; const on = !!edgeKeys && edgeKeys.has(k); e.line.classList.toggle(cls, on); e.casing.classList.toggle(cls, on); });
+      },
       /** 以時刻表推算的列車位置。list 來自 H.activeTrains。 */
       setTrains(list, onClick) {
         gTr.replaceChildren();
@@ -274,18 +278,164 @@
   /** 1.1.2：起訖站選單裡的万瀨高速鉄道線延伸段車站——只在勾選「可以利用高速鉄道」時才出現在選單最後的 optgroup，
    *  取消勾選時移除；如果移除時原本選到的剛好是延伸段車站，就把選值退回第一個（一般）選項，避免選單留著一個不存在的值。
    *  已經視為通車，不再用「假想／地圖外」這類字眼，每個選項後面統一標「*高速鉄道」，讓玩家知道只能搭高速鉄道抵達。
-   *  乘車・轉乘查詢（site.js）與訂票（booking.js）共用這個函式。 */
+   *  乘車・轉乘查詢（site.js）與訂票（booking.js）共用這個函式。
+   *  2.7.0：車站選單換成 stationPicker() 之後，這裡改呼叫它的 setExtraGroup／clearExtraGroup，不再直接動 <select> DOM。 */
   function refreshHSExtOptions(H, sel, show) {
-    let grp = sel.querySelector('optgroup[data-hsext]');
+    if (typeof sel.setExtraGroup !== 'function') {   // 舊版原生 <select>（瀏覽器還留著舊的 site.js／booking.js 快取時）
+      let grp = sel.querySelector('optgroup[data-hsext]');
+      if (show && H.hsExtStops && H.hsExtStops.length) {
+        if (!grp) { grp = h('optgroup', { label: '万瀨高速鉄道線延伸段', 'data-hsext': '1' }); sel.append(grp); }
+        grp.replaceChildren(...H.hsExtStops.map(st => h('option', { value: st.id }, st.zh + '　*高速鉄道')));
+      } else if (grp) { const wasVirtual = String(sel.value).indexOf('hsext:') === 0; grp.remove(); if (wasVirtual) sel.selectedIndex = 0; }
+      return;
+    }
     if (show && H.hsExtStops && H.hsExtStops.length) {
-      if (!grp) { grp = h('optgroup', { label: '万瀨高速鉄道線延伸段', 'data-hsext': '1' }); sel.append(grp); }
-      grp.replaceChildren(...H.hsExtStops.map(st => h('option', { value: st.id }, st.zh + '　*高速鉄道')));
-    } else if (grp) {
-      const wasVirtual = String(sel.value).indexOf('hsext:') === 0;
-      grp.remove();
-      if (wasVirtual) sel.selectedIndex = 0;
+      sel.setExtraGroup('万瀨高速鉄道線延伸段', H.hsExtStops.map(st => ({ id: st.id, label: st.zh + '　*高速鉄道' })));
+    } else {
+      sel.clearExtraGroup();
     }
   }
 
-  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, netKey, renderMap, typeTag, typeMark, fmtDate, refreshHSExtOptions });
+  /* ───────── 車站選單（2.7.0） ─────────
+   * 前輩的需求：
+   *   (1) 可以直接打字搜尋（站名／車站編號都比對）
+   *   (2) 不打字時，依路線字母編號分組排在一起
+   *   (3) 同字母的話，依北到南排列（Minecraft 座標：z 越小越北）
+   *   (4) みつせ預設排最前面
+   *   (5) 單軌（光瀨市交通局）車站獨立一區
+   * 對外行為盡量維持跟原生 <select> 相容：.value／.name 可讀可寫，選到站會呼叫 onChange(id)，
+   * 讓 site.js／booking.js 既有的程式（含 refreshHSExtOptions）幾乎不用改寫使用方式。 */
+  function stPrimaryLetter(H, st) {
+    const cs = H.codes(st.id);
+    if (!cs.length) return null;
+    const m = String(cs[0]).match(/^[A-Za-z]+/);
+    return m ? m[0] : null;
+  }
+  /** 依前輩的規則排好的車站清單：{ pinned:[みつせ], groups:[{key,label,stations}], mono:[...] } */
+  function stationGroups(H) {
+    const all = H.stations;
+    const mono = all.filter(st => H.monoOnlyIds.has(st.id)).slice().sort((a, b) => (a.z - b.z) || a.zh.localeCompare(b.zh, 'ja'));
+    const monoSet = new Set(mono.map(st => st.id));
+    const pinned = all.filter(st => st.zh === 'みつせ');
+    const pinnedSet = new Set(pinned.map(st => st.id));
+    const rest = all.filter(st => !monoSet.has(st.id) && !pinnedSet.has(st.id));
+    const byLetter = new Map();
+    rest.forEach(st => { const k = stPrimaryLetter(H, st) || 'other'; if (!byLetter.has(k)) byLetter.set(k, []); byLetter.get(k).push(st); });
+    const letters = [...byLetter.keys()].sort((a, b) => a === 'other' ? 1 : b === 'other' ? -1 : a.localeCompare(b));
+    const groups = letters.map(k => ({ key: k, label: k === 'other' ? '其他' : k, stations: byLetter.get(k).sort((a, b) => (a.z - b.z) || a.zh.localeCompare(b.zh, 'ja')) }));
+    return { pinned, groups, mono };
+  }
+  /** 字串正規化：去空白、轉小寫，方便比對英數字（站名本身是中文就直接比對原字）。 */
+  const stNorm = x => String(x || '').trim().toLowerCase();
+  function stationSearch(H, query) {
+    const q = stNorm(query);
+    if (!q) return null;
+    const score = st => {
+      const zh = st.zh, codes = H.codes(st.id).join('/');
+      const zhL = stNorm(zh), codeL = stNorm(codes), enL = stNorm(st.en);
+      const tl = (root.HK_I18N && root.HK_I18N.t) ? stNorm(root.HK_I18N.t(zh)) : zhL;   // 目前語言的站名（日文漢字寫法等）
+      if (zhL === q || codeL === q || enL === q || tl === q) return 0;
+      if (zhL.startsWith(q) || codeL.startsWith(q) || (enL && enL.startsWith(q)) || tl.startsWith(q)) return 1;
+      if (zh.indexOf(query) >= 0 || codeL.indexOf(q) >= 0 || (enL && enL.indexOf(q) >= 0) || tl.indexOf(q) >= 0) return 2;
+      return -1;
+    };
+    return H.stations.map(st => ({ st, sc: score(st) })).filter(x => x.sc >= 0).sort((a, b) => a.sc - b.sc || (a.st.z - b.st.z)).map(x => x.st);
+  }
+  /** opts: { id, label, onChange, allowEmpty（空選項文字，不給就不顯示）, placeholder } */
+  function stationPicker(H, opts) {
+    opts = opts || {};
+    let value = opts.id || (opts.allowEmpty ? '' : ((stationGroups(H).pinned[0] || H.stations[0] || {}).id || ''));
+    let extraLabel = null, extraStops = [];     // 万瀨高速鉄道線延伸段（refreshHSExtOptions 用）
+    const hidden = h('input', { type: 'hidden', value });
+    const box = h('input', { type: 'text', autocomplete: 'off', 'aria-label': opts.label || '', placeholder: opts.placeholder || '輸入站名搜尋…', class: 'stpick-box' });
+    const list = h('ul', { class: 'stpick-list', role: 'listbox', hidden: true });
+    const wrap = h('div', { class: 'stpick' }, box, list);
+    let open = false, activeEl = null;
+
+    function labelOf(id) {
+      if (!id) return '';
+      if (String(id).indexOf('hsext:') === 0) { const e = extraStops.find(s => s.id === id); return e ? e.label.replace(/　\*高速鉄道$/, '') : id; }
+      const cs = H.codes(id);
+      return (cs.length ? cs.join('/') + ' ' : '') + H.stName(id);
+    }
+    const T = x => (root.HK_I18N && root.HK_I18N.t) ? root.HK_I18N.t(x) : x;   // 輸入框的值不是文字節點，i18n 不會自動翻，這裡自己翻
+    function syncBoxText() { box.value = T(labelOf(value)); }
+    syncBoxText();
+
+    function closeList() { open = false; list.hidden = true; activeEl = null; list.replaceChildren(); }
+    function setActive(el) { if (activeEl) activeEl.classList.remove('active'); activeEl = el; if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest' }); } }
+    function choose(id) {
+      value = id; hidden.value = id; syncBoxText(); closeList(); box.blur();
+      if (opts.onChange) opts.onChange(id);
+      wrap.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    function row(idVal, text, extraCls) {
+      const li = h('li', { role: 'option', class: 'stpick-opt' + (extraCls ? ' ' + extraCls : '') }, text);
+      li.addEventListener('mousedown', e => { e.preventDefault(); choose(idVal); });
+      li.addEventListener('mouseenter', () => setActive(li));
+      return li;
+    }
+    function renderGrouped() {
+      list.replaceChildren();
+      if (opts.allowEmpty) list.append(row('', opts.allowEmpty, 'stpick-empty'));
+      const { pinned, groups, mono } = stationGroups(H);
+      pinned.forEach(st => list.append(row(st.id, labelOf(st.id), 'stpick-pin')));
+      groups.forEach(g => {
+        list.append(h('li', { class: 'stpick-group', role: 'presentation' }, g.label));
+        g.stations.forEach(st => list.append(row(st.id, labelOf(st.id))));
+      });
+      if (mono.length) {
+        list.append(h('li', { class: 'stpick-group stpick-mono-h', role: 'presentation' }, '單軌（光瀨市交通局）'));
+        mono.forEach(st => list.append(row(st.id, labelOf(st.id), 'stpick-mono')));
+      }
+      if (extraStops.length) {
+        list.append(h('li', { class: 'stpick-group', role: 'presentation' }, extraLabel));
+        extraStops.forEach(e => list.append(row(e.id, e.label)));
+      }
+    }
+    function renderSearch(q) {
+      list.replaceChildren();
+      const found = stationSearch(H, q) || [];
+      const extraHit = extraStops.filter(e => stNorm(e.label).indexOf(stNorm(q)) >= 0);
+      if (!found.length && !extraHit.length) { list.append(h('li', { class: 'stpick-empty', role: 'presentation' }, '找不到符合的車站')); return; }
+      found.forEach(st => list.append(row(st.id, labelOf(st.id), H.monoOnlyIds.has(st.id) ? 'stpick-mono' : null)));
+      extraHit.forEach(e => list.append(row(e.id, e.label)));
+    }
+    /* 2.7.0：首頁的 .band 區塊有 overflow:hidden（做背景模糊效果用），用一般的 position:absolute 下拉選單
+     * 會被它裁掉。改用 position:fixed、每次開啟時依輸入框目前的畫面座標算好位置，就不會被任何祖先的
+     * overflow:hidden 裁切；捲動時直接收起選單（一般下拉選單常見的作法），避免還要追著重新定位。 */
+    function placeList() {
+      const r = box.getBoundingClientRect();
+      Object.assign(list.style, { position: 'fixed', top: (r.bottom + 2) + 'px', left: r.left + 'px', width: r.width + 'px', right: 'auto' });
+    }
+    function onScrollClose() { if (open) { syncBoxText(); closeList(); } }
+    function openList() { open = true; list.hidden = false; placeList(); const q = box.value; (stNorm(q) && q !== T(labelOf(value))) ? renderSearch(q) : renderGrouped(); }
+    box.addEventListener('focus', () => { box.select(); openList(); window.addEventListener('scroll', onScrollClose, { passive: true, capture: true }); window.addEventListener('resize', placeList); });
+    box.addEventListener('input', () => { open = true; list.hidden = false; placeList(); renderSearch(box.value); });
+    box.addEventListener('blur', () => { setTimeout(() => { if (open) { syncBoxText(); closeList(); } window.removeEventListener('scroll', onScrollClose, { capture: true }); window.removeEventListener('resize', placeList); }, 120); });
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { syncBoxText(); closeList(); return; }
+      if (e.key === 'Enter') { e.preventDefault(); if (activeEl) activeEl.dispatchEvent(new Event('mousedown')); return; }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault(); if (!open) { openList(); return; }
+        const items = [...list.querySelectorAll('.stpick-opt')]; if (!items.length) return;
+        let i = activeEl ? items.indexOf(activeEl) : -1;
+        i = e.key === 'ArrowDown' ? Math.min(items.length - 1, i + 1) : Math.max(0, i - 1);
+        setActive(items[i]);
+      }
+    });
+
+    Object.defineProperty(wrap, 'value', { get: () => value, set: v => { value = v || ''; hidden.value = value; syncBoxText(); } });
+    Object.defineProperty(wrap, 'name', { get: () => hidden.name, set: v => { hidden.name = v; } });
+    wrap.append(hidden);
+    wrap.setExtraGroup = (label, stops) => { extraLabel = label; extraStops = stops || []; };
+    wrap.clearExtraGroup = () => {
+      const wasVirtual = String(value).indexOf('hsext:') === 0;
+      extraLabel = null; extraStops = [];
+      if (wasVirtual) { const { pinned } = stationGroups(H); wrap.value = (opts.allowEmpty ? '' : (pinned[0] && pinned[0].id) || ''); if (opts.onChange) opts.onChange(wrap.value); }
+    };
+    return wrap;
+  }
+
+  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, netKey, renderMap, typeTag, typeMark, fmtDate, refreshHSExtOptions, stationPicker, stationGroups });
 })(window);

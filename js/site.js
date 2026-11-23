@@ -10,11 +10,23 @@
   const DAY = 86400;
   const yen = n => '¥' + Number(n).toLocaleString('en-US');
 
+  /* 2.7.0：車站選單換成 HKc.stationPicker()（可打字搜尋、依路線字母＋北到南分組、みつせ預設最前、單軌獨立一區）。 */
   function stationSelect(H, id, label, onChange) {
+    if (HKc.stationPicker) return HKc.stationPicker(H, { id, label, onChange });
+    // 備援：瀏覽器還留著舊版 hk-ui.js 快取時，先用原生選單，不讓頁面壞掉
     const sel = h('select', { 'aria-label': label }, H.stations.map(st => h('option', { value: st.id }, (H.codeText(st.id) ? H.codeText(st.id) + ' ' : '') + st.zh)));
     if (id) sel.value = id;
     if (onChange) sel.addEventListener('change', () => onChange(sel.value));
     return sel;
+  }
+  /** 挑一個跟 excludeId 不同的車站，給「抵達站」之類欄位當初始預設值（不是地理或路線上的講究，純粹要跟出發站不一樣）。 */
+  function otherDefaultStation(H, excludeId) {
+    if (!HKc.stationGroups) { const alt = H.stations.find(s => s.id !== excludeId); return alt ? alt.id : ''; }
+    const g = HKc.stationGroups(H);
+    const pick = (g.groups[0] && g.groups[0].stations[0]) || g.pinned[0] || H.stations[0];
+    if (pick && pick.id !== excludeId) return pick.id;
+    const alt = H.stations.find(s => s.id !== excludeId);
+    return alt ? alt.id : (pick && pick.id) || '';
   }
   const field = (label, el) => h('label', { class: 'f' }, h('span', null, label), el);
   /** 調度（離峰・深夜・收車）時顯示給旅客的說明。 */
@@ -48,12 +60,12 @@
       field('車站', Object.assign(stationSelect(H, null, '車站'), { name: 's' })), h('span'), h('button', { class: 'btn', type: 'submit' }, '查詢時刻表'));
     const now = H.nowSec(), nowStr = hm(now);
     const fromSel = Object.assign(stationSelect(H, null, '出發站'), { name: 'from' }), toSel = Object.assign(stationSelect(H, null, '抵達站'), { name: 'to' });
-    if (H.stations.length > 1) toSel.selectedIndex = Math.min(H.stations.length - 1, 1);
+    if (H.stations.length > 1) toSel.value = otherDefaultStation(H, fromSel.value);
     const bodyRt = h('form', { action: 'timetable.html', method: 'get', class: 'v2' }, h('input', { type: 'hidden', name: 'tab', value: 'route' }),
       field('出發站', fromSel), field('抵達站', toSel), field('出發時刻', h('input', { type: 'time', name: 't', value: nowStr })), h('button', { class: 'btn', type: 'submit' }, '查詢'));
     // 線上訂票：把起訖站與出發時刻帶到 booking.html（booking.js 讀 from／to／t，兩站都有就直接搜尋）
     const bkFrom = Object.assign(stationSelect(H, null, '出發站'), { name: 'from' }), bkTo = Object.assign(stationSelect(H, null, '抵達站'), { name: 'to' });
-    if (H.stations.length > 1) bkTo.selectedIndex = Math.min(H.stations.length - 1, 1);
+    if (H.stations.length > 1) bkTo.value = otherDefaultStation(H, bkFrom.value);
     const bodyBk = h('form', { action: 'booking.html', method: 'get', class: 'v2' },
       field('出發站', bkFrom), field('抵達站', bkTo), field('出發時刻', h('input', { type: 'time', name: 't', value: nowStr })), h('button', { class: 'btn', type: 'submit' }, '搜尋班次並訂票'));
     const tabBar = h('div', { class: 'tabs', role: 'tablist' });
@@ -109,7 +121,7 @@
     // 1.1.0：高速鉄道往東平倉方向的班次，車站時刻表固定標示「東平倉・新岩沢 方面」（地圖外的假想延伸；
     // 前輩指定，只套用這一個方向，反方向仍用一般的終點命名）。
     const hx = H.cfg.hsExt;
-    if (sv.isHS && hx && hx.towardLabel && H.stName(dest) === hx.afterZh) return { key: 'hsext|' + hx.afterZh, label: hx.towardLabel + '　方面' };
+    if (sv.isHS && hx && hx.towardLabel && (hx.towardFrom || [hx.afterZh]).includes(H.stName(dest))) return { key: 'hsext|' + hx.towardLabel, label: hx.towardLabel + '　方面' };   // 2.8.2：只有開到花宮天照的下行才標「新岩沢 方面」
     // 0.21.0：方向由「這班車實際的下一個停靠站」決定（過去用到終點的最短路徑，環快這類繞行的班次會被分到相反方向）
     let nextSt = dest; for (let k = (e.i || 0) + 1; k < sv.stops.length; k++) if (sv.stops[k].pax !== false) { nextSt = sv.stops[k].station; break; }
     const p = H.shortestPath(sid, nextSt);
@@ -134,6 +146,7 @@
       out.append(h('h2', { class: 'h2', style: 'margin-top:22px' }, H.codeBadges(sid), st.zh, st.en ? h('small', null, st.en) : null));
       if (HK.sdEntry && HK.sdEntry(st.zh)) out.append(h('p', { style: 'margin:0 0 10px' }, h('a', { class: 'btn sm', href: HK.stationHref(H, st.zh) }, '車站介紹（照片・月台・附近景點與餐廳）')));
       out.append(HK.ttPanel(H, sid));
+      if (HK.Bus) out.append(HK.Bus.stationPanel(st.zh));   // 2.10.0：這一站附近的公車
     }
     draw();
   }
@@ -215,12 +228,14 @@
     // 查詢字串裡的 from／to 也可能是假想站的 id（'hsext:花宮天照' 這種），H.stById 查不到，要另外檢查。
     const hsInit = q.get('hs') === '1';
     const validSt = id => !!H.stById[id] || (hsInit && H.hsQueryStations.some(s => s.id === id && !s.real));
-    const from = q.get('from') && validSt(q.get('from')) ? q.get('from') : H.stations[0].id;
-    const to = q.get('to') && validSt(q.get('to')) ? q.get('to') : H.stations[Math.min(1, H.stations.length - 1)].id;
+    const dfltFrom = ((HKc.stationGroups && HKc.stationGroups(H).pinned[0]) || H.stations[0]).id;
+    const from = q.get('from') && validSt(q.get('from')) ? q.get('from') : dfltFrom;
+    const to = q.get('to') && validSt(q.get('to')) ? q.get('to') : otherDefaultStation(H, dfltFrom);
     const tv = q.get('t') || hm(H.nowSec());
     const fSel = stationSelect(H, null, '出發站'), tSel = stationSelect(H, null, '抵達站'), tIn = h('input', { type: 'time', value: tv });
     const via = q.get('via') && H.stById[q.get('via')] ? q.get('via') : '';
-    const vSel = h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...H.stations.map(st => h('option', { value: st.id, selected: st.id === via }, st.zh))]);
+    const vSel = HKc.stationPicker ? HKc.stationPicker(H, { id: via, label: '經由', allowEmpty: '（不指定）' })
+      : h('select', { 'aria-label': '經由' }, [h('option', { value: '' }, '（不指定）'), ...H.stations.map(st => h('option', { value: st.id, selected: st.id === via }, st.zh))]);
     const noRes = h('input', { type: 'checkbox', checked: q.get('nores') === '1' });
     const useHS = h('input', { type: 'checkbox', checked: hsInit });
     // 先依 useHS 目前的狀態把假想延伸站加進選單，再設定選到的值——順序不能反過來，
@@ -284,7 +299,7 @@
       });
       // 1.1.0：這裡改回分開的 h() 參數（前輩用語之前就是這樣拆，中間的數字單獨一個節點），
       // 不要再用 + 把整段接成一個字串——接成一個字串會讓既有的日文／英文翻譯對不上，整段都不會被翻譯。
-      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ', String(Math.round(H.minTransfer / 60 * 10) / 10), ' 分鐘計算（中央戸宮／光大前與大學前可步行轉乘，約 6 分鐘；幸村／新光瀨亦可步行轉乘高速鐵路）。乘車券依出發站到抵達站的最短路徑計算，與搭乘的班次無關；特急為全車指定席（也有半價的立席特急券），特快的 1・2 号車為指定席、3 号車以後為自由席；高速鐵路為全車指定席、沒有立席特急券，票價另計。'));
+      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ', String(Math.round(H.minTransfer / 60 * 10) / 10), ' 分鐘計算（中央戸宮／光大前與大學前可步行轉乘，約 6 分鐘；幸村／新光瀨亦可步行轉乘高速鐵路）。乘車券依出發站到抵達站的最短路徑計算，與搭乘的班次無關；特急為全車指定席（也有半價的立席特急券），特快的 1・2 号車為指定席、3 号車以後為自由席；快速與環狀快速的 4・5 号車為指定席、其他車廂為自由席；高速鐵路為全車指定席、沒有立席特急券，票價另計。'));
       try { history.replaceState(null, '', `?tab=route&from=${fSel.value}&to=${tSel.value}&t=${tIn.value}${vSel.value ? '&via=' + vSel.value : ''}${noRes.checked ? '&nores=1' : ''}${useHS.checked ? '&hs=1' : ''}`); } catch (e) { }
     }
     if (q.get('from')) go();
@@ -297,7 +312,7 @@
       const s0 = leg.stops[0], sN = leg.stops[leg.stops.length - 1], sv = leg.sv;
       lis.push(h('li', { class: li === 0 ? 'first' : '' }, h('div', { class: 'tm' }, hm(s0.dep)), h('div', { class: 'rl' }, h('i')),
         h('div', { class: 'wh' }, h('strong', null, H.codeBadges(s0.station), H.stName(s0.station)), s0.platform ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `${s0.platform} 號月台`) : null,
-          h('div', { class: 'ride' }, typeTag(sv), h('span', null, sv.routeName, leg.gou ? h('span', { class: 'gou' }, ' ' + leg.gou) : null), h('span', null, `${H.destOf(sv, leg.board)}行`), h('span', null, `${leg.stops.length - 1} 站・${Math.max(1, Math.round((sN.arr - s0.dep) / 60))} 分`), H.reserveLabel(sv) ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null))));
+          h('div', { class: 'ride' }, typeTag(sv), h('span', null, sv.routeName, leg.gou ? h('span', { class: 'gou' }, ' ' + leg.gou) : null), h('span', null, `${H.destOf(sv, leg.board)}行`), h('span', null, `${leg.stops.length - 1} 站・${Math.max(1, Math.round((sN.arr - s0.dep) / 60))} 分`), sv.isHS ? null : h('span', null, H.carsLabel(sv)), H.reserveLabel(sv) ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null))));
       const nxt = j.legs[li + 1];
       if (nxt) {
         lis.push(h('li', { class: 'walk' }, h('div', { class: 'tm' }, hm(sN.arr), h('span', null, hm(nxt.stops[0].dep))), h('div', { class: 'rl' }, h('i')), h('div', { class: 'wh' }, h('strong', null, H.codeBadges(sN.station), H.stName(sN.station)), nxt.walk ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `徒歩 → ${H.stName(nxt.walk.to)}（約 ${Math.round(nxt.walk.sec / 60)} 分）・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`) : h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `轉乘・等候 ${Math.round((nxt.stops[0].dep - sN.arr) / 60)} 分`))));
@@ -355,14 +370,15 @@
   }
 
   function viewFare(H, root) {
-    const fSel = stationSelect(H, q.get('from') && H.stById[q.get('from')] ? q.get('from') : H.stations[0].id, '出發站'), tSel = stationSelect(H, q.get('to') && H.stById[q.get('to')] ? q.get('to') : H.stations[Math.min(1, H.stations.length - 1)].id, '抵達站');
+    const dfltF = ((HKc.stationGroups && HKc.stationGroups(H).pinned[0]) || H.stations[0]).id;
+    const fSel = stationSelect(H, q.get('from') && H.stById[q.get('from')] ? q.get('from') : dfltF, '出發站'), tSel = stationSelect(H, q.get('to') && H.stById[q.get('to')] ? q.get('to') : otherDefaultStation(H, dfltF), '抵達站');
     const out = h('div', { style: 'margin-top:18px' });
     const form = h('form', { class: 'finder', onsubmit: e => { e.preventDefault(); go(); } }, h('div', { style: 'display:grid;grid-template-columns:1fr 1fr auto;gap:10px 12px;align-items:end;padding:14px 16px' }, field('出發站', fSel), field('抵達站', tSel), h('button', { class: 'btn', type: 'submit' }, '計算票價')));
     const C = H.cfg;
     const rule = h('div', { class: 'sec' }, h('h2', null, '票價制度'), h('table', { class: 'tbl' }, h('tbody', null,
       h('tr', null, h('th', { style: 'width:30%' }, '基本運費'), h('td', null, `${yen(C.fareBase)}（含同一收費區內）`)),
       h('tr', null, h('th', null, '區間加算'), h('td', null, `每跨越一個收費區加 ${yen(C.fareStep)}（依實際經過的路徑計算跨越次數，而非區號差）`)),
-      h('tr', null, h('th', null, '指定席費用'), h('td', null, `${yen(C.seatFee)}（特急為全車指定席；特快為 1・2 号車指定席，3 号車以後為自由席不收費）。特急的立席特急券為指定席的一半（${yen(Math.round(C.seatFee * C.standRatio))}），不保證有位置、不能選座位。`)),
+      h('tr', null, h('th', null, '指定席費用'), h('td', null, `${yen(C.seatFee)}（特急為全車指定席；特快為 1・2 号車指定席，3 号車以後為自由席不收費；快速與環狀快速為 4・5 号車指定席，其他車廂為自由席不收費）。特急的立席特急券為指定席的一半（${yen(Math.round(C.seatFee * C.standRatio))}），不保證有位置、不能選座位。`)),
       h('tr', null, h('th', null, '兒童・優待'), h('td', null, '12 歲以下、60 歲以上的乘車券為大人的一半（四捨五入到整數）；指定席費用不打折。')),
       h('tr', null, h('th', null, '路徑的取法'), h('td', null, '有多條路徑時，取跨越收費區最少、其次距離最短的路徑。')))));
     root.append(h('div', { style: 'margin-top:16px' }, form), out, rule);
@@ -378,7 +394,7 @@
           h('tr', null, h('th', null, `跨越收費區 ${f.crossed} 個 × ${yen(f.step)}`), h('td', { style: 'text-align:right' }, yen(f.zoneFee))),
           h('tr', null, h('th', null, '乘車券合計'), h('td', { style: 'text-align:right;font-weight:700' }, yen(f.yen))),
           h('tr', null, h('th', null, '兒童（12 歲以下）・優待（60 歲以上）'), h('td', { style: 'text-align:right' }, yen(Math.round(f.yen * H.cfg.childRatio)))),
-          h('tr', null, h('th', null, '搭乘特急（指定席）／特快 1・2 号車（指定席）另加'), h('td', { style: 'text-align:right' }, '+' + yen(H.cfg.seatFee) + '（合計 ' + yen(f.yen + H.cfg.seatFee) + '）')),
+          h('tr', null, h('th', null, '搭乘特急（指定席）／特快 1・2 号車・快速 4・5 号車（指定席）另加'), h('td', { style: 'text-align:right' }, '+' + yen(H.cfg.seatFee) + '（合計 ' + yen(f.yen + H.cfg.seatFee) + '）')),
           h('tr', null, h('th', null, '立席特急券（特急）'), h('td', { style: 'text-align:right' }, '+' + yen(Math.round(H.cfg.seatFee * H.cfg.standRatio)) + '（合計 ' + yen(f.yen + Math.round(H.cfg.seatFee * H.cfg.standRatio)) + '）')))),
         h('div', { class: 'rule' }, '計算所用的路徑：' + f.path.map(id => H.stName(id)).join(' → ') + (H.zonesConfigured ? '' : '　※ 收費區資料尚未設定，目前以未跨越任何區間計算。'))));
     }
@@ -417,7 +433,7 @@
 
     function describe(tr) {
       const sv = tr.sv, st = sv.stops, i = tr.i, dest = H.destOf(sv, i), cars = H.carsOf(sv), ri = H.reserveInfo(sv), base = tr.tr.base;
-      const carBar = h('span', { class: 'carbar', title: cars + '両編成' }, ...Array.from({ length: cars }, (_, k) => h('i', { style: `background:${sv.color}` }, String(k + 1))));
+      const carBar = h('span', { class: 'carbar', title: H.carsLabel(sv) }, ...Array.from({ length: cars }, (_, k) => h('i', { style: `background:${sv.color}` }, String(k + 1))));
       const rows = [];
       st.forEach((s, k) => {
         if (s.pax === false) return;
@@ -429,7 +445,7 @@
       });
       return h('div', { class: 'tinfo' },
         h('div', { class: 'ti-head' }, typeTag(sv), h('strong', null, sv.routeName), H.gouOf(sv, base) ? h('span', { class: 'gou' }, ' ' + H.gouOf(sv, base)) : null, h('span', { class: 'ti-dest' }, `${dest}行`)),
-        h('div', { class: 'ti-cars' }, carBar, h('span', null, `${cars} 両編成`), ri ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null),
+        h('div', { class: 'ti-cars' }, carBar, h('span', null, H.carsLabel(sv)), ri ? h('span', { class: 'resv' }, H.reserveLabel(sv)) : null),
         h('div', { class: 'ti-state' }, tr.dwelling ? `${H.stName(tr.from)} 停車中（${hm(tr.dep)} 發車）` : `${H.stName(tr.from)} → ${H.stName(tr.to)} 運行中`),
         h('table', { class: 'ti-stops' }, h('thead', null, h('tr', null, h('th'), h('th', null, '停靠站'), h('th', null, '到'), h('th', null, '發'))), h('tbody', null, rows)));
     }
@@ -471,5 +487,5 @@
   })();
   /* 2.5.0：頁尾顯示入口網站版本，方便確認瀏覽器載入的是不是新檔案（診斷頁：check.html） */
   window.HK_PORTAL_VERSION = '2.6.1';
-  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.6.1'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
+  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.15.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
 })();

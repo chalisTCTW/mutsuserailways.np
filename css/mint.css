@@ -34,7 +34,10 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 
 /* Huninn 只有一種字重：粗體一律用正常字重（車票版面除外，車票維持原本的黑體階層） */
 body :not(.tk):not(.tk *) { font-weight: 400 !important; }
-.tk:not(.tkC), .tk:not(.tkC) * { font-family: "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif; font-synthesis: weight style; }
+/* 2.10.2：車票不用粉圓——票面上的元件多半寫成 font: … var(--serif)／var(--sans)（選擇器比上面那條更具體，會蓋過），
+ * 所以在車票裡把這幾個字體變數換回原本的黑體，再加 !important 保底；感熱紙風（tkC）維持點陣字。 */
+.tk:not(.tkC) { --font: "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif; --serif: var(--font); --sans: var(--font); }
+.tk:not(.tkC), .tk:not(.tkC) * { font-family: "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif !important; font-synthesis: weight style; }
 
 /* ════════ 標頭 ════════ */
 header.sh, body[data-page="home"] header.sh { position: relative; z-index: 30; background: #fff; color: var(--ink); border-bottom: 1px solid var(--line); }

@@ -1,0 +1,85 @@
+/* 2.10.0 光瀨市交通局 公車（monorail.html「公車」分頁＋timetable.html 車站時刻表下方共用） */
+.bus-no { display: inline-block; min-width: 46px; text-align: center; color: #fff; border-radius: 7px;
+  padding: 2px 8px; font-size: 13px; letter-spacing: .03em; font-variant-numeric: tabular-nums; margin-right: 8px; vertical-align: 1px; }
+.bus-xf { display: inline-block; font-size: 11.5px; color: #0a2b59; background: #e4f0fc; border: 1px solid #bcdcf7;
+  border-radius: 999px; padding: 0 8px; margin-left: 6px; vertical-align: 1px; }
+.bus-seg { margin: 4px 0 6px; flex-wrap: wrap; }
+.bus-sel, .bus-res input, .mb-f input[type=time] { font: inherit; padding: 9px 12px; border: 1px solid #dceaf7; border-radius: 10px; background: #fff; color: inherit; max-width: 100%; }
+.bus-go { background: #15559c !important; color: #fff !important; border-color: #15559c !important; cursor: pointer; }
+.bus-hubs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.bus-hubs button, .bus-rbtn { appearance: none; font: inherit; font-size: 13.5px; border: 1px solid #dceaf7; background: #fff;
+  border-radius: 999px; padding: 6px 13px; cursor: pointer; color: #5f7085; }
+.bus-hubs button[aria-pressed="true"] { background: #0a2b59; color: #fff; border-color: #0a2b59; }
+.bus-rlist { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.bus-rbtn { border-radius: 10px; color: #1d2733; text-align: left; }
+.bus-rbtn[aria-pressed="true"] { border-color: #15559c; box-shadow: 0 0 0 2px #bcdcf7; }
+.bus-strip { border: 1px solid #dceaf7; border-radius: 14px; overflow: hidden; background: #fff; }
+.bus-strip-head { padding: 12px 14px; background: #f5faff; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.bus-strip-head .meta { color: #5f7085; font-size: 13px; }
+.bus-strip-body { overflow-x: auto; padding: 14px 10px 8px; }
+.bus-stops { list-style: none; margin: 0; padding: 0; display: flex; min-width: max-content; }
+.bus-stops li { position: relative; width: 62px; padding-top: 22px; text-align: center; }
+.bus-stops li::before { content: ""; position: absolute; top: 8px; left: 0; right: 0; height: 5px; background: var(--c); }
+.bus-stops li:first-child::before { left: 50%; }
+.bus-stops:not(.loop) li:last-child::before { right: 50%; }
+.bus-stops li .dot { position: absolute; top: 3px; left: 50%; margin-left: -8px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 4px solid; box-sizing: border-box; }
+.bus-stops li.xf .dot { width: 20px; height: 20px; margin-left: -10px; top: 1px; border-color: #0a2b59 !important; }
+.bus-stops .nm { writing-mode: vertical-rl; font-size: 13.5px; line-height: 1.25; display: inline-block; color: #1d2733; }
+.bus-stops li .bus-xf { writing-mode: vertical-rl; margin: 4px auto 0; display: block; width: fit-content; padding: 6px 0; }
+.bus-stops .mins { position: absolute; top: -9px; left: 100%; transform: translateX(-50%); font-size: 10.5px; color: #5f7085; white-space: nowrap; }
+.bus-h4 { margin: 14px 0 8px; font-size: 16px; color: #0a2b59; }
+.bus-tt { display: grid; gap: 10px; }
+.bus-ttcard { border: 1px solid #dceaf7; border-radius: 12px; overflow: hidden; background: #fff; }
+.bus-tthead { padding: 9px 12px; background: #f5faff; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.bus-tthead .next { margin-left: auto; color: #15559c; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.bus-hours { max-height: 380px; overflow-y: auto; }
+.bus-hour { display: grid; grid-template-columns: 50px 1fr; border-top: 1px solid #dceaf7; }
+.bus-hour > b { background: #f5faff; color: #0a2b59; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.bus-hour > div { padding: 6px 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.bus-hour.cur > b { background: #15559c; color: #fff; }
+.bus-min { font-size: 14px; font-variant-numeric: tabular-nums; border: 1px solid #dceaf7; border-radius: 7px; padding: 1px 8px; background: #fff; }
+.bus-res { display: grid; gap: 10px; }
+.bus-opt { border: 1px solid #dceaf7; border-radius: 12px; padding: 10px 12px; background: #fff; }
+.bus-opt-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.bus-opt-head b { font-size: 18px; color: #0a2b59; }
+.bus-opt-head span { color: #5f7085; font-size: 13.5px; }
+.bus-opt-head .fare { margin-left: auto; color: #15559c; font-size: 16px; }
+.bus-legs { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.bus-legs li { display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center; font-size: 14px; font-variant-numeric: tabular-nums; }
+.bus-legs .dir { color: #5f7085; font-size: 12.5px; flex-basis: 100%; padding-left: 62px; }
+.bus-map { border: 1px solid #dceaf7; border-radius: 14px; background: #fbfdff; overflow: hidden; }
+.bus-svgwrap { position: relative; height: min(72vh, 680px); overflow: hidden; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.bus-svgwrap.drag { cursor: grabbing; }
+.bus-svg { display: block; width: 100%; height: 100%; }
+.bus-zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 6px; }
+.bus-zb { width: 38px; height: 38px; border-radius: 10px; border: 1px solid #dceaf7; background: #fff; color: #0a2b59; font-size: 19px; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(10,43,89,.12); }
+.bus-svg .grid line { stroke: #e9f1f9; stroke-width: 1; }
+.bus-svg text.key { fill: #1d2733; }
+.bus-svg text:not(.key) { fill: #5f7085; }
+.bus-lgb { appearance: none; border: 0; background: none; padding: 0; cursor: pointer; }
+.bus-lgb[aria-pressed="true"] .bus-no { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0a2b59; }
+.bus-svg text { fill: #1d2733; paint-order: stroke; stroke: #fff; stroke-width: .25em; stroke-linejoin: round; font-family: inherit; }
+.bus-svg text.xf { fill: #0a2b59; }
+.bus-maplg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 12px; border-top: 1px solid #dceaf7; font-size: 12.5px; color: #5f7085; }
+.bus-maplg .note { flex-basis: 100%; }
+.bus-station { margin-top: 26px; padding-top: 6px; border-top: 1px dashed #cfdbe6; }
+.bus-station .note { color: #5f7085; font-size: 13.5px; margin: 0 0 6px; }
+.bus-walk { display: inline-block; min-width: 46px; text-align: center; border: 1px dashed #5f7085; color: #5f7085; border-radius: 7px; padding: 1px 8px; font-size: 13px; margin-right: 8px; }
+.bus-legs li.walk { color: #5f7085; }
+.bus-rail { display: inline-flex; min-width: 46px; margin-right: 8px; }
+.bus-rail:empty { display: none; }
+/* 2.11.0：站牌選擇（行政區＋打字查詢） */
+.bus-pick { display: grid; gap: 6px; min-width: min(280px, 100%); }
+.bus-qwrap { position: relative; }
+.bus-q { width: 100%; box-sizing: border-box; font: inherit; padding: 9px 12px; border: 1px solid #dceaf7; border-radius: 10px; background: #fff; color: inherit; }
+.bus-dsel { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 8px; border: 1px solid #dceaf7; background: #f5faff; color: #0a2b59; max-width: 100%; }
+.bus-sug { position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin: 4px 0 0; padding: 4px; list-style: none; background: #fff; border: 1px solid #dceaf7; border-radius: 12px; box-shadow: 0 10px 26px rgba(10, 43, 89, .14); max-height: 320px; overflow: auto; }
+.bus-sug li { padding: 7px 10px; border-radius: 8px; cursor: pointer; display: grid; gap: 1px; }
+.bus-sug li[aria-selected="true"], .bus-sug li:hover { background: #e4f0fc; }
+.bus-sug li b { font-weight: inherit; color: #0a2b59; }
+.bus-sug li small { color: #5f7085; font-size: 12px; line-height: 1.4; }
+.bus-sug li.none { cursor: default; color: #5f7085; font-size: 13px; background: none; }
+.mb-f > div:has(> .bus-pick) { flex: 1 1 300px; min-width: 0; }
+.bus-pick { width: 100%; }
+@media (max-width: 640px) { .mb-f > div:has(> .bus-pick) { flex-basis: 100%; } .mb-f:has(.bus-pick) .arrow { display: none; } }
