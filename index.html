@@ -34,6 +34,20 @@ header.top{background:var(--navy);color:#fff}
 .search .go{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:0 26px;font-size:18px;font-weight:700}
 .search .go:hover{background:var(--blue2)}
 .guests{display:flex;gap:8px}
+.search .dest{position:relative}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.22);z-index:20;max-height:420px;overflow:auto;padding:6px 0;color:var(--ink);font-size:14px}
+.sg-g{font-size:12px;color:var(--sub);padding:8px 14px 4px;font-weight:700}
+.sg-i{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer}
+.sg-i:hover,.sg-i.on{background:#eef4fc}
+.sg-ic{width:22px;text-align:center}.sg-t{flex:1;display:flex;flex-direction:column;line-height:1.3}.sg-t small{color:var(--sub);font-size:12px}
+.sg-n{font-size:12px;color:var(--sub);white-space:nowrap}.sg-empty{padding:10px 14px;color:var(--sub)}
+.ph,.gmain{position:relative;display:block}.gmain{height:100%}
+.illu{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:2px 6px;border-radius:4px}
+.near{color:var(--navy2);font-weight:500}
+.rthumbs{display:flex;gap:8px;overflow-x:auto;margin:10px 0 0}
+.rthumbs figure{margin:0;flex:0 0 180px}.rthumbs img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px;display:block}
+.rthumbs figcaption{font-size:12px;color:var(--sub);margin-top:2px}
+table.rooms .rimg{width:100%;max-width:160px;aspect-ratio:3/2;object-fit:cover;border-radius:4px;display:block;margin-bottom:6px}
 main{min-height:60vh}
 h2.sec{font-size:22px;margin:36px 0 4px}p.secsub{margin:0 0 16px;color:var(--sub)}
 .areas{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -149,7 +163,68 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const starStr = n => '★'.repeat(n);
   const scoreLabel = s => s >= 9 ? '好極了' : s >= 8.5 ? '非常好' : s >= 8 ? '很棒' : s >= 7 ? '很好' : '好';
-  const AREAS = ['みつせ', '紫市', '戸宮', '九里橋', '勝守', '汐崎', '白藏山', '北倉間'];
+  let PL = null;
+  const norm = t => String(t).toLowerCase().replace(/\s+/g, '').replace(/[瀬]/g, '瀨').replace(/蔵/g, '藏').replace(/澤/g, '沢').replace(/萬/g, '万').replace(/温/g, '溫').replace(/旧/g, '舊').replace(/駅|站$/g, '');
+  const dName = id => { const d = PL.dis[id]; return d ? d.zh : ''; };
+  function indexPlaces() {
+    const p = DB.places;
+    PL = { dis: {}, reg: {}, st: {}, sg: {} };
+    p.districts.forEach(d => PL.dis[d.id] = d);
+    p.regions.forEach(r => PL.reg[r.id] = r);
+    p.stations.forEach(x => PL.st[x.name] = x);
+    p.sights.forEach(x => PL.sg[x.id] = x);
+    DB.hotels.forEach(h => { if (!PL.st[h.station]) PL.st[h.station] = { name: h.station, district: h.district, pos: null }; });
+  }
+  function distTo(h, t) {
+    if (!t) return null;
+    if (t.type === 's') {
+      if (h.station === t.name) return h.dist;
+      const m = h.marks.find(m => m.type === 'station' && m.ref === t.name); if (m) return m.dist;
+      const st = PL.st[t.name];
+      return st && st.pos && h.pos ? Math.round(Math.hypot(st.pos[0] - h.pos[0], st.pos[1] - h.pos[1]) / 10) * 10 : null;
+    }
+    if (t.type === 'l') {
+      const m = h.marks.find(m => m.type === 'sight' && m.ref === t.id); if (m) return m.dist;
+      const sg = PL.sg[t.id];
+      return sg && sg.pos && h.pos ? Math.round(Math.hypot(sg.pos[0] - h.pos[0], sg.pos[1] - h.pos[1]) / 10) * 10 : null;
+    }
+    return null;
+  }
+  const NEAR_ST = 1500, NEAR_SG = 2000;
+  function target(code) {
+    if (!code) return null;
+    const i = code.indexOf(':'), k = code.slice(0, i), v = code.slice(i + 1);
+    if (k === 'd' && PL.dis[v]) return { type: 'd', id: v, label: PL.dis[v].zh };
+    if (k === 'r' && PL.reg[v]) return { type: 'r', id: v, label: PL.reg[v].zh };
+    if (k === 's' && PL.st[v]) return { type: 's', name: v, label: v + '站' };
+    if (k === 'l' && PL.sg[v]) return { type: 'l', id: v, label: PL.sg[v].name };
+    if (k === 'k') return { type: 'k', text: v, label: '「' + v + '」' };
+    const legacy = DB.hotels.find(h => h.area === code);
+    if (legacy) return { type: 'd', id: legacy.district, label: dName(legacy.district) };
+    return { type: 'k', text: code, label: '「' + code + '」' };
+  }
+  function inTarget(h, t) {
+    if (!t) return true;
+    if (t.type === 'd') return h.district === t.id;
+    if (t.type === 'r') return PL.dis[h.district] && PL.dis[h.district].region === t.id;
+    if (t.type === 's') { const d = distTo(h, t); return h.station === t.name || (d != null && d <= NEAR_ST); }
+    if (t.type === 'l') { const d = distTo(h, t); return h.district === PL.sg[t.id].district || (d != null && d <= NEAR_SG); }
+    const q = norm(t.text);
+    return [h.name, h.area, h.station, dName(h.district)].some(x => norm(x).includes(q));
+  }
+  function suggest(text) {
+    const q = norm(text); if (!q) return [];
+    const hit = s => norm(s).includes(q);
+    const cnt = t => DB.hotels.filter(h => inTarget(h, t)).length;
+    const out = [];
+    const regs = DB.places.regions.filter(r => hit(r.zh) || hit(r.ja)).map(r => ({ g: '地區', code: 'r:' + r.id, t: r.zh, sub: '地方', n: cnt({ type: 'r', id: r.id }) }));
+    const dis = DB.places.districts.filter(d => hit(d.zh) || hit(d.ja)).map(d => ({ g: '地區', code: 'd:' + d.id, t: d.zh, sub: PL.reg[d.region] ? PL.reg[d.region].zh : '', n: cnt({ type: 'd', id: d.id }) }));
+    out.push(...regs, ...dis);
+    out.push(...Object.values(PL.st).filter(x => hit(x.name)).map(x => ({ g: '車站', code: 's:' + x.name, t: x.name + '站', sub: dName(x.district), n: cnt({ type: 's', name: x.name }) })).sort((a, b) => b.n - a.n).slice(0, 5));
+    out.push(...DB.places.sights.filter(x => hit(x.name) || hit(x.tag)).map(x => ({ g: '地標・景點', code: 'l:' + x.id, t: x.name, sub: dName(x.district) + '・' + x.station + '站', n: cnt({ type: 'l', id: x.id }) })).slice(0, 5));
+    out.push(...DB.hotels.filter(h => hit(h.name)).map(h => ({ g: '住宿', code: 'h:' + h.id, t: h.name, sub: dName(h.district) + '・' + h.area, n: -1 })).slice(0, 5));
+    return out;
+  }
 
   /* 日期與固定種子的亂數：同一間房、同一天，每次打開都一樣 */
   const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -196,35 +271,66 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
 
   /* 搜尋列 */
   function searchBar(q, inline) {
-    const opts = ['<option value="">光瀨全區</option>'].concat(AREAS.map(a => `<option value="${a}"${q.area === a ? ' selected' : ''}>${a}</option>`)).join('');
+    const t = target(q.area), lab = t ? (t.type === 'k' ? t.text : t.label) : '';
     const num = (n, from, to, unit) => Array.from({ length: to - from + 1 }, (_, i) => from + i).map(v => `<option value="${v}"${v === n ? ' selected' : ''}>${v} ${unit}</option>`).join('');
     return `<form class="search${inline ? ' inline' : ''}" id="sf">
-      <label class="dest">目的地<select name="area" aria-label="目的地">${opts}</select></label>
+      <label class="dest">目的地<input name="dest" type="search" value="${esc(lab)}" placeholder="地區、車站、景點或住宿名稱" autocomplete="off" aria-label="目的地" role="combobox" aria-expanded="false" aria-controls="sugg"><input type="hidden" name="area" value="${esc(q.area)}"><div class="sugg" id="sugg" role="listbox" hidden></div></label>
       <label>入住日期<input type="date" name="in" value="${q.in}" aria-label="入住日期"></label>
       <label>退房日期<input type="date" name="out" value="${q.out}" aria-label="退房日期"></label>
       <label>人數與房間<span class="guests"><select name="adults" aria-label="大人">${num(q.adults, 1, 8, '位大人')}</select><select name="rooms" aria-label="房間數">${num(q.rooms, 1, 4, '間')}</select></span></label>
       <button class="go" type="submit">搜尋</button></form>`;
   }
-  function bindSearch(target) {
+  function bindSearch(where) {
     const f = $('#sf'); if (!f) return;
+    const inp = f.dest, box = $('#sugg'), hid = f.area;
+    let items = [], sel = -1;
+    const close = () => { box.hidden = true; inp.setAttribute('aria-expanded', 'false'); sel = -1; };
+    const render = () => {
+      items = suggest(inp.value);
+      if (!items.length) { box.innerHTML = inp.value.trim() ? '<div class="sg-empty">找不到符合的地點，按搜尋會用關鍵字找住宿</div>' : ''; box.hidden = !inp.value.trim(); return; }
+      let g = '';
+      box.innerHTML = items.map((x, i) => (x.g !== g ? `<div class="sg-g">${g = x.g}</div>` : '') + `<div class="sg-i${i === sel ? ' on' : ''}" role="option" data-i="${i}"><span class="sg-ic">${{ '地區': '🗺', '車站': '🚉', '地標・景點': '📍', '住宿': '🏨' }[x.g]}</span><span class="sg-t"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.n >= 0 ? `<span class="sg-n">${x.n} 間</span>` : ''}</div>`).join('');
+      box.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    };
+    const pick = i => {
+      const x = items[i]; if (!x) return;
+      if (x.code.startsWith('h:')) { const q = readQ(new URLSearchParams(new FormData(f))); go(`#/hotel/${x.code.slice(2)}?${qs(q, { area: '' })}`); return; }
+      hid.value = x.code; inp.value = x.t; close();
+    };
+    inp.addEventListener('input', () => { hid.value = ''; sel = -1; render(); });
+    inp.addEventListener('focus', () => { if (inp.value.trim() && !hid.value) render(); });
+    inp.addEventListener('keydown', e => {
+      if (box.hidden || !items.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); sel = (sel + 1) % items.length; render(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); sel = (sel - 1 + items.length) % items.length; render(); }
+      else if (e.key === 'Enter' && sel >= 0) { e.preventDefault(); pick(sel); }
+      else if (e.key === 'Escape') close();
+    });
+    box.addEventListener('mousedown', e => { const el = e.target.closest('[data-i]'); if (el) { e.preventDefault(); pick(+el.dataset.i); } });
+    document.addEventListener('click', e => { if (!f.contains(e.target)) close(); });
     f.addEventListener('submit', e => {
       e.preventDefault();
+      if (!hid.value && inp.value.trim()) {
+        const s = suggest(inp.value);
+        if (s.length && s[0].code.startsWith('h:')) { pick(0); return; }
+        hid.value = s.length ? s[0].code : 'k:' + inp.value.trim();
+      }
       const q = readQ(new URLSearchParams(new FormData(f)));
-      go((target === 'hotel' ? cur.split('?')[0] : '#/search') + '?' + qs(Object.assign(q, { area: f.area.value })));
+      go((where === 'hotel' ? cur.split('?')[0] : '#/search') + '?' + qs(Object.assign(q, { area: inp.value.trim() ? hid.value : '' })));
     });
   }
 
   /* 首頁 */
   function viewHome() {
     const q = readQ(new URLSearchParams());
-    const byArea = AREAS.map(a => ({ a, hs: DB.hotels.filter(h => h.area === a) })).filter(x => x.hs.length);
-    const pick = [...DB.hotels].sort((a, b) => b.stars - a.stars || b.score - a.score).slice(0, 4);
+    const byArea = DB.places.districts.map(d => ({ d, hs: DB.hotels.filter(h => h.district === d.id) })).filter(x => x.hs.length).sort((a, b) => b.hs.filter(h => h.ext).length - a.hs.filter(h => h.ext).length || b.hs.length - a.hs.length).slice(0, 8);
+    const pick = DB.hotels.filter(h => h.ext).sort((a, b) => b.stars - a.stars || b.score - a.score).slice(0, 4);
     app.innerHTML = `<section class="hero"><div class="wrap"><h1>在光瀨找到下一個落腳處</h1><p>車站旁的商務旅館、景觀飯店到設計旅店，一次比較。</p></div></section>
       <div class="wrap">${searchBar(q)}
       <h2 class="sec">熱門地區</h2><p class="secsub">依車站周邊瀏覽住宿</p>
-      <div class="areas">${byArea.map(x => `<a class="area" href="#/search?${qs(q, { area: x.a })}"><img src="${x.hs[0].thumb}" alt=""><div><b>${x.a}</b><span>${x.hs.length} 間住宿</span></div></a>`).join('')}</div>
+      <div class="areas">${byArea.map(x => `<a class="area" href="#/search?${qs(q, { area: 'd:' + x.d.id })}"><img src="${(x.hs.find(h => h.ext) || x.hs[0]).thumb}" alt=""><div><b>${x.d.zh}</b><span>${x.hs.length} 間住宿</span></div></a>`).join('')}</div>
       <h2 class="sec">精選住宿</h2><p class="secsub">評價與星級都很亮眼的選擇</p>
-      <div class="cards">${pick.map(h => { const c = cheapest(h, q); return `<a class="hcard" href="#/hotel/${h.id}?${qs(q)}"><img src="${h.thumb}" alt="${esc(h.name)}的外觀"><div class="b"><span class="nm">${esc(h.name)}</span><span class="stars" aria-label="${h.stars} 星">${starStr(h.stars)}</span><span class="ar">${h.area}・距${h.station}站 ${h.dist} 公尺</span><span class="score"><b>${h.score.toFixed(1)}</b>${scoreLabel(h.score)}</span><span class="pr">${c ? '最低 <b>' + yen(c.total) + '</b>' : '這天客滿'}</span></div></a>`; }).join('')}</div>
+      <div class="cards">${pick.map(h => { const c = cheapest(h, q); return `<a class="hcard" href="#/hotel/${h.id}?${qs(q)}"><img src="${h.thumb}" alt="${esc(h.name)}的外觀"><div class="b"><span class="nm">${esc(h.name)}</span><span class="stars" aria-label="${h.stars} 星">${starStr(h.stars)}</span><span class="ar">${dName(h.district)}・距${h.station}站 ${h.dist} 公尺</span><span class="score"><b>${h.score.toFixed(1)}</b>${scoreLabel(h.score)}</span><span class="pr">${c ? '最低 <b>' + yen(c.total) + '</b>' : '這天客滿'}</span></div></a>`; }).join('')}</div>
       </div>`;
     bindSearch();
   }
@@ -235,8 +341,10 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
   const BUDGETS = [['', '不限'], ['0-10000', '¥10,000 以下'], ['10000-20000', '¥10,000～20,000'], ['20000-40000', '¥20,000～40,000'], ['40000-999999', '¥40,000 以上']];
   function viewSearch(params) {
     const q = readQ(params);
-    const base = DB.hotels.filter(h => !q.area || h.area === q.area);
-    const rows = base.map(h => ({ h, c: cheapest(h, q) }));
+    const t = target(q.area), near = t && (t.type === 's' || t.type === 'l');
+    const base = DB.hotels.filter(h => inTarget(h, t));
+    const rows = base.map(h => ({ h, c: cheapest(h, q), d: near ? distTo(h, t) : null }));
+    const sortK = F.touched ? F.sort : near ? 'dist' : 'rec';
     const per = r => r.c ? r.c.total / q.nights / q.rooms : Infinity;
     let list = rows.filter(({ h, c }) => {
       if (F.stars.size && !F.stars.has(h.stars)) return false;
@@ -245,36 +353,36 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
       if (F.near && h.dist > +F.near) return false;
       return true;
     });
-    const S = { rec: (a, b) => (b.h.score * 10 + b.h.stars * 4 - b.h.dist / 100) - (a.h.score * 10 + a.h.stars * 4 - a.h.dist / 100), price: (a, b) => per(a) - per(b), dist: (a, b) => a.h.dist - b.h.dist, stars: (a, b) => b.h.stars - a.h.stars || b.h.score - a.h.score, score: (a, b) => b.h.score - a.h.score };
-    list.sort(S[F.sort]);
+    const S = { rec: (a, b) => (b.h.score * 10 + b.h.stars * 4 - b.h.dist / 100) - (a.h.score * 10 + a.h.stars * 4 - a.h.dist / 100), price: (a, b) => per(a) - per(b), dist: near ? (a, b) => (a.d == null ? 1e9 : a.d) - (b.d == null ? 1e9 : b.d) : (a, b) => a.h.dist - b.h.dist, stars: (a, b) => b.h.stars - a.h.stars || b.h.score - a.h.score, score: (a, b) => b.h.score - a.h.score };
+    list.sort(S[sortK]);
     const cnt = (fn) => rows.filter(fn).length;
-    const sortBtn = (k, t) => `<button type="button" data-sort="${k}" aria-pressed="${F.sort === k}">${t}</button>`;
+    const sortBtn = (k, t) => `<button type="button" data-sort="${k}" aria-pressed="${sortK === k}">${t}</button>`;
     app.innerHTML = `<div class="wrap">${searchBar(q, true)}
-      <p class="crumb"><a href="#/">首頁</a> › ${q.area ? esc(q.area) : '光瀨全區'} › 搜尋結果</p>
+      <p class="crumb"><a href="#/">首頁</a> › ${t ? esc(t.label) : '光瀨全區'} › 搜尋結果</p>
       <div class="layout"><aside class="filters" aria-label="篩選條件"><h3>篩選條件</h3>
         <fieldset><legend>星級</legend>${[5, 4, 3].map(s => `<label><input type="checkbox" data-star="${s}"${F.stars.has(s) ? ' checked' : ''}> <span class="stars" style="margin:0;font-size:14px;color:var(--amber)">${starStr(s)}</span><span>${cnt(r => r.h.stars === s)}</span></label>`).join('')}</fieldset>
         <fieldset><legend>每晚預算（每間）</legend>${BUDGETS.map(([v, t]) => `<label><input type="radio" name="bud" value="${v}"${F.budget === v ? ' checked' : ''}> ${t}</label>`).join('')}</fieldset>
         <fieldset><legend>設施與方案</legend>${FACS.map(([f]) => `<label><input type="checkbox" data-fac="${f}"${F.fac.has(f) ? ' checked' : ''}> ${f}</label>`).join('')}</fieldset>
         <fieldset><legend>距離車站</legend>${[['', '不限'], ['100', '100 公尺以內'], ['300', '300 公尺以內'], ['500', '500 公尺以內']].map(([v, t]) => `<label><input type="radio" name="near" value="${v}"${F.near === v ? ' checked' : ''}> ${t}</label>`).join('')}</fieldset>
       </aside>
-      <section><div class="reshead"><h1>${q.area ? esc(q.area) + '：' : ''}找到 ${list.length} 間住宿</h1>
-        <div class="sorts" role="group" aria-label="排序">${sortBtn('rec', '推薦')}${sortBtn('price', '價格最低')}${sortBtn('dist', '距車站最近')}${sortBtn('stars', '星級')}${sortBtn('score', '評分最高')}</div></div>
-        ${list.length ? list.map(({ h, c }) => resCard(h, c, q)).join('') : '<div class="empty">沒有符合條件的住宿，試試放寬篩選條件。</div>'}
+      <section><div class="reshead"><h1>${t ? esc(t.label) + '：' : ''}找到 ${list.length} 間住宿</h1>${near ? `<p class="small" style="flex-basis:100%;order:3;margin:-6px 0 0">${t.type === 'l' ? `${esc(dName(PL.sg[t.id].district))}的住宿，以及距離 ${esc(t.label)} ${NEAR_SG / 1000} 公里內的住宿` : `距離 ${esc(t.label)} ${NEAR_ST / 1000} 公里內的住宿`}，距離為直線距離估算</p>` : ''}
+        <div class="sorts" role="group" aria-label="排序">${sortBtn('rec', '推薦')}${sortBtn('price', '價格最低')}${sortBtn('dist', near ? '距' + esc(t.label) + '最近' : '距車站最近')}${sortBtn('stars', '星級')}${sortBtn('score', '評分最高')}</div></div>
+        ${list.length ? list.map(({ h, c, d }) => resCard(h, c, q, near ? { label: t.label, d, ref: t.type === 's' ? t.name : t.id } : null)).join('') : '<div class="empty">沒有符合條件的住宿，試試放寬篩選條件。</div>'}
       </section></div></div>`;
     bindSearch();
     app.querySelectorAll('[data-star]').forEach(el => el.onchange = () => { const s = +el.dataset.star; el.checked ? F.stars.add(s) : F.stars.delete(s); viewSearch(params); });
     app.querySelectorAll('[data-fac]').forEach(el => el.onchange = () => { el.checked ? F.fac.add(el.dataset.fac) : F.fac.delete(el.dataset.fac); viewSearch(params); });
     app.querySelectorAll('input[name=bud]').forEach(el => el.onchange = () => { F.budget = el.value; viewSearch(params); });
     app.querySelectorAll('input[name=near]').forEach(el => el.onchange = () => { F.near = el.value; viewSearch(params); });
-    app.querySelectorAll('[data-sort]').forEach(el => el.onclick = () => { F.sort = el.dataset.sort; viewSearch(params); });
+    app.querySelectorAll('[data-sort]').forEach(el => el.onclick = () => { F.sort = el.dataset.sort; F.touched = true; viewSearch(params); });
   }
-  function resCard(h, c, q) {
+  function resCard(h, c, q, tg) {
     const url = `#/hotel/${h.id}?${qs(q)}`;
     const marks = h.marks.map(m => `距${esc(m.name)} ${m.dist} 公尺`).join('・');
     const hl = [h.fac[0], h.fac[1]].filter(Boolean);
-    return `<article class="res"><a href="${url}"><img src="${h.thumb}" alt="${esc(h.name)}的外觀" loading="lazy"></a>
+    return `<article class="res"><a href="${url}" class="ph"><img src="${h.thumb}" alt="${esc(h.name)}${h.ext ? '的外觀' : '的客房示意圖'}" loading="lazy">${h.ext ? '' : '<span class="illu">客房示意圖</span>'}</a>
       <div><h2><a href="${url}">${esc(h.name)}</a> <span class="stars" aria-label="${h.stars} 星">${starStr(h.stars)}</span></h2>
-        <div class="meta"><a href="#/search?${qs(q, { area: h.area })}">${h.area}</a><span>距${h.station}站 ${h.dist} 公尺${h.note ? '（' + esc(h.note) + '）' : ''}</span>${marks ? `<span>${marks}</span>` : ''}</div>
+        <div class="meta"><span><a href="#/search?${qs(q, { area: 'd:' + h.district })}">${dName(h.district)}</a>・<a href="#/search?${qs(q, { area: 's:' + h.station })}">${esc(h.area)}</a></span>${tg && tg.d != null && h.station !== tg.ref && !h.marks.some(m => m.ref === tg.ref) ? `<span class="near">📍 距${esc(tg.label)}約 ${tg.d >= 1000 ? (tg.d / 1000).toFixed(1) + ' 公里' : tg.d + ' 公尺'}</span>` : ''}<span>距${h.station}站 ${h.dist} 公尺${h.note ? '（' + esc(h.note) + '）' : ''}</span>${marks ? `<span>${marks}</span>` : ''}</div>
         <p style="margin:8px 0 6px"><span class="tag">${h.kind}</span>${c ? `<b style="font-size:14px">${esc(c.room.name)}</b>` : ''}</p>
         ${c ? `<div class="small">${esc(c.room.beds)}・${c.room.size} m²</div>` : ''}
         ${hl.map(x => `<div class="ok">✓ ${esc(x)}</div>`).join('')}
@@ -287,28 +395,29 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
   function viewHotel(id, params) {
     const h = DB.hotels.find(x => x.id === id); if (!h) { app.innerHTML = '<div class="wrap"><p class="empty">找不到這間住宿。</p></div>'; return; }
     const q = readQ(params);
-    q.area = h.area;
+    q.area = 'd:' + h.district;
     const rows = h.rooms.map(r => {
       const ok = fits(r, q);
       return r.plans.map((p, i) => {
         const x = quote(r, p, q), max = ok ? Math.min(x.left, 5) : 0;
-        return `<tr>${i === 0 ? `<td rowspan="${r.plans.length}"><div class="rn">${esc(r.name)}</div><div>${esc(r.beds)}</div><div class="small">${r.size} m²・${esc(r.view)}・禁菸</div><div class="am">${r.amen.map(esc).join('・')}</div></td><td rowspan="${r.plans.length}">${'👤'.repeat(Math.min(r.cap, 5))}<div class="small">最多 ${r.cap} 人</div></td>` : ''}
+        return `<tr>${i === 0 ? `<td rowspan="${r.plans.length}"><img class="rimg" src="${r.img}" alt="" loading="lazy"><div class="rn">${esc(r.name)}</div><div>${esc(r.beds)}</div><div class="small">${r.size} m²・${esc(r.view)}・禁菸</div><div class="am">${r.amen.map(esc).join('・')}</div></td><td rowspan="${r.plans.length}">${'👤'.repeat(Math.min(r.cap, 5))}<div class="small">最多 ${r.cap} 人</div></td>` : ''}
           <td class="pl"><b>${esc(p.name)}</b><span class="${p.refund === '不可退款' ? 'small' : 'ok'}">${esc(p.refund)}</span>${x.left && x.left <= 3 ? `<div class="warn">只剩 ${x.left} 間</div>` : ''}</td>
           <td class="pc"><span class="price" style="font-size:18px">${x.left ? yen(x.total) : '—'}</span><div class="small">${q.nights} 晚・每間・含稅</div></td>
           <td>${!ok ? `<span class="small">不適合 ${Math.ceil(q.adults / q.rooms)} 人入住</span>` : !x.left ? '<span class="warn">客滿</span>' : `<select data-room="${r.id}" data-plan="${i}" data-price="${x.total}" aria-label="${esc(r.name)} ${esc(p.name)} 間數">${Array.from({ length: max + 1 }, (_, n) => `<option value="${n}">${n}${n ? '（' + yen(x.total * n) + '）' : ''}</option>`).join('')}</select>`}</td></tr>`;
       }).join('');
     }).join('');
     app.innerHTML = `<div class="wrap">${searchBar(q, true)}
-      <p class="crumb"><a href="#/">首頁</a> › <a href="#/search?${qs(q)}">${h.area}</a> › ${esc(h.name)}</p>
+      <p class="crumb"><a href="#/">首頁</a> › <a href="#/search?${qs(q)}">${dName(h.district)}</a> › ${esc(h.name)}</p>
       <div class="hhead"><div><span class="tag">${h.kind}</span> <span class="stars" aria-label="${h.stars} 星">${starStr(h.stars)}</span><h1>${esc(h.name)}</h1>
-        <div class="addr">📍 ${h.area}・距${h.station}站 ${h.dist} 公尺${h.note ? '（' + esc(h.note) + '）' : ''}${h.marks.map(m => `・距${esc(m.name)} ${m.dist} 公尺`).join('')}</div></div>
+        <div class="addr">📍 ${dName(h.district)}${h.area !== h.station ? '・' + esc(h.area) : ''}・距${h.station}站 ${h.dist} 公尺${h.note ? '（' + esc(h.note) + '）' : ''}${h.marks.map(m => `・距${esc(m.name)} ${m.dist} 公尺`).join('')}</div></div>
         <span class="sp"></span><a class="btn noprint" href="" data-scroll>預訂房間</a></div>
-      <div class="gallery"><img class="main" src="${h.photo}" alt="${esc(h.name)}的外觀">
+      <div class="gallery"><div class="gmain"><img class="main" src="${h.photo}" alt="${esc(h.name)}${h.ext ? '的外觀' : '的客房示意圖'}">${h.ext ? '' : '<span class="illu">客房示意圖</span>'}</div>
         <div class="infobox"><span class="score" style="font-size:15px"><b style="font-size:18px">${h.score.toFixed(1)}</b>${scoreLabel(h.score)}</span>
           <div><b>${esc(h.desc)}</b></div>
           <div class="small">入住 ${h.ci} 以後・退房 ${h.co} 以前</div>
           <div>${h.fac.slice(0, 4).map(f => `<div class="ok">✓ ${esc(f)}</div>`).join('')}</div>
           <a class="btn block" href="" data-scroll>查看空房</a></div></div>
+      <div class="rthumbs">${[...new Map(h.rooms.map(r => [r.img, r])).values()].map(r => `<figure><img src="${r.img}" alt="${esc(r.name)}的示意圖" loading="lazy"><figcaption>${esc(r.name)}</figcaption></figure>`).join('')}</div>
       <h2 class="sec">熱門設施</h2><div class="facs">${h.fac.map(f => `<span>${esc(f)}</span>`).join('')}</div>
       <h2 class="sec" id="rooms">空房情況</h2><p class="secsub">${fmtDate(q.in)} → ${fmtDate(q.out)}・${q.nights} 晚・${q.adults} 位大人・${q.rooms} 間</p>
       <div class="layout" style="grid-template-columns:1fr 200px;margin-top:8px"><div style="overflow-x:auto"><table class="rooms">
@@ -339,7 +448,7 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
     const total = ps.reduce((s, x) => s + quote(x.r, x.p, q).total * x.n, 0);
     app.innerHTML = `<div class="wrap"><p class="crumb"><a href="#/">首頁</a> › <a href="#/hotel/${h.id}?${qs(q)}">${esc(h.name)}</a> › 填寫資料</p>
       <div class="bookgrid"><div>
-        <div class="box"><span class="stars">${starStr(h.stars)}</span><h3>${esc(h.name)}</h3><div class="small">${h.area}・距${h.station}站 ${h.dist} 公尺</div></div>
+        <div class="box"><span class="stars">${starStr(h.stars)}</span><h3>${esc(h.name)}</h3><div class="small">${dName(h.district)}・距${h.station}站 ${h.dist} 公尺</div></div>
         <div class="box"><h3>預訂內容</h3><div><b>入住</b> ${fmtDate(q.in)}　${h.ci} 以後</div><div><b>退房</b> ${fmtDate(q.out)}　${h.co} 以前</div><div class="small">共 ${q.nights} 晚・${q.adults} 位大人</div>
           <hr style="border:0;border-top:1px solid var(--line)">${ps.map(x => `<div>${x.n} × ${esc(x.r.name)}<div class="small">${esc(x.p.name)}・${esc(x.p.refund)}</div></div>`).join('')}</div>
         <div class="box" style="background:#eef4fc"><h3>價格</h3><div class="price">${yen(total)}</div><div class="small">含稅費・入住時於櫃台付款（虛構）</div></div>
@@ -366,7 +475,7 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
     const h = DB.hotels.find(x => x.id === rec.hotel);
     return `<div class="voucher"><div class="vh"><b>YADORI 宿り</b><span>住宿憑證</span><span class="sp"></span><span class="code">${rec.code}</span></div>
       <div class="vb"><img src="${h.thumb}" alt=""><dl>
-        <dt>住宿</dt><dd>${esc(h.name)}　${starStr(h.stars)}</dd><dt>地點</dt><dd>${h.area}・距${h.station}站 ${h.dist} 公尺</dd>
+        <dt>住宿</dt><dd>${esc(h.name)}　${starStr(h.stars)}</dd><dt>地點</dt><dd>${dName(h.district)}・距${h.station}站 ${h.dist} 公尺</dd>
         <dt>入住</dt><dd>${fmtDate(rec.in)}　${h.ci} 以後（預計 ${esc(rec.eta)}）</dd><dt>退房</dt><dd>${fmtDate(rec.out)}　${h.co} 以前</dd>
         <dt>住客</dt><dd>${esc(rec.name)}　大人 ${rec.adults} 位・${rec.nights} 晚</dd>
         <dt>客房</dt><dd>${rec.items.map(x => `${x.n} × ${esc(x.room)}（${esc(x.plan)}）`).join('<br>')}</dd>
@@ -410,7 +519,7 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
     else if (seg[0] === 'mine') viewMine();
     else viewHome();
   }
-  fetch('data/hotels.json').then(r => r.json()).then(d => { DB = d; route(); }).catch(() => { app.innerHTML = '<div class="wrap"><p class="empty">住宿資料載入失敗。</p></div>'; });
+  fetch('data/hotels.json').then(r => r.json()).then(d => { DB = d; indexPlaces(); route(); }).catch(() => { app.innerHTML = '<div class="wrap"><p class="empty">住宿資料載入失敗。</p></div>'; });
 })();
 </script>
 </body>
