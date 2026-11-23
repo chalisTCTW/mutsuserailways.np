@@ -215,7 +215,7 @@
           h('div', null, h('dt', null, '全程所要時間'), h('dd', null, totals.length > 1 ? `約 ${totals[0]}～${totals[totals.length - 1]} 分` : `約 ${totals[0]} 分`)),
           h('div', null, h('dt', null, '首班／末班'), h('dd', null, allT.length ? (fl => `${hm(fl[0])}／${hm(fl[1])}（${H.stName(st[0].station)} 發車）`)(H.firstLast(allT)) : '本日無班次')),
           h('div', null, h('dt', null, '本日班次'), h('dd', null, `${allT.length} 班`)),
-          h('div', null, h('dt', null, '編組'), h('dd', null, `${cars} 両編成${ri ? '・' + ri : ''}`)))));
+          h('div', null, h('dt', null, '編組'), h('dd', null, `${H.carsLabel(sv)}${ri ? '・' + ri : ''}`)))));
       if (dirs.length > 1) out.append(h('div', { class: 'dirs', role: 'group', 'aria-label': '方向' }, dirs.map((v, k) => h('button', { type: 'button', 'aria-pressed': String(k === di), onclick: () => setDi(k) }, v.label))));
       if (g.routes.size > 1) out.append(h('p', { class: 'note' }, `合併顯示：${[...g.routes].join('、')}。`));
 

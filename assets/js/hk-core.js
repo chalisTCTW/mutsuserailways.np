@@ -14,7 +14,8 @@
     seatsPerCar: 40,               // 2100 形每節座位數（2+2）
     // 指定席政策（0.21.0）：特急＝全車指定席（另有立席特急券）；特快＝1・2 号車指定席、3 号車以後自由席。1 号車＝進行方向最前端。
     // 2.14.0：花川本線快速・環狀快速 8 輛編組，4・5 号車指定席（reservedList＝指定席車廂號碼），規則比照特快（不收自由席費、沒有立席特急券）。
-    reserved: [{ re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }, { re: '花川本線快速|環[状狀]快速', cars: 8, mode: 'part', reservedList: [4, 5] }],
+    // 2.15.0：快速只有 8 輛編組的班次有 4・5 号車指定席（minCars），6 輛的不開放訂位；輛數本身改用快照的實際編組。
+    reserved: [{ re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }, { re: '花川本線快速|環[状狀]快速', cars: 8, mode: 'part', reservedList: [4, 5], minCars: 8 }],
     standRatio: 0.5,               // 立席特急券＝指定席費用的比例
     // 1.1.0：高速鐵路（routeType＝HIGH_SPEED）獨立票價制度，不套用一般的分區運費與 CFG.reserved：
     // 票價＝hsFareStep × 跨越的收費區數（沿用一般鐵路同一套分區；至少算跨 1 區）；全車指定席、沒有立席特急券，
@@ -90,7 +91,28 @@
     const dump = snapshot.data || snapshot.dump || snapshot;
     const net = A.buildNetwork(dump, {});
     if (snapshot.schedule && A.calibrate) A.calibrate(net, snapshot.schedule);
-    return index(net, dump, snapshot.dispatch);
+    const H = index(net, dump, snapshot.dispatch);
+    H.formMap = formations(dump, snapshot.schedule);
+    return H;
+  }
+  /**
+   * 2.15.0：每班的實際編組（輛數）——從快照的班表（schedule.sidings：每條側線跑哪些路線）對到側線上放的車（data.sidings[].vehicleCars）。
+   * key＝「車庫id|MTR路線id」與「*|MTR路線id」，值＝排序過、不重複的輛數（0 輛的空側線不算）。
+   * 前輩在遊戲裡換車後下 /atos site publish now，網站就跟著遊戲裡實際放的車走。
+   */
+  function formations(dump, schedule) {
+    const out = new Map();
+    if (!schedule || !schedule.sidings || !dump || !dump.sidings) return out;
+    const carsOf = new Map(dump.sidings.map(x => [String(x.id), (x.vehicleCars || []).length]));
+    const add = (k, n) => { if (!out.has(k)) out.set(k, new Set()); out.get(k).add(n); };
+    for (const x of schedule.sidings) {
+      const n = carsOf.get(String(x.siding)) || 0;
+      if (n <= 0) continue;
+      for (const t of (x.trips || [])) { add(String(x.depot) + '|' + String(t.route), n); add('*|' + String(t.route), n); }
+    }
+    const res = new Map();
+    out.forEach((v, k) => res.set(k, [...v].sort((a, b) => a - b)));
+    return res;
   }
 
   /* ───────── 調度（離峰・深夜・收車）─────────
@@ -244,7 +266,7 @@
         || lrtNames.has(route.displayZh || '') || lrtNames.has(route.zh || '') || lrtNames.has(nm.line || ''));
       // 1.1.0：高速鉄道的 tcls 固定給 'hs'（不是一般的 ltd／exp／loc），這樣共用的 .ttag／.mk 樣式才會套到專屬的識別色，
       // 不會被誤判成各停（loc）而顯示成灰框。
-      svcs.push({ idx, isLRT, stops: s.stops.filter(x => !x.op && !hideIds.has(x.station)),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
+      svcs.push({ idx, isLRT, stops: s.stops.filter(x => !x.op && !hideIds.has(x.station)),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], depotId: String(s.depot), mid: String(s.member), member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
     });
     H.svcs = svcs;
     /* 2.3.0：H.edges／L.paths 裡的 svcs 存的是 net.services 的索引（sv.idx），不是 H.svcs 的陣列位置。
@@ -938,8 +960,12 @@
         out = { mode: 'all', cars, reservedCars: cars, seats, fee: CFG.hsSeatFee, bizFee: CFG.hsBusinessFee, bizCars: biz, carSeats, standFee: 0, noStanding: true, perCar: CFG.seatsPerCar, edgeCarSeats: edge };
       } else {
         for (const r of CFG.reserved) if (new RegExp(r.re).test(sv.routeName)) {
-          const rc = r.mode === 'part' ? (r.reservedList ? r.reservedList.length : r.reservedCars) : r.cars;
-          out = { mode: r.mode || 'all', cars: r.cars, reservedCars: rc, seats: rc * CFG.seatsPerCar, fee: CFG.seatFee, standFee: r.mode === 'part' ? 0 : Math.round(CFG.seatFee * CFG.standRatio), perCar: CFG.seatsPerCar };
+          // 2.15.0：編組用這班實際的輛數（快照沒有資料才用規則裡的 cars）；指定席車廂超出實際輛數（例如 6 輛的快速沒有 4・5 号車以外…）就不開放訂位
+          const real = H.formOf(sv), cars = real ? real[0] : r.cars;
+          let rc = r.mode === 'part' ? (r.reservedList ? r.reservedList.length : r.reservedCars) : cars;
+          if (r.mode === 'part' && r.reservedList && r.minCars && cars < r.minCars) break;
+          if (r.mode === 'part' && (r.reservedList ? Math.max(...r.reservedList) : r.reservedCars) > cars) break;
+          out = { mode: r.mode || 'all', cars, reservedCars: rc, seats: rc * CFG.seatsPerCar, fee: CFG.seatFee, standFee: r.mode === 'part' ? 0 : Math.round(CFG.seatFee * CFG.standRatio), perCar: CFG.seatsPerCar };
           if (r.reservedList) out.rList = r.reservedList.slice();
           break;
         }
@@ -952,8 +978,19 @@
     H.reserveLabel = function (sv) { const ri = H.reserveInfo(sv); if (!ri) return ''; if (ri.mode === 'all') return '全車指定席'; if (!ri.head) return ri.rList.join('・') + '号車指定席／其他車廂自由席'; return (ri.reservedCars === 1 ? '1号車' : '1・' + ri.reservedCars + '号車') + '指定席／' + (ri.reservedCars + 1) + '号車以後自由席'; };
     /** 2.14.0：自由席車廂的說明（3号車以後／4・5号車以外）。 */
     H.freeCarsText = function (ri) { return ri.head ? (ri.reservedCars + 1) + '号車以後' : ri.rList.join('・') + '号車以外'; };
-    /** 編組節數（顯示用）：指定席種別依規定；其他用車庫內有出庫路徑的側線的編組。 */
+    /** 2.15.0：這班的實際編組（排序過的輛數陣列；多半只有一種）。快照沒有資料（例如高速鉄道的虛擬延伸）回傳 null。 */
+    H.formOf = function (sv) {
+      if (!sv || !H.formMap || !sv.mid) return null;
+      return H.formMap.get(sv.depotId + '|' + sv.mid) || H.formMap.get('*|' + sv.mid) || null;
+    };
+    /** 2.15.0：編組的顯示文字：「8 輛編組」；同一班可能是不同輛數時「6・8 輛編組」。 */
+    H.carsLabel = function (sv) {
+      const f = H.formOf(sv);
+      return (f && f.length > 1 ? f.join('・') : String(H.carsOf(sv))) + ' 輛編組';
+    };
+    /** 編組節數：2.15.0 起以快照的實際編組為準（有多種時取最少的）；沒有資料時，指定席種別依規定、其他用車庫內有出庫路徑的側線的編組。 */
     H.carsOf = function (sv) {
+      const f = H.formOf(sv); if (f) return f[0];
       const ri = H.reserveInfo(sv); if (ri) return ri.cars;
       const sd = ((sv.depot && sv.depot.sidings) || []).filter(x => x.cars > 0 && x.path !== false).map(x => x.cars);
       if (sd.length) { const c = new Map(); sd.forEach(n => c.set(n, (c.get(n) || 0) + 1)); return [...c.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0][0]; }
