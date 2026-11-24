@@ -36,6 +36,12 @@
    "zh": "五原地方",
    "ja": "五原地方",
    "en": "Gohara Region"
+  },
+  {
+   "id": "tensho",
+   "zh": "天照地方",
+   "ja": "天照地方",
+   "en": "Tensho Region"
   }
  ],
  "districts": [
@@ -254,6 +260,30 @@
     "ja": "十万浦郡瑞別町",
     "en": "Mizubetsu Town, Jumanmura District"
    }
+  },
+  {
+   "id": "takio",
+   "region": "gohara",
+   "zh": "滝尾町",
+   "ja": "滝尾町",
+   "en": "Takio Town",
+   "full": {
+    "zh": "十万浦郡滝尾町",
+    "ja": "十万浦郡滝尾町",
+    "en": "Takio Town, Jumanmura District"
+   }
+  },
+  {
+   "id": "mikasa",
+   "region": "tensho",
+   "zh": "御笠市",
+   "ja": "御笠市",
+   "en": "Mikasa City",
+   "full": {
+    "zh": "御笠市",
+    "ja": "御笠市",
+    "en": "Mikasa City"
+   }
   }
  ],
  "stations": {
@@ -339,7 +369,13 @@
   "咲海": "hekura",
   "海寺町": "mizubetsu",
   "瑞別": "mizubetsu",
-  "五原千歲": "mizubetsu"
+  "五原千歲": "mizubetsu",
+  "北五原": "mizubetsu",
+  "福田町": "mizubetsu",
+  "五原滝尾": "takio",
+  "三浦": "mikasa",
+  "三浦海岸": "mikasa",
+  "御笠市": "mikasa"
  },
  "transfer": [
   "みつせ",

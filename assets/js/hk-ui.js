@@ -110,8 +110,9 @@
       if (sv.isHS) return;
       const k = gKey(sv);
       let g = groups.get(k);
-      if (!g) { g = { key: k, name: k, cls: sv.tcls, color: sv.color || '#429769', stops: new Set(), pass: new Set(), edges: new Set(), seq: null, lrt: !!sv.isLRT }; groups.set(k, g); }
+      if (!g) { g = { key: k, name: k, names: new Set(), cls: sv.tcls, color: sv.color || '#429769', stops: new Set(), pass: new Set(), edges: new Set(), seq: null, lrt: !!sv.isLRT }; groups.set(k, g); }
       const ss = sv.stops.filter(x => x.pax !== false).map(x => x.station);
+      g.names.add(String(sv.routeName).replace(/\s+$/, ''));
       if (String(sv.routeName).replace(/\s+/g, '') === k && sv.color) g.color = sv.color;
       ss.forEach(x => g.stops.add(x));
       const full = [ss[0]];
@@ -134,7 +135,8 @@
     });
     const order = LINES.map(l => l.id), cord = ['loc', 'exp', 'ltd'];
     const G = [...groups.values()];
-    G.forEach(g => { g.home = nameLines(g.name)[0] || null; g.light = lum(g.color) > 0.6; });
+    G.forEach(g => { if (g.names.size === 1) g.name = [...g.names][0];
+      g.home = nameLines(g.name)[0] || null; g.light = lum(g.color) > 0.6; });
     G.sort((a, b) => (order.indexOf(a.home) - order.indexOf(b.home)) || (cord.indexOf(a.cls) - cord.indexOf(b.cls)));
     const orient = L.paths.map(() => 0);
     [...G].sort((a, b) => b.edges.size - a.edges.size).forEach(g => {
