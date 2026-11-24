@@ -191,6 +191,25 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
     return null;
   }
   const NEAR_ST = 1500, NEAR_SG = 2000;
+  function tpoint(t) {
+    if (!t) return null;
+    if (t.type === 's') return PL.st[t.name] && PL.st[t.name].pos;
+    if (t.type === 'l') return PL.sg[t.id] && PL.sg[t.id].pos;
+    const ps = Object.values(PL.st).filter(x => x.pos && (t.type === 'd' ? x.district === t.id : t.type === 'r' && PL.dis[x.district] && PL.dis[x.district].region === t.id)).map(x => x.pos);
+    if (!ps.length) return null;
+    return [ps.reduce((a, p) => a + p[0], 0) / ps.length, ps.reduce((a, p) => a + p[1], 0) / ps.length];
+  }
+  function nearestFallback(t) {
+    const pt = tpoint(t); if (!pt) return null;
+    const all = DB.hotels.filter(h => h.pos).map(h => ({ h, d: Math.round(Math.hypot(h.pos[0] - pt[0], h.pos[1] - pt[1]) / 10) * 10 })).sort((a, b) => a.d - b.d);
+    const ds = [], pick = [];
+    for (const x of all) {
+      if (!ds.includes(x.h.district)) { if (ds.length >= 3 || (ds.length && pick.length >= 5)) break; ds.push(x.h.district); }
+      if (ds.includes(x.h.district)) pick.push(x);
+    }
+    const out = all.filter(x => ds.includes(x.h.district));
+    return out.length ? { ds, list: out } : null;
+  }
   function target(code) {
     if (!code) return null;
     const i = code.indexOf(':'), k = code.slice(0, i), v = code.slice(i + 1);
@@ -289,7 +308,7 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
       items = suggest(inp.value);
       if (!items.length) { box.innerHTML = inp.value.trim() ? '<div class="sg-empty">找不到符合的地點，按搜尋會用關鍵字找住宿</div>' : ''; box.hidden = !inp.value.trim(); return; }
       let g = '';
-      box.innerHTML = items.map((x, i) => (x.g !== g ? `<div class="sg-g">${g = x.g}</div>` : '') + `<div class="sg-i${i === sel ? ' on' : ''}" role="option" data-i="${i}"><span class="sg-ic">${{ '地區': '🗺', '車站': '🚉', '地標・景點': '📍', '住宿': '🏨' }[x.g]}</span><span class="sg-t"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.n >= 0 ? `<span class="sg-n">${x.n} 間</span>` : ''}</div>`).join('');
+      box.innerHTML = items.map((x, i) => (x.g !== g ? `<div class="sg-g">${g = x.g}</div>` : '') + `<div class="sg-i${i === sel ? ' on' : ''}" role="option" data-i="${i}"><span class="sg-ic">${{ '地區': '🗺', '車站': '🚉', '地標・景點': '📍', '住宿': '🏨' }[x.g]}</span><span class="sg-t"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.n > 0 ? `<span class="sg-n">${x.n} 間</span>` : x.n === 0 ? '<span class="sg-n">改找附近</span>' : ''}</div>`).join('');
       box.hidden = false; inp.setAttribute('aria-expanded', 'true');
     };
     const pick = i => {
@@ -342,9 +361,11 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
   function viewSearch(params) {
     const q = readQ(params);
     const t = target(q.area), near = t && (t.type === 's' || t.type === 'l');
-    const base = DB.hotels.filter(h => inTarget(h, t));
-    const rows = base.map(h => ({ h, c: cheapest(h, q), d: near ? distTo(h, t) : null }));
-    const sortK = F.touched ? F.sort : near ? 'dist' : 'rec';
+    let base = DB.hotels.filter(h => inTarget(h, t)), fb = null;
+    if (!base.length && t && t.type !== 'k') { fb = nearestFallback(t); if (fb) base = fb.list.map(x => x.h); }
+    const fbD = fb ? new Map(fb.list.map(x => [x.h.id, x.d])) : null, byD = near || !!fb;
+    const rows = base.map(h => ({ h, c: cheapest(h, q), d: fb ? fbD.get(h.id) : near ? distTo(h, t) : null }));
+    const sortK = F.touched ? F.sort : byD ? 'dist' : 'rec';
     const per = r => r.c ? r.c.total / q.nights / q.rooms : Infinity;
     let list = rows.filter(({ h, c }) => {
       if (F.stars.size && !F.stars.has(h.stars)) return false;
@@ -353,7 +374,7 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
       if (F.near && h.dist > +F.near) return false;
       return true;
     });
-    const S = { rec: (a, b) => (b.h.score * 10 + b.h.stars * 4 - b.h.dist / 100) - (a.h.score * 10 + a.h.stars * 4 - a.h.dist / 100), price: (a, b) => per(a) - per(b), dist: near ? (a, b) => (a.d == null ? 1e9 : a.d) - (b.d == null ? 1e9 : b.d) : (a, b) => a.h.dist - b.h.dist, stars: (a, b) => b.h.stars - a.h.stars || b.h.score - a.h.score, score: (a, b) => b.h.score - a.h.score };
+    const S = { rec: (a, b) => (b.h.score * 10 + b.h.stars * 4 - b.h.dist / 100) - (a.h.score * 10 + a.h.stars * 4 - a.h.dist / 100), price: (a, b) => per(a) - per(b), dist: byD ? (a, b) => (a.d == null ? 1e9 : a.d) - (b.d == null ? 1e9 : b.d) : (a, b) => a.h.dist - b.h.dist, stars: (a, b) => b.h.stars - a.h.stars || b.h.score - a.h.score, score: (a, b) => b.h.score - a.h.score };
     list.sort(S[sortK]);
     const cnt = (fn) => rows.filter(fn).length;
     const sortBtn = (k, t) => `<button type="button" data-sort="${k}" aria-pressed="${sortK === k}">${t}</button>`;
@@ -365,9 +386,9 @@ footer{background:var(--navy);color:#cfd8e6;font-size:13px;padding:24px 0;margin
         <fieldset><legend>設施與方案</legend>${FACS.map(([f]) => `<label><input type="checkbox" data-fac="${f}"${F.fac.has(f) ? ' checked' : ''}> ${f}</label>`).join('')}</fieldset>
         <fieldset><legend>距離車站</legend>${[['', '不限'], ['100', '100 公尺以內'], ['300', '300 公尺以內'], ['500', '500 公尺以內']].map(([v, t]) => `<label><input type="radio" name="near" value="${v}"${F.near === v ? ' checked' : ''}> ${t}</label>`).join('')}</fieldset>
       </aside>
-      <section><div class="reshead"><h1>${t ? esc(t.label) + '：' : ''}找到 ${list.length} 間住宿</h1>${near ? `<p class="small" style="flex-basis:100%;order:3;margin:-6px 0 0">${t.type === 'l' ? `${esc(dName(PL.sg[t.id].district))}的住宿，以及距離 ${esc(t.label)} ${NEAR_SG / 1000} 公里內的住宿` : `距離 ${esc(t.label)} ${NEAR_ST / 1000} 公里內的住宿`}，距離為直線距離估算</p>` : ''}
-        <div class="sorts" role="group" aria-label="排序">${sortBtn('rec', '推薦')}${sortBtn('price', '價格最低')}${sortBtn('dist', near ? '距' + esc(t.label) + '最近' : '距車站最近')}${sortBtn('stars', '星級')}${sortBtn('score', '評分最高')}</div></div>
-        ${list.length ? list.map(({ h, c, d }) => resCard(h, c, q, near ? { label: t.label, d, ref: t.type === 's' ? t.name : t.id } : null)).join('') : '<div class="empty">沒有符合條件的住宿，試試放寬篩選條件。</div>'}
+      <section><div class="reshead"><h1>${fb ? esc(t.label) + '：沒有住宿，改找附近地區' : (t ? esc(t.label) + '：' : '') + '找到 ' + list.length + ' 間住宿'}</h1>${fb ? `<p class="small" style="flex-basis:100%;order:3;margin:-6px 0 0">${esc(t.label)}沒有可預訂的住宿，以下依距離列出最近的地區：${fb.ds.map(dName).map(esc).join('、')}（共 ${list.length} 間，距離為直線距離估算）</p>` : near ? `<p class="small" style="flex-basis:100%;order:3;margin:-6px 0 0">${t.type === 'l' ? `${esc(dName(PL.sg[t.id].district))}的住宿，以及距離 ${esc(t.label)} ${NEAR_SG / 1000} 公里內的住宿` : `距離 ${esc(t.label)} ${NEAR_ST / 1000} 公里內的住宿`}，距離為直線距離估算</p>` : ''}
+        <div class="sorts" role="group" aria-label="排序">${sortBtn('rec', '推薦')}${sortBtn('price', '價格最低')}${sortBtn('dist', byD ? '距' + esc(t.label) + '最近' : '距車站最近')}${sortBtn('stars', '星級')}${sortBtn('score', '評分最高')}</div></div>
+        ${list.length ? list.map(({ h, c, d }) => resCard(h, c, q, byD ? { label: t.label, d, ref: fb ? null : t.type === 's' ? t.name : t.id } : null)).join('') : '<div class="empty">沒有符合條件的住宿，試試放寬篩選條件。</div>'}
       </section></div></div>`;
     bindSearch();
     app.querySelectorAll('[data-star]').forEach(el => el.onchange = () => { const s = +el.dataset.star; el.checked ? F.stars.add(s) : F.stars.delete(s); viewSearch(params); });
