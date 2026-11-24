@@ -4912,5 +4912,16 @@ window.HK_I18N_DICT = {
 "新 1750 形": ["新1750形", "New 1750 Series"],
 "1000 形": ["1000形", "1000 Series"],
 "1100 形": ["1100形", "1100 Series"],
-"8 輛編組的班次 4・5 号車為指定席（可線上訂票），其他車廂為自由席；6 輛編組的班次全車自由席。": ["8両編成の列車は4・5号車が指定席（オンライン予約可）、その他の車両は自由席です。6両編成の列車は全車自由席です。", "On 8-car trains, cars 4–5 are reserved (bookable online) and the other cars are non-reserved; 6-car trains are all non-reserved."]
+"8 輛編組的班次 4・5 号車為指定席（可線上訂票），其他車廂為自由席；6 輛編組的班次全車自由席。": ["8両編成の列車は4・5号車が指定席（オンライン予約可）、その他の車両は自由席です。6両編成の列車は全車自由席です。", "On 8-car trains, cars 4–5 are reserved (bookable online) and the other cars are non-reserved; 6-car trains are all non-reserved."],
+"環狀線": ["環状線", "Mitsuse Loop Line"],
+"白藏山線": ["白蔵山線", "Shirakura Line"],
+"新中央線": ["新中央線", "Shin-Chuo Line"],
+"上羽本線": ["上羽本線", "Kamiha Main Line"],
+"松歲線": ["松歳線", "Matsutoshi Line"],
+"光瀨都市單軌": ["光瀬都市モノレール", "Hikarise Monorail"],
+"種別停車": ["種別停車", "Stops by Service"],
+"路線別": ["路線別", "By Line"],
+"路徑地圖": ["経路マップ", "Route Map"],
+"路線圖顯示方式": ["路線図の表示方法", "Map display"],
+"膠囊橫跨的線＝在這站停車，沒有被蓋到的線＝通過": ["カプセルが重なる線＝停車、重ならない線＝通過", "Lines covered by a capsule stop here; others pass through"]
 };

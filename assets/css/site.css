@@ -141,7 +141,7 @@ dl.news .row:target { background: var(--g3); }
 .mapbox { border: 1px solid var(--line); background: var(--white); position: relative; }
 .mapbox .rmap { width: 100%; height: auto; display: block; max-height: 78vh; }
 .rmap .e-casing { fill: none; stroke: #fff; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
-.rmap .e-line { fill: none; stroke: var(--g1); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.rmap .e-line { fill: none; stroke: var(--lc, var(--g1)); stroke-width: var(--lw, 7px); stroke-linecap: round; stroke-linejoin: round; }
 /* 2.3.0：輕軌（MTR 路線類型 LIGHT_RAIL）——在拓樸裡、站位照排，只是畫成藍色細線，
  * 跟一般路線（var(--g1)，綠色，7px）明顯區分。顏色／粗細由 JS 依 CFG.lrtColor／lrtWidth 設成變數。
  * 只有「整段都只有輕軌在走」的路段才會套用；跟一般路線共用的路段仍畫成一般路線（粗線優先）。 */
@@ -167,7 +167,7 @@ dl.news .row:target { background: var(--g3); }
 .rmap .st[tabindex] { cursor: pointer; }
 .rmap .st[tabindex]:hover .st-name { fill: var(--g1); font-weight: 700; }
 .rmap.dim .e-line { stroke: #c8d3ce; }
-.rmap.dim .e-line.on { stroke: var(--g1); }
+.rmap.dim .e-line.on { stroke: var(--lc, var(--g1)); }
 .rmap.dim .e-line.lrt.on { stroke: var(--lrt-color, #1f6fd0); }   /* 2.3.0：輕軌被點亮時回到藍色，不是綠色 */
 .rmap.dim .e-casing.on { stroke: #fff; }
 .rmap.dim .st { opacity: .4; }
@@ -855,3 +855,21 @@ header.sh .gnav li.admin a { padding: 6px 10px; }
 .lchips .svgrp + .svgrp { margin-top: 4px; }
 .svgrp-l { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 6.5em; }
 .gsec h2 .retire { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #fdecea; color: #b3261e; vertical-align: middle; }
+
+/* 2.16.0：路線別（A）／種別停車（B）路線圖 */
+.rmap .strip-case { fill: none; stroke: #7d8790; stroke-linecap: round; stroke-linejoin: round; }
+.rmap.dim .strip-case { stroke: none; }
+.rmap .st-cap { fill: #fff; stroke: #2b3540; stroke-width: 1.7; }
+.rmap .st.sel .st-cap { fill: #f2c200; }
+.rmap .ln-name { font: 700 12px var(--font); paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; letter-spacing: .04em; }
+.rmap.dim .ln-name { opacity: .35; }
+.rmap.dim .hs-line { opacity: .3; }
+.rmap.dim .hs-line.on { opacity: 1; stroke-width: 4; }
+.mapmode { display: inline-flex; margin: 8px 8px 0; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; position: relative; z-index: 2; }
+.mapmode button { border: 0; background: transparent; padding: 6px 14px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
+.mapmode button[aria-pressed="true"] { background: var(--g1); color: #fff; }
+.maplegend .rc.light { box-shadow: inset 0 0 0 1px #7d8790; }
+.jr-map { border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 8px; }
+.jr-map summary { cursor: pointer; font-size: 14px; color: var(--g1); }
+.jr-mapbox { margin-top: 8px; border-radius: 10px; overflow: hidden; }
+.jr-mapbox .rmap { max-height: 420px; min-width: 0 !important; }

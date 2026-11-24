@@ -132,4 +132,17 @@ window.HK_CONFIG = {
   // 2.8.0：車站編碼的「/」＝同時有兩條路線的編碼。遊戲內（ATOS 1.6.0）會自動更新；在新快照匯出之前，網站先用這裡的設定顯示。
   // 2.12.0：花川本線 東平倉以北（滝井川方面）從村下起編 HM01；村下同時是學園線 H51
   codeOverride: { '新勝守': ['S12', 'KB05'], '北倉間': ['KU03', 'T05'], '村下': ['HM01', 'H51'], '桂木': ['HM02'], '南滝井川': ['HM03'], '滝井川': ['HM04'] },
+  // 2.16.0：路線圖的「路線」＝車站編號字首。名稱寫在線旁，顏色為路線色；MTS／HIK 這類特殊編號視為所在路線。
+  mapLines: [
+    { id: 'L', zh: '環狀線', prefixes: ['L'], color: '#57125e', key: '環状' },
+    { id: 'S', zh: '白藏山線', prefixes: ['S'], color: '#e74f84', key: '白藏山' },
+    { id: 'KU', zh: '倉浦市區線', prefixes: ['KU', 'KS'], color: '#00a6e0', key: '倉浦' },
+    { id: 'H', zh: '花川本線', prefixes: ['H', 'HM'], color: '#429769', key: '花川' },
+    { id: 'T', zh: '新中央線', prefixes: ['T'], color: '#c0198e', key: '新中央' },
+    { id: 'KB', zh: '上羽本線', prefixes: ['KB'], color: '#8cc63f', key: '上羽' },
+    { id: 'M', zh: '松歲線', prefixes: ['M', 'M04A'], color: '#6b7280', key: '松歲' },
+    { id: 'MONO', zh: '光瀨都市單軌', prefixes: [], color: '#1f6fd0', key: '單軌', lrt: true },
+  ],
+  mapWildCodes: ['MTS', 'HIK'],
+  mapDefaultMode: { map: 'B', home: 'B', live: 'A' },
 };

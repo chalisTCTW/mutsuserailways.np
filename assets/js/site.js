@@ -1,7 +1,7 @@
 /* site.js — 各頁面的行為（首頁、時刻表／乘車／票價、即時列車動態）。 */
 (function () {
   'use strict';
-  const { h, s, $, $$, load, computeLayout, renderMap, typeTag, typeMark, fmtDate } = window.HK;
+  const { h, s, $, $$, load, computeLayout, renderMap, renderMapSwitch, typeTag, typeMark, fmtDate } = window.HK;
   const HKc = window.HK;
   const page = document.body.dataset.page;
   const app = $('#app');
@@ -98,7 +98,7 @@
 
     // 簡易路線圖
     const L = computeLayout(H), box = $('#minimap');
-    const mm = renderMap(box, H, L, { fontSize: 13, interactive: true });
+    const mm = renderMapSwitch(box, H, L, { fontSize: 13, interactive: true }, 'home');
     const pop = h('div', { class: 'pop mappop', hidden: true }); box.parentNode.insertBefore(pop, box.nextSibling);
     mm.onStation(st => { mm.mark(st.id, 'sel'); window.HK.stationPop(H, st, pop); });
   }
@@ -320,9 +320,14 @@
         lis.push(h('li', { class: 'last' }, h('div', { class: 'tm' }, hm(sN.arr)), h('div', { class: 'rl' }, h('i')), h('div', { class: 'wh' }, h('strong', null, H.codeBadges(sN.station), H.stName(sN.station)), sN.platform ? h('span', { style: 'margin-left:8px;font-size:12px;color:var(--muted)' }, `${sN.platform} 號月台`) : null)));
       }
     });
+    const mapBox = h('div', { class: 'mapbox jr-mapbox' });
+    let drawn = false;
+    const drawMap = () => { if (drawn) return; drawn = true; const L = H._L || (H._L = computeLayout(H)); const m = renderMap(mapBox, H, L, { interactive: false, mode: 'A' }); m.route(j.legs); };
+    const det = h('details', { class: 'jr-map', ontoggle: e => { if (e.target.open) drawMap(); } }, h('summary', null, '路徑地圖'), mapBox);
+    if (first) { det.open = true; setTimeout(drawMap, 0); }
     return h('article', { class: 'jr' },
       h('header', { class: 'jr-head' }, h('span', { class: 't' }, `${hm(j.dep)} → ${hm(j.arr)}${j.arr >= DAY ? '（翌日）' : ''}`), h('span', { class: 'm' }, `${dur} 分　${transfers ? `轉乘 ${transfers} 次` : '不需轉乘'}`), fare ? h('span', { class: 'y' }, yen(fare.yen), h('small', null, ' 單程')) : null),
-      h('ol', { class: 'legs' }, lis));
+      h('ol', { class: 'legs' }, lis), det);
   }
 
   /** 1.1.1：萬瀨高速鉄道線假想延伸試算結果的卡片——獨立票價查詢欄位（hsFareBox）與乘車・轉乘查詢（viewRoute，
@@ -405,11 +410,10 @@
     const L = computeLayout(H);
     const box = h('div', { class: 'mapbox' }), info = h('div', { class: 'pop mappop', hidden: true });
     root.append(h('p', { class: 'lead', style: 'margin-top:16px' }, '點選車站，查看停靠路線、接下來的發車，並前往時刻表或乘車查詢。'), box, info);
-    const m = renderMap(box, H, L, { interactive: true });
+    const m = renderMapSwitch(box, H, L, { interactive: true }, 'map');
     const open = st => { m.mark(st.id, 'sel'); window.HK.stationPop(H, st, info); };
     m.onStation(open);
     const s0 = q.get('s'); if (s0 && H.stById[s0]) { open(H.stById[s0]); setTimeout(() => { try { info.scrollIntoView({ block: 'nearest' }); } catch (e) { } }, 50); }
-    box.append(h('div', { class: 'legend' }, h('span', null, '○ 車站'), h('span', null, '◎ 轉乘站')));
   }
 
   /* ───────── 即時列車動態 ───────── */
@@ -419,7 +423,7 @@
     const clockEl = h('span', { class: 'now' }), slider = h('input', { type: 'range', min: 0, max: DAY - 60, step: 60, 'aria-label': '時刻' });
     let manual = false, picked = null;
     const reset = h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { manual = false; tick(); } }, '回到現在');
-    const m = renderMap(box, H, L, { interactive: false });
+    const m = renderMapSwitch(box, H, L, { interactive: false }, 'live');
     const seenR = new Set(), routeLeg = [];
     H.svcs.forEach(sv => { const k = sv.routeName; if (seenR.has(k)) return; seenR.add(k); routeLeg.push(h('span', null, h('i', { class: 'rc', style: `background:${sv.color}` }), k)); });
     const lg = h('div', { class: 'legend' }, ...routeLeg, h('span', null, '列車の色は各路線のイメージカラーです。位置依時刻表推算，並非實際車輛位置。'));
@@ -487,5 +491,5 @@
   })();
   /* 2.5.0：頁尾顯示入口網站版本，方便確認瀏覽器載入的是不是新檔案（診斷頁：check.html） */
   window.HK_PORTAL_VERSION = '2.6.1';
-  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.15.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
+  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.16.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
 })();

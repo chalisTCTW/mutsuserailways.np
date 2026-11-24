@@ -92,25 +92,94 @@
     return d + 'L' + f(e[0]) + ' ' + f(e[1]);
   }
 
-  /** 在 container 畫路線圖。回傳控制器 { svg, highlight(set), setTrains(list), onStation(fn) }。 */
+  /* 2.16.0：路線（車站編號字首）與種別（班次）的模型。A＝路線別、B＝種別停車都用這份。 */
+  const keyOf = (a, b) => a < b ? a + '|' + b : b + '|' + a;
+  function lum(hex) { const c = String(hex || '#000').replace('#', ''); if (c.length < 6) return 0; const f = i => parseInt(c.slice(i, i + 2), 16) / 255; return 0.2126 * f(0) + 0.7152 * f(2) + 0.0722 * f(4); }
+  function lineModel(H, L) {
+    if (L._lm) return L._lm;
+    const CF = (HK.CFG) || root.HK_CONFIG || {};
+    const LINES = CF.mapLines || [], byId = {}, pre = {};
+    LINES.forEach(l => { byId[l.id] = l; (l.prefixes || []).forEach(p => pre[p] = l.id); });
+    const wild = new Set(CF.mapWildCodes || []);
+    const codeLines = id => { const st = new Set(); let w = false; H.codes(id).forEach(c => { const p = String(c).replace(/\d+[A-Z]?$/, ''); if (wild.has(c) || wild.has(p)) { w = true; return; } const l = pre[c] || pre[p]; if (l) st.add(l); }); return { s: st, w }; };
+    const nameLines = n => LINES.map(l => [String(n).indexOf(l.key), l.id]).filter(x => x[0] >= 0).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+    const eIdx = new Map(); L.paths.forEach((p, i) => eIdx.set(keyOf(p.a, p.b), i));
+    const gKey = sv => String(sv.routeName).replace(/スーパー|通勤/g, '').replace(/松歲線直通|學園線直通/g, '').replace(/（.*?）/g, '').replace(/\s+/g, '');
+    const groups = new Map(), onEdge = L.paths.map(() => new Set());
+    H.svcs.forEach(sv => {
+      if (sv.isHS) return;
+      const k = gKey(sv);
+      let g = groups.get(k);
+      if (!g) { g = { key: k, name: k, cls: sv.tcls, color: sv.color || '#429769', stops: new Set(), pass: new Set(), edges: new Set(), seq: null, lrt: !!sv.isLRT }; groups.set(k, g); }
+      const ss = sv.stops.filter(x => x.pax !== false).map(x => x.station);
+      if (String(sv.routeName).replace(/\s+/g, '') === k && sv.color) g.color = sv.color;
+      ss.forEach(x => g.stops.add(x));
+      const full = [ss[0]];
+      for (let i = 0; i + 1 < ss.length; i++) {
+        const p = H.shortestPath(ss[i], ss[i + 1]); if (!p) continue;
+        for (let j = 0; j + 1 < p.length; j++) { const ei = eIdx.get(keyOf(p[j], p[j + 1])); if (ei != null) { g.edges.add(ei); onEdge[ei].add(g); } }
+        p.slice(1, -1).forEach(x => g.pass.add(x)); full.push(...p.slice(1));
+      }
+      if (!g.seq || full.length > g.seq.length) g.seq = full;
+    });
+    const edgeLines = L.paths.map((p, i) => {
+      const A = codeLines(p.a), B = codeLines(p.b); let I = null;
+      if (A.s.size && B.s.size) I = [...A.s].filter(x => B.s.has(x)); else if (A.s.size && B.w) I = [...A.s]; else if (B.s.size && A.w) I = [...B.s];
+      const sl = [...new Set([...onEdge[i]].flatMap(g => nameLines(g.name)))];
+      let r = I && I.length ? I.filter(x => sl.includes(x)) : [];
+      if (!r.length && I && I.length === 1) r = I;
+      if (!r.length) r = sl.slice(0, 1);
+      if (!r.length && H.isLrtEdge && H.isLrtEdge(p) && byId.MONO) r = ['MONO'];
+      return r.filter(x => byId[x]);
+    });
+    const order = LINES.map(l => l.id), cord = ['loc', 'exp', 'ltd'];
+    const G = [...groups.values()];
+    G.forEach(g => { g.home = nameLines(g.name)[0] || null; g.light = lum(g.color) > 0.6; });
+    G.sort((a, b) => (order.indexOf(a.home) - order.indexOf(b.home)) || (cord.indexOf(a.cls) - cord.indexOf(b.cls)));
+    const orient = L.paths.map(() => 0);
+    [...G].sort((a, b) => b.edges.size - a.edges.size).forEach(g => {
+      const q = g.seq || [];
+      for (let k = 0; k + 1 < q.length; k++) { const ei = eIdx.get(keyOf(q[k], q[k + 1])); if (ei == null || orient[ei]) continue; orient[ei] = L.paths[ei].a === q[k] ? 1 : -1; }
+    });
+    const edgeGroups = L.paths.map((p, i) => G.filter(g => g.edges.has(i)));
+    return (L._lm = { LINES, byId, edgeLines, edgeGroups, orient, groups: G, eIdx });
+  }
+  function offPts(pts, d) {
+    if (!d) return pts;
+    const n = pts.length, out = [];
+    const nrm = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1; return [-dy / l, dx / l]; };
+    for (let i = 0; i < n; i++) {
+      let nx, ny;
+      if (i === 0) [nx, ny] = nrm(pts[0], pts[1]); else if (i === n - 1) [nx, ny] = nrm(pts[n - 2], pts[n - 1]);
+      else { const a = nrm(pts[i - 1], pts[i]), b = nrm(pts[i], pts[i + 1]); let mx = a[0] + b[0], my = a[1] + b[1]; const ml = Math.hypot(mx, my) || 1; mx /= ml; my /= ml; const c = mx * a[0] + my * a[1] || 1; nx = mx / c; ny = my / c; }
+      out.push([pts[i][0] + nx * d, pts[i][1] + ny * d]);
+    }
+    return out;
+  }
+
+  /** 在 container 畫路線圖。回傳控制器 { svg, highlight(set), setTrains(list), onStation(fn) }。
+   *  2.16.0：opts.mode＝'A'（路線別，預設）或 'B'（種別停車）；opts.lineLabels＝false 可不寫路線名稱。 */
   function renderMap(container, H, L, opts) {
     opts = opts || {};
     const W = L.width, HT = L.height, FS = opts.fontSize || 13;
     const CFGX = (root.HK && root.HK.CFG) || root.HK_CONFIG || {};
     const CR = opts.cornerRadius != null ? opts.cornerRadius : (CFGX.mapCornerRadius != null ? CFGX.mapCornerRadius : 10);   // 2.4.0 轉角圓角半徑
-    const svg = s('svg', { viewBox: `0 0 ${W} ${HT}`, class: 'rmap', role: 'img', 'aria-label': '光瀨都市鉄道 路線圖', preserveAspectRatio: 'xMidYMid meet' });
-    const gEdge = s('g', { class: 'edges' }), gHs = s('g', { class: 'hs-edges' }), gSt = s('g', { class: 'stations' }), gLab = s('g', { class: 'labels' }), gTr = s('g', { class: 'trains' });
-    svg.append(gEdge, gHs, gSt, gLab, gTr);
+    const MODE = opts.mode === 'B' ? 'B' : 'A', LMD = lineModel(H, L);
+    const svg = s('svg', { viewBox: `0 0 ${W} ${HT}`, class: 'rmap mode-' + MODE, role: 'img', 'aria-label': '光瀨都市鉄道 路線圖', preserveAspectRatio: 'xMidYMid meet' });
+    const gEdge = s('g', { class: 'edges' }), gHs = s('g', { class: 'hs-edges' }), gLn = s('g', { class: 'line-names' }), gSt = s('g', { class: 'stations' }), gLab = s('g', { class: 'labels' }), gTr = s('g', { class: 'trains' });
+    svg.append(gEdge, gHs, gLn, gSt, gLab, gTr);
 
     // 1.1.0：高速鐵路不計入拓樸（H.edges 已經排除），只在轉乘站之間疊一層虛線（含站外轉乘，例如幸村↔新光瀨）
     // 1.1.2：改用 L.hsPaths（只接受 45°／90° 轉彎的折線，車站位置完全沿用一般鐵路排好的結果）；
     //        顏色用 CFG.hsColor——跟票價查詢・車站時刻表・乘車轉乘查詢三頁共用的高速鉄道識別色一致，且跟一般鐵路（var(--g1)）明顯不同。
     gHs.style.setProperty('--hs-color', (HK.CFG && HK.CFG.hsColor) || '#136880');
+    const hsEls = [];
     (L.hsPaths || H.hsEdges || []).forEach(e => {
       const cls = 'hs-line' + (e.walk ? ' hs-walk' : '');
-      if (e.pts) { gHs.append(s('path', { d: roundPath(e.pts, CR), class: cls })); return; }
-      const a = L.pos.get(e.a), b = L.pos.get(e.b); if (!a || !b) return;
-      gHs.append(s('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: cls }));
+      let el;
+      if (e.pts) el = s('path', { d: roundPath(e.pts, CR), class: cls });
+      else { const a = L.pos.get(e.a), b = L.pos.get(e.b); if (!a || !b) return; el = s('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: cls }); }
+      gHs.append(el); hsEls.push({ e, el });
     });
 
     // 連結：每站經過的路線數（轉乘站畫大圓）
@@ -121,13 +190,51 @@
      * 只有「只有輕軌在走」的路段改用藍色細線（跟一般路線共用的路段仍畫成一般路線）。 */
     gEdge.style.setProperty('--lrt-color', (HK.CFG && HK.CFG.lrtColor) || '#1f6fd0');
     gEdge.style.setProperty('--lrt-width', (((HK.CFG && HK.CFG.lrtWidth) || 3.6) + 'px'));   // 要帶 px：白色外框用 calc(... + 4.5px) 算，無單位數字沒辦法相加
-    const edgeEls = [];
-    L.paths.forEach(p => {
-      const d = roundPath(p.pts, CR);
-      const lrt = H.isLrtEdge ? H.isLrtEdge(p) : false;
-      const casing = s('path', { d, class: 'e-casing' + (lrt ? ' lrt' : '') }), line = s('path', { d, class: 'e-line' + (lrt ? ' lrt' : '') });
-      gEdge.append(casing, line); edgeEls.push({ p, line, casing });
+    const edgeEls = [], GAP = 4.4, SW = 3.2, LWA = 7, bundle = [];
+    L.paths.forEach((p, i) => {
+      const pts = LMD.orient[i] < 0 ? p.pts.slice().reverse() : p.pts;
+      const lrt = H.isLrtEdge ? H.isLrtEdge(p) : false, lines = [];
+      let casing;
+      if (MODE === 'B' && LMD.edgeGroups[i].length) {
+        const gs = LMD.edgeGroups[i], n = gs.length;
+        bundle[i] = n * GAP / 2 + 1;
+        casing = s('path', { d: roundPath(pts, CR), class: 'e-casing', style: `stroke-width:${(n * GAP + 6).toFixed(1)}px` }); gEdge.append(casing);
+        gs.forEach((g, k) => {
+          const d = roundPath(offPts(pts, (k - (n - 1) / 2) * GAP), CR), w = g.lrt ? 2.4 : SW;
+          if (g.light) gEdge.append(s('path', { d, class: 'strip-case', style: `stroke-width:${w + 1.8}px` }));
+          const el = s('path', { d, class: 'e-line strip', style: `--lc:${g.color};--lw:${w}px` }); gEdge.append(el); lines.push(el);
+        });
+      } else {
+        const ls = LMD.edgeLines[i].length ? LMD.edgeLines[i] : [null], n = ls.length, w = n > 1 ? 5 : LWA;
+        bundle[i] = lrt ? 2.5 : n * w / 2 + (n > 1 ? 1 : 0);
+        casing = s('path', { d: roundPath(pts, CR), class: 'e-casing' + (lrt ? ' lrt' : ''), style: n > 1 ? `stroke-width:${n * 5.6 + 5}px` : null }); gEdge.append(casing);
+        ls.forEach((lid, k) => {
+          const ln = lid ? LMD.byId[lid] : null, d = roundPath(offPts(pts, (k - (n - 1) / 2) * 5.6), CR);
+          const el = s('path', { d, class: 'e-line' + (lrt ? ' lrt' : ''), style: ln && !lrt ? `--lc:${ln.color};--lw:${w}px` : null }); gEdge.append(el); lines.push(el);
+        });
+      }
+      edgeEls.push({ p, line: lines, casing, i, pts });
     });
+    /* B：停車站畫成橫跨停車種別的膠囊；中間夾著通過的種別就拆成兩顆 */
+    const caps = new Map();
+    if (MODE === 'B') {
+      const pick = new Map();
+      edgeEls.forEach(e => {
+        const gs = LMD.edgeGroups[e.i]; if (!gs.length) return;
+        const P = e.pts;
+        const a = LMD.orient[e.i] < 0 ? e.p.b : e.p.a, b = LMD.orient[e.i] < 0 ? e.p.a : e.p.b;
+        [[a, P[0], P[1], 1], [b, P[P.length - 1], P[P.length - 2], -1]].forEach(([sid, pt, nx, sg]) => {
+          const c = pick.get(sid); if (c && c.gs.length >= gs.length) return;
+          pick.set(sid, { gs, pt, dx: (nx[0] - pt[0]) * sg, dy: (nx[1] - pt[1]) * sg });
+        });
+      });
+      pick.forEach((c, sid) => {
+        const n = c.gs.length, l = Math.hypot(c.dx, c.dy) || 1, ux = c.dx / l, uy = c.dy / l, nx = -uy, ny = ux;
+        const stop = c.gs.map(g => g.stops.has(sid)), runs = []; let a = -1;
+        stop.concat([false]).forEach((v, k) => { if (v && a < 0) a = k; if (!v && a >= 0) { runs.push([a, k - 1]); a = -1; } });
+        caps.set(sid, { runs: runs.map(([i0, i1]) => { const o0 = (i0 - (n - 1) / 2) * GAP - 3.6, o1 = (i1 - (n - 1) / 2) * GAP + 3.6; return { cx: c.pt[0] + nx * (o0 + o1) / 2, cy: c.pt[1] + ny * (o0 + o1) / 2, len: o1 - o0, ang: Math.atan2(ny, nx) * 180 / Math.PI }; }), half: n * GAP / 2 + 4 });
+      });
+    }
 
     // 站名位置：每站從 8 個候選位置挑「與其他標籤、車站、線重疊最少」者
     const boxes = [], pts = []; // 已放的標籤框
@@ -151,7 +258,7 @@
       const q = L.pos.get(st.id), cstr = H.codeText ? H.codeText(st.id) : '',
         /* 2.4.0：站名寬度要抓寬一點。車站編號那一段是等寬字體（比 textW 的 0.56em 估計值寬），
          * 估太窄會讓避讓誤以為放得下，實測就是「M01/L08/KU10戸宮」這種長編號的站名疊到別人。 */
-        w = (textW(st.zh, FS) + (cstr ? textW(cstr, FS - 3) * 1.18 + 6 : 0)) + 5, hgt = FS + 3, r = linesAt.get(st.id).size > 1 ? 11 : 8, gap = r + 3;
+        w = (textW(st.zh, FS) + (cstr ? textW(cstr, FS - 3) * 1.18 + 6 : 0)) + 5, hgt = FS + 3, r = caps.has(st.id) ? Math.max(8, caps.get(st.id).half) : linesAt.get(st.id).size > 1 ? 11 : 8, gap = r + 3;
       /* 2.4.0：候選位置從 8 個擴成「兩圈 × 8 方向」＝16 個（外圈再退 11px）。
        * 站名互相疊是前輩明確要求要解決的，所以重疊的罰分拉到絕對壓倒性（1200），
        * 寧可把站名放到比較遠、比較醜的位置，也不要兩個站名疊在一起。 */
@@ -194,6 +301,42 @@
       }
       boxes.push(best.box); labelPos.set(st.id, best);
     }
+    /* 2.16.0：路線名稱寫在線旁（路線色）。每條路線挑最長的直線段，避開站名與車站。 */
+    if (opts.lineLabels !== false) {
+      const segsBy = new Map();
+      edgeEls.forEach(e => {
+        const ls = LMD.edgeLines[e.i]; if (ls.length !== 1) return;
+        const P = e.pts;
+        for (let k = 0; k + 1 < P.length; k++) { const len = Math.hypot(P[k + 1][0] - P[k][0], P[k + 1][1] - P[k][1]); (segsBy.get(ls[0]) || segsBy.set(ls[0], []).get(ls[0])).push({ a: P[k], b: P[k + 1], len, bw: bundle[e.i] || 4 }); }
+      });
+      const nb = [];
+      LMD.LINES.forEach(ln => {
+        const sg = (segsBy.get(ln.id) || []).sort((x, y) => y.len - x.len); if (!sg.length) return;
+        const total = sg.reduce((t, x) => t + x.len, 0), want = total > 1600 ? 2 : 1, fs = 12, tw = textW(ln.zh, fs) + 8, th = fs + 4, got = [];
+        for (const g of sg.slice(0, 12)) {
+          if (got.length >= want) break;
+          if (g.len < tw + 26) continue;
+          const dx = g.b[0] - g.a[0], dy = g.b[1] - g.a[1], l = g.len, ux = dx / l, uy = dy / l;
+          let ang = Math.atan2(dy, dx) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang <= -90) ang += 180;
+          const mx = (g.a[0] + g.b[0]) / 2, my = (g.a[1] + g.b[1]) / 2, ca = Math.abs(Math.cos(ang * Math.PI / 180)), sa = Math.abs(Math.sin(ang * Math.PI / 180));
+          const hw = (ca * tw + sa * th) / 2, hh = (sa * tw + ca * th) / 2;
+          let best = null;
+          [1, -1].forEach(sd => {
+            const o = g.bw + th / 2 + 3, cx = mx - uy * o * sd, cy = my + ux * o * sd, bx = { x: cx - hw, y: cy - hh, w: hw * 2, h: hh * 2 };
+            let pen = 0;
+            boxes.forEach(b => { if (overlap(bx, b)) pen += 100; });
+            nb.forEach(b => { if (overlap(bx, b)) pen += 100; });
+            pts.forEach(pt => { if (pt[0] > bx.x - 6 && pt[0] < bx.x + bx.w + 6 && pt[1] > bx.y - 6 && pt[1] < bx.y + bx.h + 6) pen += 40; });
+            if (got.some(q => Math.hypot(q[0] - cx, q[1] - cy) < 500)) pen += 1000;
+            if (!best || pen < best.pen) best = { pen, cx, cy, bx };
+          });
+          if (!best || best.pen >= 100) continue;
+          got.push([best.cx, best.cy]); nb.push(best.bx);
+          gLn.append(s('text', { transform: `translate(${best.cx.toFixed(1)} ${best.cy.toFixed(1)}) rotate(${ang.toFixed(1)})`, 'text-anchor': 'middle', dy: '0.36em', class: 'ln-name', style: `fill:${ln.color}` }, ln.zh));
+        }
+      });
+      boxes.push(...nb);
+    }
 
     { // 依內容裁切 viewBox（含站名），避免四周留白過大
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -205,8 +348,12 @@
     H.stations.forEach(st => {
       const q = L.pos.get(st.id), multi = linesAt.get(st.id).size > 1, lp = labelPos.get(st.id);
       const g = s('g', { class: 'st' + (multi ? ' xfer' : ''), 'data-id': st.id, tabindex: opts.interactive ? '0' : null, role: opts.interactive ? 'button' : null, 'aria-label': opts.interactive ? st.zh : null });
-      if (multi) g.append(s('circle', { cx: q.x, cy: q.y, r: 11, class: 'st-ring' }));
-      g.append(s('circle', { cx: q.x, cy: q.y, r: multi ? 6.5 : 8, class: 'st-dot' }));
+      const cp = caps.get(st.id);
+      if (cp && cp.runs.length) cp.runs.forEach(r => g.append(s('rect', { x: (-r.len / 2).toFixed(1), y: -3.9, width: r.len.toFixed(1), height: 7.8, rx: 3.9, class: 'st-cap', transform: `translate(${r.cx.toFixed(1)} ${r.cy.toFixed(1)}) rotate(${r.ang.toFixed(1)})` })));
+      else {
+        if (multi) g.append(s('circle', { cx: q.x, cy: q.y, r: 11, class: 'st-ring' }));
+        g.append(s('circle', { cx: q.x, cy: q.y, r: multi ? 6.5 : 8, class: 'st-dot' }));
+      }
       const label = s('text', { x: q.x + lp.dx, y: q.y + lp.dy, 'text-anchor': lp.a, class: 'st-name' }, (H.codes(st.id).length ? [s('tspan', { class: 'st-code' }, H.codeText(st.id)), s('tspan', { dx: 4 }, st.zh)] : st.zh));
       g.append(label);
       if (opts.interactive) {
@@ -226,12 +373,31 @@
         const on = !!stationIds;
         svg.classList.toggle('dim', on);
         stEls.forEach((g, id) => g.classList.toggle('on', on && stationIds.has(id)));
-        edgeEls.forEach(e => { const k = e.p.a < e.p.b ? e.p.a + '|' + e.p.b : e.p.b + '|' + e.p.a; e.line.classList.toggle('on', on && edgeKeys && edgeKeys.has(k)); e.casing.classList.toggle('on', on && edgeKeys && edgeKeys.has(k)); });
+        edgeEls.forEach(e => { const k = keyOf(e.p.a, e.p.b), v = !!(on && edgeKeys && edgeKeys.has(k)); e.line.forEach(x => x.classList.toggle('on', v)); e.casing.classList.toggle('on', v); });
+        hsEls.forEach(x => x.el.classList.toggle('on', false));
+      },
+      /** 2.16.0：把一趟行程（legs）在圖上標出來，其餘變淡，並把視野縮到行程範圍。 */
+      route(legs) {
+        const ids = new Set(), ek = new Set(), hsIds = new Set();
+        (legs || []).forEach(leg => {
+          const ss = (leg.stops || []).map(x => x.station).filter(id => H.stById[id] && L.pos.get(id));
+          if (leg.sv && leg.sv.isHS) { ss.forEach(x => { ids.add(x); hsIds.add(x); }); return; }
+          for (let k = 0; k + 1 < ss.length; k++) { const p = H.shortestPath(ss[k], ss[k + 1]) || [ss[k], ss[k + 1]]; p.forEach(x => ids.add(x)); for (let j = 0; j + 1 < p.length; j++) ek.add(keyOf(p[j], p[j + 1])); }
+          ss.forEach(x => ids.add(x));
+          if (leg.walk && leg.walk.to && L.pos.get(leg.walk.to)) ids.add(leg.walk.to);
+        });
+        ctl.highlight(ids, ek);
+        hsEls.forEach(x => x.el.classList.toggle('on', hsIds.has(x.e.a) && hsIds.has(x.e.b)));
+        const first = legs && legs[0] && legs[0].stops[0], lastL = legs && legs[legs.length - 1], last = lastL && lastL.stops[lastL.stops.length - 1];
+        stEls.forEach((g, id) => g.classList.toggle('sel', !!((first && id === first.station) || (last && id === last.station))));
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        ids.forEach(id => { const v = L.pos.get(id); if (!v) return; x0 = Math.min(x0, v.x); y0 = Math.min(y0, v.y); x1 = Math.max(x1, v.x); y1 = Math.max(y1, v.y); });
+        if (x0 < Infinity) { const m = 70, w = Math.max(360, x1 - x0 + 2 * m), hh = Math.max(240, y1 - y0 + 2 * m); svg.setAttribute('viewBox', `${((x0 + x1) / 2 - w / 2).toFixed(0)} ${((y0 + y1) / 2 - hh / 2).toFixed(0)} ${w.toFixed(0)} ${hh.toFixed(0)}`); }
       },
       mark(id, cls) { stEls.forEach((g, k) => g.classList.toggle(cls, k === id)); },
       /** 2.9.0：替一組邊（a|b）加上 class（HIKACARD 不能使用的區間畫成灰色虛線用）。 */
       markEdges(edgeKeys, cls) {
-        edgeEls.forEach(e => { const k = e.p.a < e.p.b ? e.p.a + '|' + e.p.b : e.p.b + '|' + e.p.a; const on = !!edgeKeys && edgeKeys.has(k); e.line.classList.toggle(cls, on); e.casing.classList.toggle(cls, on); });
+        edgeEls.forEach(e => { const on = !!edgeKeys && edgeKeys.has(keyOf(e.p.a, e.p.b)); e.line.forEach(x => x.classList.toggle(cls, on)); e.casing.classList.toggle(cls, on); });
       },
       /** 以時刻表推算的列車位置。list 來自 H.activeTrains。 */
       setTrains(list, onClick) {
@@ -261,6 +427,39 @@
       },
     };
     return ctl;
+  }
+
+  /** 2.16.0：可切換「路線別（A）／種別停車（B）」的路線圖。which＝'map'／'home'／'live'，預設值看 CFG.mapDefaultMode，
+   *  使用者選過就記在 localStorage。回傳的控制器跟 renderMap 一樣，切換時會重畫並重新套用車站點選、列車位置。 */
+  function renderMapSwitch(container, H, L, opts, which) {
+    const CF = (HK.CFG) || root.HK_CONFIG || {}, LSK = 'hk-mapmode-' + which;
+    let mode = ((CF.mapDefaultMode || {})[which]) || 'A';
+    try { const v = localStorage.getItem(LSK); if (v === 'A' || v === 'B') mode = v; } catch (e) { /* 沒有 localStorage */ }
+    const bar = h('div', { class: 'mapmode', role: 'group', 'aria-label': '路線圖顯示方式' }), inner = h('div', { class: 'mapinner' }), leg = h('div', { class: 'legend maplegend' });
+    container.replaceChildren(bar, inner, leg);
+    const st = { cbs: [], trains: null, mark: null };
+    let ctl = null;
+    function legend() {
+      const LM = lineModel(H, L);
+      if (mode === 'A') leg.replaceChildren(...LM.LINES.filter((l, i) => LM.edgeLines.some(x => x.includes(l.id))).map(l => h('span', null, h('i', { class: 'rc', style: `background:${l.color}` }), l.zh)), h('span', null, '○ 車站'), h('span', null, '◎ 轉乘站'));
+      else leg.replaceChildren(...LM.groups.map(g => h('span', null, h('i', { class: 'rc' + (g.light ? ' light' : ''), style: `background:${g.color}` }), g.name)), h('span', null, '膠囊橫跨的線＝在這站停車，沒有被蓋到的線＝通過'));
+    }
+    function draw() {
+      ctl = renderMap(inner, H, L, Object.assign({}, opts, { mode }));
+      st.cbs.forEach(f => ctl.onStation(f));
+      if (st.trains) ctl.setTrains(...st.trains);
+      if (st.mark) ctl.mark(...st.mark);
+      bar.replaceChildren(...[['B', '種別停車'], ['A', '路線別']].map(([k, t]) => h('button', { type: 'button', 'aria-pressed': String(mode === k), onclick: () => { if (mode === k) return; mode = k; try { localStorage.setItem(LSK, k); } catch (e) { } draw(); } }, t)));
+      legend();
+    }
+    draw();
+    return {
+      get svg() { return ctl.svg; }, get stEls() { return ctl.stEls; },
+      onStation(f) { st.cbs.push(f); ctl.onStation(f); },
+      setTrains(...a) { st.trains = a; ctl.setTrains(...a); },
+      mark(...a) { st.mark = a; ctl.mark(...a); },
+      highlight(...a) { ctl.highlight(...a); }, markEdges(...a) { ctl.markEdges(...a); }, route(...a) { ctl.route(...a); },
+    };
   }
 
   /** 種別標籤（白綠配色：特急類＝綠底白字、急行／快速類＝綠框、各停＝灰框）。
@@ -437,5 +636,5 @@
     return wrap;
   }
 
-  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, netKey, renderMap, typeTag, typeMark, fmtDate, refreshHSExtOptions, stationPicker, stationGroups });
+  Object.assign(HK, { h, s, $, $$, getJSON, load, computeLayout, netKey, renderMap, renderMapSwitch, lineModel, typeTag, typeMark, fmtDate, refreshHSExtOptions, stationPicker, stationGroups });
 })(window);
