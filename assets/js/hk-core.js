@@ -308,9 +308,24 @@
     H.codeText = id => { const cs = H.codes(id); return cs.length ? cs.join('/') : ''; };
     if (window.HK_I18N) window.HK_I18N.names(net.stations.map(s => [s.zh, s.en]).concat((net.routes || []).map(r => [r.zh, r.en]), (net.routes || []).map(r => [r.displayZh, r.en])));
 
+    /* 2.18.0：MTR 路線的自訂行先（例「みつせ/名島港|MITSUSE/NAJIMA」）：拆掉英文段，各站對到網站站名；英文頁用車站英文名，對不到就用自訂的英文段。 */
+    const destCache = new Map();
+    const titleCase = t => t.toLowerCase().replace(/(^|[\s\/\-・])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+    H.destText = raw => {
+      if (destCache.has(raw)) return destCache.get(raw);
+      const bar = raw.indexOf('|'), ja = (bar >= 0 ? raw.slice(0, bar) : raw).trim(), enRaw = bar >= 0 ? raw.slice(bar + 1).replace(/\|+$/, '').trim() : '';
+      const toks = ja.split(/[\/／]/).map(t => t.trim()).filter(Boolean);
+      const all = stations.concat(net.stations || []);
+      const hit = toks.map(t => all.find(st => st.zh === t));
+      const zh = toks.map((t, k) => hit[k] ? hit[k].zh : t).join('/') || ja;
+      const en = toks.length && hit.every(x => x && x.en) ? hit.map(x => x.en).join(' / ') : enRaw ? (enRaw === enRaw.toUpperCase() ? titleCase(enRaw) : enRaw) : '';
+      if (en && window.HK_I18N) window.HK_I18N.names([[zh, en]]);
+      destCache.set(raw, zh);
+      return zh;
+    };
     H.destOf = (sv, i) => {
       const out = i != null && sv.stops[i] && sv.stops[i].out;
-      if (out) return out;
+      if (out) return H.destText(out);
       const first = sv.stops[0].station, last = sv.stops[sv.stops.length - 1].station;
       return first === last ? (sv.member.dir || '環狀') : H.stName(last);
     };

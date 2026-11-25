@@ -4962,5 +4962,19 @@ window.HK_I18N_DICT = {
 "天照地方": ["天照地方", "Tensho Region"],
 "滝尾町": ["滝尾町", "Takio Town"],
 "十万浦郡滝尾町": ["十万浦郡滝尾町", "Takio Town, Jumanmura District"],
-"スーパーしらたか": ["スーパーしらたか", "Super Shirataka"]
+"スーパーしらたか": ["スーパーしらたか", "Super Shirataka"],
+"千歲川古玩街": ["千歳川骨董通り", "Chitosegawa Antique Street"],
+"老街・手工藝": ["古い町並み・手工芸", "Old Town · Crafts"],
+"沿著水圳延伸的老街區，紙扇、和服與手工藝老店林立，走累了還能坐下來品茶、吃傳統點心。": ["水路沿いに続く古い町並み。扇子や着物、手工芸の老舗が軒を連ね、歩き疲れたらお茶と伝統菓子でひと休みできます。", "An old quarter along a canal, lined with long-established shops selling paper fans, kimono and handicrafts — and teahouses for a break with traditional sweets."],
+"千歲川的水圳從街區中央緩緩流過，兩岸是石砌河堤與整排老店鋪。紙扇行、和服店、木工與漆器工坊一間接著一間，不少店家還能看到師傅現場製作。": ["千歳川の水路が街の中央をゆったりと流れ、両岸には石積みの護岸と老舗が並びます。扇子屋、着物店、木工や漆器の工房が軒を連ね、職人の手仕事を間近で見られる店も少なくありません。", "The Chitose River canal flows gently through the heart of the quarter, with stone embankments and rows of old shops on both banks. Paper-fan makers, kimono shops and woodwork and lacquer workshops stand side by side, and in many you can watch the artisans at work."],
+"沿著河岸步道往石橋走，水面映著兩側的街屋，晴天的傍晚特別好拍。巷子裡的茶屋提供傳統茶藝和和菓子，適合逛累了停下來歇腳。從五原千歲站步行即可抵達。": ["川沿いの遊歩道を石橋へ歩くと、水面に両岸の町家が映り込み、晴れた日の夕方は絶好の撮影スポットです。路地の茶屋では伝統の茶と和菓子が楽しめ、散策の休憩にぴったり。五原千歳駅から徒歩で行けます。", "Walk the riverside path toward the stone bridge and the townhouses are mirrored in the water — clear evenings are perfect for photos. Teahouses in the side lanes serve traditional tea and wagashi, ideal for a rest. Within walking distance of Gohara-Chitose Station."],
+"水圳穿過街區中央的河岸景觀": ["街の中央を流れる水路の川辺の風景", "A canal running through the middle of the quarter"],
+"紙扇、和服、手工藝老店與工坊": ["扇子・着物・手工芸の老舗と工房", "Long-established fan, kimono and craft shops and workshops"],
+"傳統茶藝與和菓子茶屋": ["伝統の茶と和菓子の茶屋", "Teahouses with traditional tea and wagashi"],
+"石橋與河面倒影，傍晚最好拍": ["石橋と川面の映り込み、夕方がおすすめ", "The stone bridge and reflections — best in the evening"],
+"俯瞰千歲川水圳與石橋": ["千歳川の水路と石橋を見下ろす", "Overlooking the Chitose River canal and stone bridge"],
+"水圳與石橋": ["水路と石橋", "Canal and stone bridge"],
+"千歲川河岸的街屋與倒影": ["千歳川沿いの町家と映り込み", "Townhouses and reflections along the Chitose River"],
+"河岸街屋與倒影": ["川沿いの町家と映り込み", "Riverside townhouses and reflections"],
+"十万浦郡瑞別町千歲川1-1": ["十万浦郡瑞別町千歳川1-1", "1-1 Chitosegawa, Mizubetsu Town, Jumanmura District"]
 };

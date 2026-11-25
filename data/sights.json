@@ -613,5 +613,38 @@
     ],
     "address": "十万浦郡平倉市南滝井川町",
     "addressEn": "Minami-Takiigawa-machi, Heikura City, Jumanmura District"
+  },
+  {
+    "id": "chitosegawa",
+    "name": "千歲川古玩街",
+    "kana": "ちとせがわこっとうどおり",
+    "en": "Chitosegawa Antique Street",
+    "station": "五原千歲",
+    "tag": "老街・手工藝",
+    "lead": "沿著水圳延伸的老街區，紙扇、和服與手工藝老店林立，走累了還能坐下來品茶、吃傳統點心。",
+    "body": [
+      "千歲川的水圳從街區中央緩緩流過，兩岸是石砌河堤與整排老店鋪。紙扇行、和服店、木工與漆器工坊一間接著一間，不少店家還能看到師傅現場製作。",
+      "沿著河岸步道往石橋走，水面映著兩側的街屋，晴天的傍晚特別好拍。巷子裡的茶屋提供傳統茶藝和和菓子，適合逛累了停下來歇腳。從五原千歲站步行即可抵達。"
+    ],
+    "points": [
+      "水圳穿過街區中央的河岸景觀",
+      "紙扇、和服、手工藝老店與工坊",
+      "傳統茶藝與和菓子茶屋",
+      "石橋與河面倒影，傍晚最好拍"
+    ],
+    "photos": [
+      {
+        "src": "assets/photo/chitosegawa1.webp",
+        "alt": "俯瞰千歲川水圳與石橋",
+        "cap": "水圳與石橋"
+      },
+      {
+        "src": "assets/photo/chitosegawa2.webp",
+        "alt": "千歲川河岸的街屋與倒影",
+        "cap": "河岸街屋與倒影"
+      }
+    ],
+    "address": "十万浦郡瑞別町千歲川1-1",
+    "addressEn": "1-1 Chitosegawa, Mizubetsu Town, Jumanmura District"
   }
 ]
