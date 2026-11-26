@@ -90,6 +90,8 @@
     if (!A || !A.buildNetwork) throw new Error('model.js 尚未載入');
     const dump = snapshot.data || snapshot.dump || snapshot;
     const net = A.buildNetwork(dump, {});
+    const alias = (root.HK_CONFIG && root.HK_CONFIG.stationAlias) || {};
+    for (const st of net.stations || []) if (alias[st.zh]) st.zh = alias[st.zh];
     if (snapshot.schedule && A.calibrate) A.calibrate(net, snapshot.schedule);
     const H = index(net, dump, snapshot.dispatch);
     H.formMap = formations(dump, snapshot.schedule);

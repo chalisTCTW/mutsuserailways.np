@@ -144,5 +144,6 @@ window.HK_CONFIG = {
     { id: 'MONO', zh: '光瀨都市單軌', prefixes: [], color: '#1f6fd0', key: '單軌', lrt: true },
   ],
   mapWildCodes: ['MTS', 'HIK'],
+  stationAlias: { '五原千歳': '五原千歲' },
   mapDefaultMode: { map: 'B', home: 'B', live: 'A' },
 };
