@@ -244,6 +244,17 @@
     };
   }
 
+  /* 2.18.2：拿掉運転停車後，連續兩站同一個車站（例：名島港→尾軌→名島港）合併成一站：到站取前者、發車取後者。 */
+  function mergeSame(list) {
+    const out = [];
+    for (const x of list) {
+      const p = out[out.length - 1];
+      if (p && p.station === x.station) { out[out.length - 1] = Object.assign({}, p, { dep: x.dep != null ? x.dep : p.dep, platformName: p.platformName === x.platformName ? p.platformName : (p.platformName && x.platformName ? p.platformName + '→' + x.platformName : p.platformName || x.platformName), out: x.out || p.out }); continue; }
+      out.push(x);
+    }
+    return out;
+  }
+
   function index(net, dump, disp) {
     const H = { net, cfg: CFG };
     const DP = makeDispatch(disp);
@@ -293,7 +304,7 @@
         || lrtNames.has(route.displayZh || '') || lrtNames.has(route.zh || '') || lrtNames.has(nm.line || ''));
       // 1.1.0：高速鉄道的 tcls 固定給 'hs'（不是一般的 ltd／exp／loc），這樣共用的 .ttag／.mk 樣式才會套到專屬的識別色，
       // 不會被誤判成各停（loc）而顯示成灰框。
-      svcs.push({ idx, isLRT, stops: s.stops.filter(x => !x.op && !hideIds.has(x.station)),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], depotId: String(s.depot), mid: String(s.member), member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
+      svcs.push({ idx, isLRT, stops: mergeSame(s.stops.filter(x => !x.op && !hideIds.has(x.station))),   /* 1.0.4 運転停車的站不是旅客停靠站：從入口網站的停車站、時刻表、查詢全部拿掉 */ depot: depotsById[s.depot], depotId: String(s.depot), mid: String(s.member), member, route, line: nm.line, type: nm.type, tcls: isHS ? 'hs' : typeClass(nm.type), routeName: route.displayZh, color: col, ink: inkOn(col), isHS });
     });
     H.svcs = svcs;
     /* 2.3.0：H.edges／L.paths 裡的 svcs 存的是 net.services 的索引（sv.idx），不是 H.svcs 的陣列位置。

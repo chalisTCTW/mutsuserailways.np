@@ -143,7 +143,17 @@
       const q = g.seq || [];
       for (let k = 0; k + 1 < q.length; k++) { const ei = eIdx.get(keyOf(q[k], q[k + 1])); if (ei == null || orient[ei]) continue; orient[ei] = L.paths[ei].a === q[k] ? 1 : -1; }
     });
-    const edgeGroups = L.paths.map((p, i) => G.filter(g => g.edges.has(i)));
+    /* 2.18.2：平行區間依速度排列——水平段越慢的種別在上，垂直・斜向段越慢的種別在右，讓停車的種別靠在一起。 */
+    const slow = g => cord.indexOf(g.cls) * 1e4 - g.stops.size;
+    const edgeGroups = L.paths.map((p, i) => {
+      const gs = G.filter(g => g.edges.has(i)).sort((a, b) => (slow(a) - slow(b)) || String(a.key).localeCompare(String(b.key)));
+      if (gs.length < 2) return gs;
+      const P = orient[i] < 0 ? p.pts.slice().reverse() : p.pts;
+      let ux = 1, uy = 0, best = -1;
+      for (let k = 0; k + 1 < P.length; k++) { const dx = P[k + 1][0] - P[k][0], dy = P[k + 1][1] - P[k][1], l = Math.hypot(dx, dy); if (l > best) { best = l; ux = dx / l; uy = dy / l; } }
+      const horiz = Math.abs(uy) < 0.414 * Math.abs(ux);
+      return (horiz ? ux > 0 : uy > 0) ? gs : gs.reverse();
+    });
     return (L._lm = { LINES, byId, edgeLines, edgeGroups, orient, groups: G, eIdx });
   }
   function offPts(pts, d) {
@@ -168,8 +178,8 @@
     const CR = opts.cornerRadius != null ? opts.cornerRadius : (CFGX.mapCornerRadius != null ? CFGX.mapCornerRadius : 10);   // 2.4.0 轉角圓角半徑
     const MODE = opts.mode === 'B' ? 'B' : 'A', LMD = lineModel(H, L);
     const svg = s('svg', { viewBox: `0 0 ${W} ${HT}`, class: 'rmap mode-' + MODE, role: 'img', 'aria-label': '光瀨都市鉄道 路線圖', preserveAspectRatio: 'xMidYMid meet' });
-    const gEdge = s('g', { class: 'edges' }), gHs = s('g', { class: 'hs-edges' }), gLn = s('g', { class: 'line-names' }), gSt = s('g', { class: 'stations' }), gLab = s('g', { class: 'labels' }), gTr = s('g', { class: 'trains' });
-    svg.append(gEdge, gHs, gLn, gSt, gLab, gTr);
+    const gCase = s('g', { class: 'edge-cases' }), gSCase = s('g', { class: 'strip-cases' }), gEdge = s('g', { class: 'edges' }), gHs = s('g', { class: 'hs-edges' }), gLn = s('g', { class: 'line-names' }), gSt = s('g', { class: 'stations' }), gLab = s('g', { class: 'labels' }), gTr = s('g', { class: 'trains' });
+    svg.append(gCase, gSCase, gEdge, gHs, gLn, gSt, gLab, gTr);
 
     // 1.1.0：高速鐵路不計入拓樸（H.edges 已經排除），只在轉乘站之間疊一層虛線（含站外轉乘，例如幸村↔新光瀨）
     // 1.1.2：改用 L.hsPaths（只接受 45°／90° 轉彎的折線，車站位置完全沿用一般鐵路排好的結果）；
@@ -200,16 +210,16 @@
       if (MODE === 'B' && LMD.edgeGroups[i].length) {
         const gs = LMD.edgeGroups[i], n = gs.length;
         bundle[i] = n * GAP / 2 + 1;
-        casing = s('path', { d: roundPath(pts, CR), class: 'e-casing', style: `stroke-width:${(n * GAP + 6).toFixed(1)}px` }); gEdge.append(casing);
+        casing = s('path', { d: roundPath(pts, CR), class: 'e-casing', style: `stroke-width:${(n * GAP + 6).toFixed(1)}px` }); gCase.append(casing);
         gs.forEach((g, k) => {
           const d = roundPath(offPts(pts, (k - (n - 1) / 2) * GAP), CR), w = g.lrt ? 2.4 : SW;
-          if (g.light) gEdge.append(s('path', { d, class: 'strip-case', style: `stroke-width:${w + 1.8}px` }));
+          if (g.light) gSCase.append(s('path', { d, class: 'strip-case', style: `stroke-width:${w + 1.8}px` }));
           const el = s('path', { d, class: 'e-line strip', style: `--lc:${g.color};--lw:${w}px` }); gEdge.append(el); lines.push(el);
         });
       } else {
         const ls = LMD.edgeLines[i].length ? LMD.edgeLines[i] : [null], n = ls.length, w = n > 1 ? 5 : LWA;
         bundle[i] = lrt ? 2.5 : n * w / 2 + (n > 1 ? 1 : 0);
-        casing = s('path', { d: roundPath(pts, CR), class: 'e-casing' + (lrt ? ' lrt' : ''), style: n > 1 ? `stroke-width:${n * 5.6 + 5}px` : null }); gEdge.append(casing);
+        casing = s('path', { d: roundPath(pts, CR), class: 'e-casing' + (lrt ? ' lrt' : ''), style: n > 1 ? `stroke-width:${n * 5.6 + 5}px` : null }); gCase.append(casing);
         ls.forEach((lid, k) => {
           const ln = lid ? LMD.byId[lid] : null, d = roundPath(offPts(pts, (k - (n - 1) / 2) * 5.6), CR);
           const el = s('path', { d, class: 'e-line' + (lrt ? ' lrt' : ''), style: ln && !lrt ? `--lc:${ln.color};--lw:${w}px` : null }); gEdge.append(el); lines.push(el);
