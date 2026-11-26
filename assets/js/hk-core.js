@@ -159,10 +159,36 @@
     else if (sinceS && rules.length) { const c = ruleStarts(sinceS + 1, sinceS + 9 * DAY).filter(t => t > sinceS); if (c.length) untilS = Math.min(...c); }
     const stateAct = disp.recall ? 'recall' : (disp.mode || 'default');
     const ruleAt = epochS => { const h = ruleHit(epochS); return h ? h[0].act : 'default'; };
-    /** epochS 這一刻適用的方案（default／midday／offpeak／night／recall）。 */
+    /** epochS 這一刻適用的方案（default／midday／offpeak／night／recall）——全系統。 */
     const actAt = epochS => {
       if (sinceS && epochS >= sinceS && epochS < untilS) return stateAct;
       return rules.length ? ruleAt(epochS) : 'default';
+    };
+    /* 2.18.1：與 ATOS 網頁 1.2.5 相同——每個車庫可有自己的手動方案（depotPlan）與時段表（depotSched），優先於全系統。 */
+    const DEPOT_PLAN = disp.depotPlan || {}, DEPOT_SCHED = disp.depotSched || {};
+    const ruleHitIn = (rs, epochS) => {
+      if (!rs.length) return null;
+      const d0 = dayIdxOf(epochS);
+      let best = null, bestAt = -Infinity;
+      for (let k = 0; k <= 8 && !best; k++) for (const r of rs) {
+        if (!appliesOn(r, d0 - k)) continue;
+        const t = startOf(r, d0 - k);
+        if (t <= epochS && t > bestAt) { best = r; bestAt = t; }
+      }
+      return best ? [best, bestAt] : null;
+    };
+    const depotActAt = (depotId, epochS) => {
+      const o = DEPOT_PLAN[depotId];
+      if (o) {
+        const sn = o.since ? Math.floor(o.since / 1000) : 0, un = o.until ? Math.floor(o.until / 1000) : Infinity;
+        if (sn && epochS >= sn && epochS < un) return o.act;
+      }
+      const sc = DEPOT_SCHED[depotId];
+      if (sc && sc.on && sc.rules && sc.rules.length) {
+        const h = ruleHitIn(sc.rules.slice().sort((a, b) => a.m - b.m), epochS);
+        if (h) return h[0].act;
+      }
+      return actAt(epochS);
     };
     /* 收車區間；首末班只看「時間最長的那一次收車」（較短的不算分界） */
     const recallIv = (from, to) => {
@@ -190,11 +216,12 @@
     return {
       has: id => !!rankOf[id],
       actAt,
+      depotActAt,
       mainRecalls,
       /** depotId：車庫；raw：UTC 一天秒數的發車時刻；epochS：這一班發車的實際時間（epoch 秒）。 */
       runs(depotId, raw, epochS) {
         const m = rankOf[depotId]; if (!m) return true;
-        const a = actAt(epochS); if (a === 'recall') return false;
+        const a = depotActAt(String(depotId), epochS); if (a === 'recall') return false;
         const n = N[a] || 1; if (n === 1 && a !== 'midday') return true;
         const i = m.get(raw); if (i == null) return true;
         return a === 'midday' ? i % 3 !== 0 : i % n === 0;
