@@ -4976,5 +4976,15 @@ window.HK_I18N_DICT = {
 "水圳與石橋": ["水路と石橋", "Canal and stone bridge"],
 "千歲川河岸的街屋與倒影": ["千歳川沿いの町家と映り込み", "Townhouses and reflections along the Chitose River"],
 "河岸街屋與倒影": ["川沿いの町家と映り込み", "Riverside townhouses and reflections"],
-"十万浦郡瑞別町千歲川1-1": ["十万浦郡瑞別町千歳川1-1", "1-1 Chitosegawa, Mizubetsu Town, Jumanmura District"]
+"十万浦郡瑞別町千歲川1-1": ["十万浦郡瑞別町千歳川1-1", "1-1 Chitosegawa, Mizubetsu Town, Jumanmura District"],
+"20000 形": ["20000形", "20000 Series"],
+"2004 年": ["2004年", "2004"],
+"3 輛・6 輛": ["3両・6両", "3 or 6 cars"],
+"花川本線、上羽本線": ["花川本線、上羽本線", "Hanakawa Main Line, Kamiha Main Line"],
+"行駛在霧中高架彎道的20000形": ["霧の中、高架の曲線を走る20000形", "20000 Series on a curved viaduct in the fog"],
+"霧中的高架彎道": ["霧の中の高架曲線", "Curved viaduct in the fog"],
+"通過古道第一踏切的20000形": ["古道第一踏切を通過する20000形", "20000 Series passing Furumichi No. 1 Level Crossing"],
+"古道第一踏切": ["古道第一踏切", "Furumichi No. 1 Level Crossing"],
+"回送中的20000形": ["回送中の20000形", "20000 Series running out of service"],
+"回送": ["回送", "Out of service"]
 };

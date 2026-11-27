@@ -34,7 +34,9 @@
         { name: '1100 形', en: '1100 Series', rows: [['登場年', '2021 年'], ['編組', '8 輛（快速）・4 輛（各停）'], ['最高速度', '130 km/h'], ['服務設備', '4・5 号車指定席車廂（2026 年改造）'], ['服務路線／種別', '花川本線快速（8 輛）、各停（4 輛）'], ['製造商', '鶴島精工']],
           photos: [P('c1100-1', '行駛在高架彎道的1100形', '')] },
         { name: '新 1150 形', en: 'New 1150 Series', rows: [['登場年', '2021 年'], ['編組', '6 輛・8 輛'], ['最高速度', '130 km/h'], ['服務路線／種別', '新中央線白藏山線各停（6 輛）、環狀線（8 輛）'], ['製造商', '鶴島精工']],
-          photos: [P('n1150-1', '行駛中的新1150形', ''), P('n1150-2', '行駛在高架上的新1150形', ''), P('n1150-int', '新1150形的車廂內部', '車廂內部')] }] }
+          photos: [P('n1150-1', '行駛中的新1150形', ''), P('n1150-2', '行駛在高架上的新1150形', ''), P('n1150-int', '新1150形的車廂內部', '車廂內部')] },
+        { name: '20000 形', en: '20000 Series', rows: [['登場年', '2004 年'], ['編組', '3 輛・6 輛'], ['最高速度', '160 km/h'], ['服務路線／種別', '花川本線、上羽本線']],
+          photos: [P('c20000-1', '行駛在霧中高架彎道的20000形', '霧中的高架彎道'), P('c20000-2', '通過古道第一踏切的20000形', '古道第一踏切'), P('c20000-3', '回送中的20000形', '回送')] }] }
   ];
 
   const sec = (title, sub, ...kids) => h('section', { class: 'gsec' }, h('h2', null, title, sub ? h('small', null, sub) : null), ...kids);
@@ -132,8 +134,8 @@
         h('div', { class: 'kb-t' }, h('span', { class: 'tag', style: cur.color ? `--bc:${cur.color}` : null }, cur.tag), h('h2', null, cur.title), h('p', { class: 'kb-s' }, cur.en))));
       cur.vehicles.forEach(v => {
         const ph = gallery(v.photos);
-        out.append(sec(v.retire ? [v.name, ' ', h('span', { class: 'retire' }, '即將退役')] : v.name, v.en, h('div', { class: 'kbcols' },
-          h('div', null, h('table', { class: 'tbl' }, h('tbody', null, v.rows.map(([k, x]) => h('tr', null, h('th', null, k), h('td', null, x)))))), ph)));
+        out.append(sec(v.retire ? [v.name, ' ', h('span', { class: 'retire' }, '即將退役')] : v.name, v.en, h('div', { class: 'kbcols' }, ph,
+          h('div', null, h('table', { class: 'tbl' }, h('tbody', null, v.rows.map(([k, x]) => h('tr', null, h('th', null, k), h('td', null, x)))))))));
       });
       if (cur.kind === 'fleet') { out.append(h('p', { class: 'note' }, '通勤列車只介紹車型；各路線的停靠站與時刻請見時刻表。'), h('p', null, h('a', { class: 'btn ghost', href: 'timetable.html' }, '時刻表'))); return; }
       if (!groups.length) { out.append(sec('運行與時刻', null, h('p', null, '時刻表資料中還沒有這個種別的班次，更新後會顯示在這裡。'))); return; }
