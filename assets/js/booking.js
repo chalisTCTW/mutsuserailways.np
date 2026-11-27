@@ -80,7 +80,7 @@
         h('label', { class: 'f hs-field', style: 'flex-direction:row;display:flex;gap:6px;align-items:center;padding:6px 10px' }, useHS, h('span', null, h('span', { class: 'hs-tag' }, '高速鉄道'), '可以利用高速鐵路（含延伸路段）')),
         h('button', { class: 'btn', type: 'submit' }, '查詢班次')));
     const out = h('div', { class: 'bk-out' });
-    root.append(h('p', { class: 'lead' }, '特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席；花川本線快速・環狀快速為 4・5 号車指定席、其他車廂自由席；高速鐵路為全車指定席（沒有立席特急券，票價另計）。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。'), h('div', { style: 'margin-top:12px' }, form), out);
+    root.append(h('p', { class: 'lead' }, '特急スーパーこばな・こばな為 1～6 号車、スーパーしらたか為 1～4 号車指定席，其他特急為全車指定席（也有半價的立席特急券）；特快為 1・2 号車指定席、3 号車以後自由席；花川本線快速・環狀快速為 4・5 号車指定席、其他車廂自由席；高速鐵路為全車指定席（沒有立席特急券，票價另計）。行程中只要有一段可以預約，就會列出完整行程（含轉乘）。'), h('div', { style: 'margin-top:12px' }, form), out);
 
     const pax = () => ({ a: Number(nA.value), c: Number(nC.value), s: Number(nS.value), n: Number(nA.value) + Number(nC.value) + Number(nS.value) });
 

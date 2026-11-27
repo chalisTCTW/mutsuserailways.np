@@ -14,8 +14,9 @@
     seatsPerCar: 40,               // 2100 形每節座位數（2+2）
     // 指定席政策（0.21.0）：特急＝全車指定席（另有立席特急券）；特快＝1・2 号車指定席、3 号車以後自由席。1 号車＝進行方向最前端。
     // 2.14.0：花川本線快速・環狀快速 8 輛編組，4・5 号車指定席（reservedList＝指定席車廂號碼），規則比照特快（不收自由席費、沒有立席特急券）。
+    // 2.20.1：こばな・スーパーこばな＝1～6号車指定席，スーパーしらたか（6 輛）＝1～4号車指定席，あおさぎ照舊全車指定席。
     // 2.15.0：快速只有 8 輛編組的班次有 4・5 号車指定席（minCars），6 輛的不開放訂位；輛數本身改用快照的實際編組。
-    reserved: [{ re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }, { re: '花川本線快速|環[状狀]快速', cars: 8, mode: 'part', reservedList: [4, 5], minCars: 8 }],
+    reserved: [{ re: 'こばな', cars: 8, mode: 'part', reservedList: [1, 2, 3, 4, 5, 6] }, { re: 'しらたか', cars: 6, mode: 'part', reservedList: [1, 2, 3, 4] }, { re: '特急', cars: 8, mode: 'all' }, { re: '特別快速|特快', cars: 6, mode: 'part', reservedCars: 2 }, { re: '花川本線快速|環[状狀]快速', cars: 8, mode: 'part', reservedList: [4, 5], minCars: 8 }],
     standRatio: 0.5,               // 立席特急券＝指定席費用的比例
     // 1.1.0：高速鐵路（routeType＝HIGH_SPEED）獨立票價制度，不套用一般的分區運費與 CFG.reserved：
     // 票價＝hsFareStep × 跨越的收費區數（沿用一般鐵路同一套分區；至少算跨 1 區）；全車指定席、沒有立席特急券，
@@ -289,6 +290,16 @@
     // 2.13.0：信號場（例：桂木信號場）不是旅客車站——遊戲裡列車可能在那裡停（待避），入口網站一律當作沒有這一站
     const hideRe = new RegExp(CFG.hideStationsRe || '信[號号]場$');
     const hideIds = new Set(net.stations.filter(st => hideRe.test(st.zh || '')).map(st => st.id));
+    /* 2.20.2：同名路線只是上行、下行停站不同（例：スーパーしらたか上行跳站）而沒被合併時，方向不重疊就照常用原名，不加（上行）／（下行）。 */
+    {
+      const byZh = new Map(); net.routes.forEach(r => { if (!byZh.has(r.zh)) byZh.set(r.zh, []); byZh.get(r.zh).push(r); });
+      byZh.forEach(rs => {
+        if (rs.length < 2 || rs.some(r => r.status !== 'operating')) return;
+        const seen = new Set(); let ok = true;
+        rs.forEach(r => r.directions.forEach(d => { if (seen.has(d.label)) ok = false; seen.add(d.label); }));
+        if (ok) rs.forEach(r => { r.displayZh = r.zh; });
+      });
+    }
     const svcs = [];
     net.services.forEach((s, idx) => {
       const route = routesByKey[s.route], member = net.members[s.member];
@@ -634,6 +645,26 @@
     }
     const phys = new Map();
     for (const [k, e] of edges) if (!chords.has(k)) phys.set(k, e);
+    /* 2.20.1：跳站連線兩端不在同一個班次裡時（例：特急 東平倉→御笠市，各停分成兩個班次），
+     * 改用幾何判斷——別的連線能沿著同一條走廊（繞行 ≤1.4 倍、偏離 ≤30%）接起兩端，就當作跳站連線。 */
+    {
+      const P = id => H.stById[id], dist = (a, b) => Math.hypot(P(a).x - P(b).x, P(a).z - P(b).z);
+      const dev = (c, a, b) => { const A = P(a), B = P(b), C = P(c), dx = B.x - A.x, dz = B.z - A.z, L2 = dx * dx + dz * dz || 1, t = Math.max(0, Math.min(1, ((C.x - A.x) * dx + (C.z - A.z) * dz) / L2)); return Math.hypot(A.x + dx * t - C.x, A.z + dz * t - C.z); };
+      const list = [...phys.entries()].map(([k, e]) => ({ k, e, len: dist(e.a, e.b) })).sort((x, y) => y.len - x.len);
+      const nb = new Map(); const link = (a, b, l) => { if (!nb.has(a)) nb.set(a, new Map()); nb.get(a).set(b, l); };
+      list.forEach(({ e, len }) => { link(e.a, e.b, len); link(e.b, e.a, len); });
+      for (const { k, e, len } of list) {
+        nb.get(e.a).delete(e.b); nb.get(e.b).delete(e.a);
+        const lim = len * 1.4, d = new Map([[e.a, 0]]), q = [[0, e.a]], seen = new Set(); let ok = false;
+        while (q.length) {
+          q.sort((x, y) => x[0] - y[0]); const [du, u] = q.shift();
+          if (seen.has(u)) continue; seen.add(u);
+          if (u === e.b) { ok = true; break; }
+          for (const [v, l] of nb.get(u) || []) { const nd = du + l; if (nd > lim || (v !== e.b && dev(v, e.a, e.b) > len * 0.3)) continue; if (nd < (d.has(v) ? d.get(v) : Infinity)) { d.set(v, nd); q.push([nd, v]); } }
+        }
+        if (ok) phys.delete(k); else { link(e.a, e.b, len); link(e.b, e.a, len); }
+      }
+    }
     // 跳站連線一併記錄所屬班次，讓路線圖畫「這條線有停這些站」
     H.edges = [...phys.values()].map(e => {
       const a = H.stById[e.a], b = H.stById[e.b];
@@ -1030,7 +1061,7 @@
       return (sv._ri = out);
     };
     /** 顯示文字：全車指定席／1・2号車指定席。 */
-    H.reserveLabel = function (sv) { const ri = H.reserveInfo(sv); if (!ri) return ''; if (ri.mode === 'all') return '全車指定席'; if (!ri.head) return ri.rList.join('・') + '号車指定席／其他車廂自由席'; return (ri.reservedCars === 1 ? '1号車' : '1・' + ri.reservedCars + '号車') + '指定席／' + (ri.reservedCars + 1) + '号車以後自由席'; };
+    H.reserveLabel = function (sv) { const ri = H.reserveInfo(sv); if (!ri) return ''; if (ri.mode === 'all') return '全車指定席'; if (!ri.head) return ri.rList.join('・') + '号車指定席／其他車廂自由席'; return (ri.reservedCars === 1 ? '1号車' : (ri.reservedCars === 2 ? '1・' : '1～') + ri.reservedCars + '号車') + '指定席／' + (ri.reservedCars + 1) + '号車以後自由席'; };
     /** 2.14.0：自由席車廂的說明（3号車以後／4・5号車以外）。 */
     H.freeCarsText = function (ri) { return ri.head ? (ri.reservedCars + 1) + '号車以後' : ri.rList.join('・') + '号車以外'; };
     /** 2.15.0：這班的實際編組（排序過的輛數陣列；多半只有一種）。快照沒有資料（例如高速鉄道的虛擬延伸）回傳 null。 */

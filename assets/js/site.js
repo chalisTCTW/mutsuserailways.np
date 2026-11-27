@@ -299,7 +299,7 @@
       });
       // 1.1.0：這裡改回分開的 h() 參數（前輩用語之前就是這樣拆，中間的數字單獨一個節點），
       // 不要再用 + 把整段接成一個字串——接成一個字串會讓既有的日文／英文翻譯對不上，整段都不會被翻譯。
-      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ', String(Math.round(H.minTransfer / 60 * 10) / 10), ' 分鐘計算（中央戸宮／光大前與大學前可步行轉乘，約 6 分鐘；幸村／新光瀨亦可步行轉乘高速鐵路）。乘車券依出發站到抵達站的最短路徑計算，與搭乘的班次無關；特急為全車指定席（也有半價的立席特急券），特快的 1・2 号車為指定席、3 号車以後為自由席；快速與環狀快速的 4・5 号車為指定席、其他車廂為自由席；高速鐵路為全車指定席、沒有立席特急券，票價另計。'));
+      out.append(h('p', { class: 'note' }, '轉乘時間以最短 ', String(Math.round(H.minTransfer / 60 * 10) / 10), ' 分鐘計算（中央戸宮／光大前與大學前可步行轉乘，約 6 分鐘；幸村／新光瀨亦可步行轉乘高速鐵路）。乘車券依出發站到抵達站的最短路徑計算，與搭乘的班次無關；特急スーパーこばな・こばな為 1～6 号車、スーパーしらたか為 1～4 号車指定席，其他特急為全車指定席（也有半價的立席特急券），特快的 1・2 号車為指定席、3 号車以後為自由席；快速與環狀快速的 4・5 号車為指定席、其他車廂為自由席；高速鐵路為全車指定席、沒有立席特急券，票價另計。'));
       try { history.replaceState(null, '', `?tab=route&from=${fSel.value}&to=${tSel.value}&t=${tIn.value}${vSel.value ? '&via=' + vSel.value : ''}${noRes.checked ? '&nores=1' : ''}${useHS.checked ? '&hs=1' : ''}`); } catch (e) { }
     }
     if (q.get('from')) go();
@@ -383,7 +383,7 @@
     const rule = h('div', { class: 'sec' }, h('h2', null, '票價制度'), h('table', { class: 'tbl' }, h('tbody', null,
       h('tr', null, h('th', { style: 'width:30%' }, '基本運費'), h('td', null, `${yen(C.fareBase)}（含同一收費區內）`)),
       h('tr', null, h('th', null, '區間加算'), h('td', null, `每跨越一個收費區加 ${yen(C.fareStep)}（依實際經過的路徑計算跨越次數，而非區號差）`)),
-      h('tr', null, h('th', null, '指定席費用'), h('td', null, `${yen(C.seatFee)}（特急為全車指定席；特快為 1・2 号車指定席，3 号車以後為自由席不收費；快速與環狀快速為 4・5 号車指定席，其他車廂為自由席不收費）。特急的立席特急券為指定席的一半（${yen(Math.round(C.seatFee * C.standRatio))}），不保證有位置、不能選座位。`)),
+      h('tr', null, h('th', null, '指定席費用'), h('td', null, `${yen(C.seatFee)}（特急スーパーこばな・こばな為 1～6 号車、スーパーしらたか為 1～4 号車指定席，其他特急為全車指定席；特快為 1・2 号車指定席，3 号車以後為自由席不收費；快速與環狀快速為 4・5 号車指定席，其他車廂為自由席不收費）。特急的立席特急券為指定席的一半（${yen(Math.round(C.seatFee * C.standRatio))}），不保證有位置、不能選座位。`)),
       h('tr', null, h('th', null, '兒童・優待'), h('td', null, '12 歲以下、60 歲以上的乘車券為大人的一半（四捨五入到整數）；指定席費用不打折。')),
       h('tr', null, h('th', null, '路徑的取法'), h('td', null, '有多條路徑時，取跨越收費區最少、其次距離最短的路徑。')))));
     root.append(h('div', { style: 'margin-top:16px' }, form), out, rule);
@@ -492,5 +492,5 @@
   /* 2.5.0：頁尾顯示入口網站版本，方便確認瀏覽器載入的是不是新檔案（診斷頁：check.html） */
   window.HK_PORTAL_VERSION = '2.6.1';
   try { const n = document.querySelector('footer .nav'); if (n && !n.querySelector('.sewa')) { const a = document.createElement('a'); a.className = 'sewa'; a.href = 'sewa/'; a.textContent = 'SEWA 論壇'; n.appendChild(a); } } catch (e) { /* 不影響頁面 */ }
-  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.20.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
+  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.20.2'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
 })();
