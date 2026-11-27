@@ -4987,5 +4987,15 @@ window.HK_I18N_DICT = {
 "古道第一踏切": ["古道第一踏切", "Furumichi No. 1 Level Crossing"],
 "回送中的20000形": ["回送中の20000形", "20000 Series running out of service"],
 "回送": ["回送", "Out of service"],
-"SEWA 論壇": ["SEWA 掲示板", "SEWA Forum"]
+"SEWA 論壇": ["SEWA 掲示板", "SEWA Forum"],
+"車10分": ["車10分", "10 min by car"],
+"駅構内": ["駅構内", "Inside the station"],
+"光瀨市交通局的市營公車，以みつせ、戸宮、花倉街道、東平倉、紫市、名島港、勝守、十万浦市、上羽神別、瑞別町、御笠市、照宮、鷹田為中心運行。": ["光瀬市交通局の市営バスは、みつせ・戸宮・花倉街道・東平倉・紫市・名島港・勝守・十万浦市・上羽神別・瑞別町・御笠市・照宮・鷹田を中心に運行しています。", "Hikarise City Transportation Bureau's municipal buses run around Mitsuse, Tomiya, Hanakura-Kaido, Tohekura, Murasaki City, Najima Port, Katsumori, Jumanmura City, Kamiha-Kanbetsu, Mizubetsu Town, Mikasa City, Terunomiya and Takada."],
+"雲中瀬町": ["雲中瀬町", "Kumonakase Town"],
+"天照市": ["天照市", "Tensho City"],
+"鷹田市": ["鷹田市", "Takada City"],
+"十万浦郡御笠市": ["十万浦郡御笠市", "Mikasa City, Jumanmura District"],
+"十万浦郡雲中瀬町": ["十万浦郡雲中瀬町", "Kumonakase Town, Jumanmura District"],
+"十万浦郡天照市": ["十万浦郡天照市", "Tensho City, Jumanmura District"],
+"十万浦郡鷹田市": ["十万浦郡鷹田市", "Takada City, Jumanmura District"]
 };

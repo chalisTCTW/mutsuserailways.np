@@ -280,9 +280,45 @@
    "ja": "御笠市",
    "en": "Mikasa City",
    "full": {
-    "zh": "御笠市",
-    "ja": "御笠市",
-    "en": "Mikasa City"
+    "zh": "十万浦郡御笠市",
+    "ja": "十万浦郡御笠市",
+    "en": "Mikasa City, Jumanmura District"
+   }
+  },
+  {
+   "id": "kumonakase",
+   "region": "tensho",
+   "zh": "雲中瀬町",
+   "ja": "雲中瀬町",
+   "en": "Kumonakase Town",
+   "full": {
+    "zh": "十万浦郡雲中瀬町",
+    "ja": "十万浦郡雲中瀬町",
+    "en": "Kumonakase Town, Jumanmura District"
+   }
+  },
+  {
+   "id": "tensho",
+   "region": "tensho",
+   "zh": "天照市",
+   "ja": "天照市",
+   "en": "Tensho City",
+   "full": {
+    "zh": "十万浦郡天照市",
+    "ja": "十万浦郡天照市",
+    "en": "Tensho City, Jumanmura District"
+   }
+  },
+  {
+   "id": "takada",
+   "region": "tensho",
+   "zh": "鷹田市",
+   "ja": "鷹田市",
+   "en": "Takada City",
+   "full": {
+    "zh": "十万浦郡鷹田市",
+    "ja": "十万浦郡鷹田市",
+    "en": "Takada City, Jumanmura District"
    }
   }
  ],
@@ -375,7 +411,15 @@
   "五原滝尾": "takio",
   "三浦": "mikasa",
   "三浦海岸": "mikasa",
-  "御笠市": "mikasa"
+  "御笠市": "mikasa",
+  "荒村": "kumonakase",
+  "南雲中瀬": "kumonakase",
+  "雲中瀬": "kumonakase",
+  "綾野": "tensho",
+  "照宮": "tensho",
+  "鷹田": "takada",
+  "鷹田団地前": "takada",
+  "佐日原": "takada"
  },
  "transfer": [
   "みつせ",
