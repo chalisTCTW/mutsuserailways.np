@@ -4986,5 +4986,6 @@ window.HK_I18N_DICT = {
 "通過古道第一踏切的20000形": ["古道第一踏切を通過する20000形", "20000 Series passing Furumichi No. 1 Level Crossing"],
 "古道第一踏切": ["古道第一踏切", "Furumichi No. 1 Level Crossing"],
 "回送中的20000形": ["回送中の20000形", "20000 Series running out of service"],
-"回送": ["回送", "Out of service"]
+"回送": ["回送", "Out of service"],
+"SEWA 論壇": ["SEWA 掲示板", "SEWA Forum"]
 };

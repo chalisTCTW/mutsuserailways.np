@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEWA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%229%22 fill=%22%231f78b8%22/%3E%3Cpath d=%22M7 20c3-6 6-6 9 0s6 6 9 0%22 stroke=%22%23fff%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE 輕鬆、像真的在滑的匿名論壇
+   IDEA 光瀨市民的匿名討論區 SEWA
+   PICTURE 文章列表本身＋點開的單篇與樓層留言
+   COLOUR 淡藍頂欄、白卡片、深藍強調
+   LAYOUT 左看板欄＋中間列表；手機改成橫向看板 */
+:root{color-scheme:light dark;--bg:light-dark(#eef6fc,#0e1720);--card:light-dark(#fff,#16222e);--ink:light-dark(#1d2a35,#e4edf4);--mut:light-dark(#6b7d8c,#93a6b6);--line:light-dark(#dce8f1,#243444);--top:light-dark(#a9daf7,#1c3a50);--pri:light-dark(#1f78b8,#7cc4f0);--chip:light-dark(#e2f1fb,#1c2f3f);--m:#3d8fd1;--mb:light-dark(#d4e9f9,#1f3a52);--f:#e07aa0;--fb:light-dark(#fbe2ec,#4a2636)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans TC",system-ui,sans-serif;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:5;background:var(--top);box-shadow:0 1px 0 var(--line)}
+.hb{max-width:1080px;margin:auto;display:flex;align-items:center;gap:14px;padding:10px 16px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:20px;letter-spacing:.02em}
+.logo svg{width:30px;height:30px}
+.logo small{font-size:12px;font-weight:500;color:var(--mut)}
+.srch{flex:1;max-width:420px;margin-left:auto;display:flex;align-items:center;gap:8px;background:light-dark(#ffffffcc,#0e1720aa);border-radius:999px;padding:8px 14px;font-size:14px;color:var(--mut)}
+.srch input{all:unset;flex:1;font-size:16px;color:var(--ink)}
+.wrap{max-width:1080px;margin:auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;padding:18px 16px 40px}
+nav.boards{position:sticky;top:70px;align-self:start;display:flex;flex-direction:column;gap:2px}
+.bd{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:15px;cursor:pointer;border:0;background:none;color:inherit;font-family:inherit;text-align:left;min-height:44px}
+.bd i{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;color:#fff;flex:none}
+.bd[aria-pressed=true]{background:var(--chip);color:var(--pri);font-weight:700}
+.bd:focus-visible,.post:focus-visible,.back:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+.list{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.tabs{display:flex;gap:18px;padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
+.tabs{align-items:center}.tabs button{all:unset;cursor:pointer;color:var(--mut);padding:6px 0;border-bottom:2px solid transparent;min-height:32px}
+.tabs button[aria-selected=true]{color:var(--pri);border-color:var(--pri);font-weight:700}.tabs button:focus-visible{outline:2px solid var(--pri)}
+.tabs .cnt{margin-left:auto;color:var(--mut);font-size:13px}
+.off{background:#104e37;color:#fff;border-radius:4px;padding:0 5px;font-size:12px;margin-left:4px}
+.oc{background:light-dark(#f1f8f4,#13261d);margin:0 -10px;padding-inline:10px;border-radius:8px}
+.r18{background:#b03a5b}.bd.ad{margin-top:8px;border-top:1px dashed var(--line);border-radius:0 0 10px 10px}
+.gate{position:fixed;inset:0;z-index:20;background:#0b141ccc;display:grid;place-items:center;padding:16px}.gate[hidden]{display:none}
+.gbox{background:var(--card);border-radius:16px;padding:24px;max-width:380px;box-shadow:0 10px 40px #0006}
+.gbox h2{margin:0 0 8px;font-size:20px}.gbox p{margin:0 0 18px;color:var(--mut);font-size:15px}
+.gbtn{display:flex;gap:10px;justify-content:flex-end}.gbtn button{font:inherit;font-size:15px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--ink);cursor:pointer}
+.gbtn #gy{background:#b03a5b;border-color:#b03a5b;color:#fff}
+.post{display:block;padding:16px 18px;border-bottom:1px solid var(--line);cursor:pointer}
+.post:hover{background:light-dark(#f6fbff,#1a2836)}
+.meta{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mut);flex-wrap:wrap}
+.av{width:22px;height:22px;border-radius:50%;flex:none;display:block}
+.post h3{margin:6px 0 4px;font-size:17px;line-height:1.4}
+.ex{margin:0;color:var(--mut);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.st{display:flex;gap:16px;margin-top:8px;font-size:13px;color:var(--mut)}
+.st span{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.hot{font-size:12px;color:#fff;background:#e8713c;border-radius:4px;padding:0 6px}
+.art{background:var(--card);border-radius:14px;border:1px solid var(--line);padding:20px 22px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--pri);font-size:15px;min-height:44px;cursor:pointer;background:none;border:0;font-family:inherit;padding:0}
+.art h1{font-size:clamp(22px,3.4vw,28px);line-height:1.3;margin:10px 0 6px;text-wrap:balance}
+.au{display:flex;align-items:center;gap:10px;margin-top:8px}
+.au .av{width:38px;height:38px}
+.au b{display:block;font-size:15px}
+.au small{color:var(--mut);font-size:13px}
+.body{white-space:pre-line;margin:16px 0 6px;font-size:16.5px;max-width:68ch}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.tags span{background:var(--chip);color:var(--pri);border-radius:999px;padding:2px 10px;font-size:13px}
+.cm{border-top:1px solid var(--line);padding:14px 0;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px}
+.cm .av{width:34px;height:34px}
+.cm .h{font-size:13px;color:var(--mut);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cm .h b{color:var(--ink);font-weight:500}
+.op{background:var(--pri);color:var(--card);border-radius:4px;padding:0 5px;font-size:12px}
+.cm p{margin:4px 0 0;white-space:pre-line}
+.cm .lk{font-size:13px;color:var(--mut);margin-top:4px}
+.sum{font-size:14px;color:var(--mut);margin:18px 0 4px}
+footer{max-width:1080px;margin:auto;padding:0 16px 30px;font-size:13px;color:var(--mut)}
+@media(max-width:760px){.bd.ad{margin-top:0;border-top:1px solid var(--line);border-radius:10px}.wrap{grid-template-columns:1fr;gap:12px;padding-top:12px}nav.boards{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}.bd{flex:none;background:var(--card);border:1px solid var(--line);padding:6px 12px 6px 8px}.srch{display:none}.art{padding:16px}}
+</style>
+</head>
+<body>
+<header><div class="hb">
+<a class="logo" href="#"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1f78b8"/><path d="M7 20c3-6 6-6 9 0s6 6 9 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="23" cy="10" r="3" fill="#a9daf7"/></svg>SEWA</a>
+<label class="srch"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2"/></svg><input id="q" placeholder="搜尋文章" aria-label="搜尋文章"></label>
+</div></header>
+<div class="wrap">
+<nav class="boards" id="boards" aria-label="看板"></nav>
+<main id="main"></main>
+</div>
+<div class="gate" id="gate" hidden><div class="gbox" role="dialog" aria-modal="true" aria-labelledby="gt"><h2 id="gt">此看板含成人內容</h2><p>「西斯」板的文章包含性與親密關係的討論，僅適合年滿 18 歲的讀者。</p><div class="gbtn"><button id="gn">離開</button><button id="gy">我已滿 18 歲</button></div></div></div>
+<footer>SEWA・看板、文章與留言皆為光瀨世界觀的虛構內容，不開放發文。　<a href="../index.html" style="color:var(--pri)">光瀨都市鉄道</a></footer>
+<script>
+{
+let B=[],P=[],cur='all',kw='',sort='hot',adult=false;
+try{adult=sessionStorage.getItem('sewa18')==='1'}catch(e){}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const av=g=>g==='o'?`<svg class="av" viewBox="0 0 40 40" aria-label="官方"><rect width="40" height="40" rx="20" fill="#104e37"/><path d="M9 25c4-8 7-8 11 0s7 8 11 0" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`:`<svg class="av" viewBox="0 0 40 40" aria-label="${g==='m'?'男':'女'}"><circle cx="20" cy="20" r="20" fill="var(--${g}b)"/><circle cx="20" cy="16" r="7" fill="var(--${g})"/><path d="M7 35c2-8 7-11 13-11s11 3 13 11" fill="var(--${g})"/></svg>`;
+const who=(g,at)=>g==='o'?`${esc(at)}<span class="off">官方</span>`:`${g==='m'?'男':'女'}・${esc(at)}`;
+const age=t=>t==='今天'?0:/小時前/.test(t)?parseInt(t)/24:t==='昨天'?1:/天前/.test(t)?parseInt(t):/週前/.test(t)?7*parseInt(t):99;
+const bn=id=>B.find(x=>x.id===id)||{n:''};
+const isA=p=>bn(p.b).adult;
+const boardsEl=document.getElementById('boards'),main=document.getElementById('main'),q=document.getElementById('q'),gate=document.getElementById('gate');
+function drawBoards(){boardsEl.innerHTML=B.map(b=>`<button class="bd${b.adult?' ad':''}" data-b="${b.id}" aria-pressed="${b.id===cur}"><i style="background:${b.c}">${b.k}</i>${b.n}</button>`).join('')}
+function drawList(){
+let ps=P.filter(p=>(cur==='all'?!isA(p)||adult:p.b===cur)&&(!kw||(p.ti+p.tx+p.tg.join('')).includes(kw)));
+ps=ps.slice().sort(sort==='hot'?(x,y)=>y.lk+y.c.length*40-(x.lk+x.c.length*40):(x,y)=>age(x.t)-age(y.t));
+main.innerHTML=`<div class="list"><div class="tabs" role="tablist"><button role="tab" aria-selected="${sort==='hot'}" data-s="hot">熱門</button><button role="tab" aria-selected="${sort==='new'}" data-s="new">最新</button><span class="cnt">${ps.length} 篇</span></div>${ps.length?ps.map(p=>`<a class="post" href="#p-${p.id}"><div class="meta">${av(p.g)}<span>${esc(bn(p.b).n)}</span>·<span>${who(p.g,p.at)}</span>·<span>${esc(p.t)}</span>${p.hot?'<span class="hot">熱門</span>':''}${isA(p)?'<span class="hot r18">18+</span>':''}</div><h3>${esc(p.ti)}</h3><p class="ex">${esc(p.tx)}</p><div class="st"><span>♥ ${p.lk}</span><span>留言 ${p.c.length}</span></div></a>`).join(''):'<p style="padding:18px;color:var(--mut)">沒有符合的文章。</p>'}</div>`}
+function drawPost(p){
+main.innerHTML=`<article class="art"><button class="back" id="back">← 回到列表</button><div class="meta" style="margin-top:6px"><span>${esc(bn(p.b).n)}</span>·<span>${esc(p.t)}</span></div><h1>${esc(p.ti)}</h1><div class="au">${av(p.g)}<div><b>${p.g==='m'?'男':'女'}・匿名</b><small>${esc(p.at)}</small></div></div><div class="body">${esc(p.tx)}</div><div class="tags">${p.tg.map(t=>`<span>#${esc(t)}</span>`).join('')}</div><div class="st"><span>♥ ${p.lk}</span><span>留言 ${p.c.length}</span></div><p class="sum">共 ${p.c.length} 則留言</p>${p.c.map((c,i)=>{const op=c[0]===p.g&&c[1]===p.at&&c[2].startsWith('原PO');const tx=op?c[2].replace(/^原PO：/,''):c[2];return `<div class="cm${c[0]==='o'?' oc':''}">${av(c[0])}<div><div class="h"><b>${who(c[0],c[1])}</b>${op?'<span class="op">原PO</span>':''}<span>B${i+1}</span></div><p>${esc(tx)}</p><div class="lk">♥ ${c[3]}</div></div></div>`}).join('')}</article>`;
+document.getElementById('back').addEventListener('click',()=>{history.replaceState(null,'',location.pathname);route()});window.scrollTo(0,0)}
+function route(){const m=/^#p-(\d+)$/.exec(location.hash);const p=m&&P.find(x=>x.id==m[1]);if(p&&isA(p)&&!adult){askGate(()=>drawPost(p),()=>{history.replaceState(null,'',location.pathname);drawList()});return}p?drawPost(p):drawList()}
+let gYes=null,gNo=null;
+function askGate(y,n){gYes=y;gNo=n;gate.hidden=false;document.getElementById('gy').focus()}
+document.getElementById('gy').addEventListener('click',()=>{adult=true;try{sessionStorage.setItem('sewa18','1')}catch(e){}gate.hidden=true;gYes&&gYes()});
+document.getElementById('gn').addEventListener('click',()=>{gate.hidden=true;gNo&&gNo()});
+boardsEl.addEventListener('click',e=>{const b=e.target.closest('.bd');if(!b)return;const go=()=>{cur=b.dataset.b;drawBoards();if(location.hash)history.replaceState(null,'',location.pathname);drawList()};bn(b.dataset.b).adult&&!adult?askGate(go,()=>{}):go()});
+main.addEventListener('click',e=>{const t=e.target.closest('[data-s]');if(!t)return;sort=t.dataset.s;drawList()});
+q.addEventListener('input',()=>{kw=q.value.trim();if(location.hash)history.replaceState(null,'',location.pathname);drawList()});
+window.addEventListener('hashchange',route);
+fetch('forum.json?v=1').then(r=>r.json()).then(d=>{B=d.B;P=d.P;drawBoards();route()}).catch(()=>{main.innerHTML='<p style="padding:18px">文章載入失敗，請重新整理。</p>'});
+}
+</script>
+</body>
+</html>

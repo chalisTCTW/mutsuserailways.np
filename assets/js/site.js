@@ -491,5 +491,6 @@
   })();
   /* 2.5.0：頁尾顯示入口網站版本，方便確認瀏覽器載入的是不是新檔案（診斷頁：check.html） */
   window.HK_PORTAL_VERSION = '2.6.1';
-  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.18.4'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
+  try { const n = document.querySelector('footer .nav'); if (n && !n.querySelector('.sewa')) { const a = document.createElement('a'); a.className = 'sewa'; a.href = 'sewa/'; a.textContent = 'SEWA 論壇'; n.appendChild(a); } } catch (e) { /* 不影響頁面 */ }
+  try { const c = document.querySelector('footer .copy'); if (c) { const v = document.createElement('span'); v.className = 'ver'; v.textContent = '　Portal v2.19.0'; c.appendChild(v); } } catch (e) { /* 不影響頁面 */ }
 })();
