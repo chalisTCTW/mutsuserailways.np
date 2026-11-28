@@ -320,6 +320,18 @@
     "ja": "十万浦郡鷹田市",
     "en": "Takada City, Jumanmura District"
    }
+  },
+  {
+   "id": "hatsumi",
+   "region": "tensho",
+   "zh": "初海市",
+   "ja": "初海市",
+   "en": "Hatsumi City",
+   "full": {
+    "zh": "初海市",
+    "ja": "初海市",
+    "en": "Hatsumi City"
+   }
   }
  ],
  "stations": {
@@ -419,7 +431,8 @@
   "照宮": "tensho",
   "鷹田": "takada",
   "鷹田団地前": "takada",
-  "佐日原": "takada"
+  "佐日原": "takada",
+  "千瀨初海": "hatsumi"
  },
  "transfer": [
   "みつせ",
