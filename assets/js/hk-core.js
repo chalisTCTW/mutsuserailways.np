@@ -290,14 +290,12 @@
     // 2.13.0：信號場（例：桂木信號場）不是旅客車站——遊戲裡列車可能在那裡停（待避），入口網站一律當作沒有這一站
     const hideRe = new RegExp(CFG.hideStationsRe || '信[號号]場$');
     const hideIds = new Set(net.stations.filter(st => hideRe.test(st.zh || '')).map(st => st.id));
-    /* 2.20.2：同名路線只是上行、下行停站不同（例：スーパーしらたか上行跳站）而沒被合併時，方向不重疊就照常用原名，不加（上行）／（下行）。 */
+    /* 2.20.2／2.20.5：同名路線因停站或起訖站不同（例：スーパーしらたか上行跳站、特快延伸到咲海研究學園都市）沒被合併時，照常用原名，不加（上行）／（下行）。高速鉄道維持原樣。 */
     {
       const byZh = new Map(); net.routes.forEach(r => { if (!byZh.has(r.zh)) byZh.set(r.zh, []); byZh.get(r.zh).push(r); });
       byZh.forEach(rs => {
-        if (rs.length < 2 || rs.some(r => r.status !== 'operating')) return;
-        const seen = new Set(); let ok = true;
-        rs.forEach(r => r.directions.forEach(d => { if (seen.has(d.label)) ok = false; seen.add(d.label); }));
-        if (ok) rs.forEach(r => { r.displayZh = r.zh; });
+        if (rs.length < 2 || rs.some(r => r.status !== 'operating') || /高速鉄道/.test(rs[0].zh)) return;
+        rs.forEach(r => { r.displayZh = r.zh; });
       });
     }
     const svcs = [];
